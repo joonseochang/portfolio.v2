@@ -618,8 +618,13 @@ export const ContactModalContent = ({ darkMode = false }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [showMore, setShowMore] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [activePanel, setActivePanel] = useState(null); // null | 'msg' | 'ext' | 'bot'
+  const composing = activePanel === 'msg';
+  const showMore = activePanel === 'ext';
+  const showQR = activePanel === 'bot';
+  const togglePanel = (panel) => { playClick(); setActivePanel(prev => prev === panel ? null : panel); };
+  const [message, setMessage] = useState('');
+  const [sendState, setSendState] = useState('idle'); // idle | sending | sent | error
   const { playClick } = useSounds();
 
   // Check if device is mobile/tablet
@@ -708,19 +713,29 @@ export const ContactModalContent = ({ darkMode = false }) => {
     },
   ];
 
-  const handleCopyAll = async () => {
-    playClick();
-    const text = [
-      'changjoonseo126@gmail.com',
-      'instagram.com/joonseochang',
-      'linkedin.com/in/joonseo-chang',
-      'twitter.com/joonseochang',
-    ].join('\n');
+  const linkCount = contactItems.length + (showMore ? extraItems.length : 0);
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent('https://joonseochang.com')}&bgcolor=fafafa&color=333333&margin=8`;
+
+  const handleSend = async () => {
+    if (!message.trim() || sendState === 'sending') return;
+    setSendState('sending');
     try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
+      const res = await fetch('/.netlify/functions/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message.trim() }),
+      });
+      if (!res.ok) throw new Error();
+      setSendState('sent');
+      setTimeout(() => {
+        setActivePanel(null);
+        setMessage('');
+        setSendState('idle');
+      }, 1500);
+    } catch {
+      setSendState('error');
+      setTimeout(() => setSendState('idle'), 2000);
+    }
   };
 
   // Render a contact row (shared between main + extra items)
@@ -789,36 +804,78 @@ export const ContactModalContent = ({ darkMode = false }) => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Inner card with contact rows - skeuomorphic white card */}
-      <div className="contact-modal-inner w-[280px] py-[15px] flex flex-col items-center gap-[10px]">
-        {contactItems.map((item, index) =>
-          renderContactRow(item, index < contactItems.length - 1 || showMore)
+      {/* Inner card - skeuomorphic white card */}
+      <div className="contact-modal-inner w-[280px]">
+
+        {/* Contact links view */}
+        {!composing && (
+          <div className="contact-view-anim pt-[15px] pb-[10px] flex flex-col items-center gap-[10px]">
+            {contactItems.map((item, index) =>
+              renderContactRow(item, index < contactItems.length - 1 || showMore)
+            )}
+            {showMore && extraItems.map((item, index) =>
+              renderContactRow(item, index < extraItems.length - 1)
+            )}
+          </div>
         )}
 
-        {/* Extra links — expand/collapse */}
-        {showMore && extraItems.map((item, index) =>
-          renderContactRow(item, index < extraItems.length - 1)
+        {/* Compose view */}
+        {composing && (
+          <div className="contact-view-anim py-[15px] px-[15px] flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-[2px]">
+              <span className="font-graphik text-[14px] font-medium text-[#1a1a1a]">Leave a message</span>
+              <span className="font-graphik text-[12px] text-[#b3b3b3]">I'll get back to you by email.</span>
+            </div>
+            <textarea
+              className="contact-compose-textarea font-graphik text-[14px] text-[#5b5b5e] h-[110px] rounded-[10px] p-[10px] resize-none outline-none w-full"
+              placeholder="Write something..."
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              maxLength={1000}
+              autoFocus
+            />
+            <button
+              className={`contact-send-btn w-full h-[34px] rounded-[10px] font-graphik text-[14px]${sendState === 'sent' ? ' sent' : sendState === 'error' ? ' error' : ''}`}
+              onClick={handleSend}
+              disabled={!message.trim() || sendState === 'sending' || sendState === 'sent'}
+            >
+              {sendState === 'sending' ? 'Sending...' : sendState === 'sent' ? 'Sent!' : sendState === 'error' ? 'Failed — try again' : 'Send'}
+            </button>
+          </div>
         )}
+
       </div>
 
       {/* TE-inspired control strip */}
-      <div className="te-strip flex items-center justify-center gap-[6px] py-[7px] px-[10px] w-full">
-        <button
-          className={`te-btn${showMore ? ' on' : ''}`}
-          onClick={() => { playClick(); setShowMore(!showMore); }}
-        >
-          <span className="te-led" />
-          <span className="te-btn-label">ext</span>
-        </button>
-        <button
-          className={`te-btn${copied ? ' on' : ''}`}
-          onClick={handleCopyAll}
-        >
-          <span className="te-led" />
-          <span className="te-btn-label">{copied ? 'ok!' : 'cpy'}</span>
-        </button>
-        <div className="te-badge">
-          <span className="te-badge-label">te-04</span>
+      <div className="te-strip flex items-center justify-end pt-[8px] pb-[9px] px-[14px] w-full" style={{ position: 'relative' }}>
+        {/* QR popover */}
+        {showQR && (
+          <div className="te-qr-popover">
+            <img src={qrUrl} width={120} height={120} alt="QR code" />
+          </div>
+        )}
+        <div className="flex items-center gap-[5px]">
+          <button
+            className={`te-btn${composing ? ' on' : ''}`}
+            onClick={() => togglePanel('msg')}
+          >
+            <span className="te-led" />
+            <span className="te-btn-label">msg</span>
+          </button>
+          <button
+            className={`te-btn${showMore ? ' on' : ''}`}
+            onClick={() => togglePanel('ext')}
+          >
+            <span className="te-led" />
+            <span className="te-btn-label">ext</span>
+          </button>
+          <button
+            className={`te-btn${showQR ? ' on' : ''}`}
+            onClick={() => togglePanel('bot')}
+          >
+            <span className="te-led" />
+            <span className="te-btn-label">bot</span>
+          </button>
         </div>
       </div>
     </div>

@@ -57,7 +57,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
     { label: 'Favorite director', value: 'Hirokazu Koreeda' },
     { label: 'Sports I watch', value: 'ATP, WTA, LCK, PL' },
     { label: 'K-Drama pick', value: 'Reply 1988' },
-    { label: 'K-Music pick', value: 'A Call from My Dream' },
+    { label: 'K-Music pick', value: 'Last Night Story' },
     { label: 'Motivational anthem', value: "Fuckin' in the Bushes" },
     { label: 'Learning', value: 'Japanese' },
     { label: 'Military unit', value: '12th Infantry Division' },
@@ -359,7 +359,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
 
           {/* Text content - 337px wide centered in 385px */}
           <div className="flex flex-col gap-[5px] w-[337px] leading-[25px] text-[14px]">
-            <p className={`${firstReveal ? 'about-reveal' : ''} font-graphik font-medium text-black`} style={firstReveal ? { '--reveal-i': 4 } : undefined}>
+            <p className={`${firstReveal ? 'about-reveal' : ''} font-graphik font-medium text-[#333333]`} style={firstReveal ? { '--reveal-i': 4 } : undefined}>
               I've had a nomadic upbringing.
             </p>
             <div className="flex flex-col gap-[10px] font-graphik text-[#5b5b5e]">
