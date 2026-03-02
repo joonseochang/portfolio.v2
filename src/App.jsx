@@ -296,6 +296,7 @@ function App() {
   }, []);
   const [isCommitExpanded, setIsCommitExpanded] = useState(false);
   const faceHoverTimeoutRef = useRef(null);
+  const faceEnterTimeoutRef = useRef(null);
   const faceZoneRef = useRef(null);
   const faceIconRef = useRef(null);
 
@@ -629,6 +630,7 @@ function App() {
   const videoFrameRef = useRef(null);
   const isTransitioningRef = useRef(false);
   const modalTimeoutRef = useRef(null);
+  const musicEnterTimeoutRef = useRef(null);
   const shortcutsModalTimeoutRef = useRef(null);
   const shortcutsButtonRef = useRef(null);
   
@@ -2335,10 +2337,19 @@ function App() {
                   clearTimeout(faceHoverTimeoutRef.current);
                   faceHoverTimeoutRef.current = null;
                 }
-                setIsFaceHoverExiting(false);
-                setIsHomeButtonHovered(true);
+                if (faceEnterTimeoutRef.current) {
+                  clearTimeout(faceEnterTimeoutRef.current);
+                }
+                faceEnterTimeoutRef.current = setTimeout(() => {
+                  setIsFaceHoverExiting(false);
+                  setIsHomeButtonHovered(true);
+                }, 40);
               }}
               onMouseLeave={() => {
+                if (faceEnterTimeoutRef.current) {
+                  clearTimeout(faceEnterTimeoutRef.current);
+                  faceEnterTimeoutRef.current = null;
+                }
                 setIsFaceHoverExiting(true);
                 faceHoverTimeoutRef.current = setTimeout(() => {
                   setIsHomeButtonHovered(false);
@@ -3037,11 +3048,20 @@ function App() {
                   clearTimeout(modalTimeoutRef.current);
                   modalTimeoutRef.current = null;
                 }
-                setIsModalExiting(false);
-                setIsMusicHovered(true);
+                if (musicEnterTimeoutRef.current) {
+                  clearTimeout(musicEnterTimeoutRef.current);
+                }
+                musicEnterTimeoutRef.current = setTimeout(() => {
+                  setIsModalExiting(false);
+                  setIsMusicHovered(true);
+                }, 40);
                 // playPreview(); // Disabled for now
               }}
               onMouseLeave={() => {
+                if (musicEnterTimeoutRef.current) {
+                  clearTimeout(musicEnterTimeoutRef.current);
+                  musicEnterTimeoutRef.current = null;
+                }
                 stopPreview();
                 setIsModalExiting(true);
                 modalTimeoutRef.current = setTimeout(() => {
