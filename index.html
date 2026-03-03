@@ -40,6 +40,12 @@
     <!-- Preload hint for fonts (Vite will inject actual preloads) -->
     <!-- Font loading optimized via font-display: swap in CSS -->
 
+    <!-- Google Fonts: async load to avoid render-blocking -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap"></noscript>
+
     <!-- DNS Prefetch and Preconnect for external resources -->
     <link rel="dns-prefetch" href="https://joonseo-videos.b-cdn.net">
     <link rel="preconnect" href="https://joonseo-videos.b-cdn.net" crossorigin>

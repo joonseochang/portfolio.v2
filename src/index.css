@@ -1,5 +1,4 @@
-/* Google Fonts for Korean text */
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=Noto+Serif+KR:wght@400&display=swap');
+/* Google Fonts loaded async in index.html — no render-blocking @import here */
 
 @tailwind base;
 @tailwind components;
@@ -1982,6 +1981,7 @@ background-color: #E8F6FF;
 .contact-scrollable {
   max-height: 410px;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
