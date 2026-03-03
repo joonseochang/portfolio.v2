@@ -13,7 +13,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const carouselWrapRef = useRef(null)
   const carouselState = useRef({
     position: 0,
-    targetSpeed: 0.3,   // cruising speed: ~18px/s
+    targetSpeed: 0.6,   // cruising speed: ~36px/s
     dragging: false,
     dragStartX: 0,
     dragStartPos: 0,
@@ -174,7 +174,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
       cs.position = -(cs.halfWidth - 110)
     }
 
-    const rampDuration = 2500 // ms to reach full speed on first open
+    const rampDuration = 1500 // ms to reach full speed on first open
 
     const tick = (now) => {
       if (!cs.running) return
@@ -190,10 +190,10 @@ const AboutPanel = ({ isOpen, onClose }) => {
       if (!cs.hasRamped) {
         const elapsed = now - cs.loopStartTime
         if (elapsed < rampDuration) {
-          // Ease-out cubic ramp: starts at 40% speed, accelerates to 100%
+          // Ease-out ramp: starts at 60% speed, accelerates to 100%
           const t = elapsed / rampDuration
           const eased = 1 - Math.pow(1 - t, 2)
-          speed = cs.targetSpeed * (0.4 + 0.6 * eased)
+          speed = cs.targetSpeed * (0.6 + 0.4 * eased)
         } else {
           cs.hasRamped = true
         }
