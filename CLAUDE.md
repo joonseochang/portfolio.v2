@@ -208,15 +208,49 @@ Location derives from `clock_location` in `cms-data/website-copy.json` → never
 
 ---
 
-## Multi-Session Conflict Prevention
+## Multi-Agent Conflict Prevention
 
-**Hot files** (coordinate before editing): `src/App.jsx`, `src/index.css`, `src/components/SlideUpModal.jsx`
+Multiple Claude agents may work in parallel on different features. Follow this protocol strictly to avoid conflicts.
 
-- Check `git status` at session start
-- Use feature branches for 3+ file changes
-- Commit incrementally
-- Prefer new files over editing shared files
-- Run `npm run build` before commit
+### Hot Files — Never edit these without coordination
+| File | Why it's hot |
+|------|-------------|
+| `src/App.jsx` | All state, routing, modal logic — high merge conflict risk |
+| `src/index.css` | Global CSS — class collisions silently break things |
+| `src/components/SlideUpModal.jsx` | Shared modal shell used by every modal |
+
+### Session Start Checklist (MANDATORY)
+1. `git pull origin main` — sync to latest before doing anything
+2. `git status` — verify clean working tree; if dirty, stash or commit first
+3. Identify which hot files your task needs to touch
+4. If another agent may be touching the same hot file, scope work to **new files only** until you can merge
+
+### Branch Strategy
+| Scope | Branch needed? |
+|-------|---------------|
+| Single new file (new hook, new component) | No — commit directly to `main` |
+| 2+ hot file edits | Yes — use `feat/<short-name>` |
+| Conflicting with known parallel work | Yes — always branch |
+
+```bash
+git checkout -b feat/my-feature
+# ... work ...
+git checkout main && git pull && git merge feat/my-feature
+```
+
+### Conflict-Safe Patterns
+- **Prefer new files** over editing hot files. New hook → `src/hooks/useXxx.js`. New component → `src/components/Xxx.jsx`. Import into `App.jsx` in a single, small diff.
+- **Isolate CSS** — add new component styles in a scoped class block at the bottom of `index.css`, never inline into existing blocks.
+- **Never reformat** hot files. Only change lines you need to change. Reformatting creates false conflicts.
+- **Atomic commits** — one logical change per commit. Easier to cherry-pick and revert.
+
+### Pre-Deploy Gate
+Before every commit to `main`:
+```bash
+npm run build   # must succeed with zero errors
+git diff main   # review your changes one final time
+```
+If build fails, fix before committing — never commit a broken build.
 
 ---
 
