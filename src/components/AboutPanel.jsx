@@ -167,26 +167,33 @@ const AboutPanel = ({ isOpen, onClose }) => {
     // Measure half-width for seamless wrapping
     cs.halfWidth = track.scrollWidth / 2
     cs.running = true
+    cs.lastTickTime = null
     if (!cs.hasRamped) {
       cs.loopStartTime = performance.now()
       // Start 110px to the right so "Current age" opens more centered
       cs.position = -(cs.halfWidth - 110)
     }
 
-    const rampDuration = 5000 // ms to reach full speed on first open
+    const rampDuration = 2500 // ms to reach full speed on first open
 
     const tick = (now) => {
       if (!cs.running) return
       const h = cs.halfWidth
+
+      // Delta time — normalized to 60fps so speed is frame-rate independent
+      const dt = cs.lastTickTime ? Math.min(now - cs.lastTickTime, 50) : 16.667
+      cs.lastTickTime = now
+      const dtScale = dt / 16.667
 
       // Calculate current auto-scroll speed with ramp
       let speed = cs.targetSpeed
       if (!cs.hasRamped) {
         const elapsed = now - cs.loopStartTime
         if (elapsed < rampDuration) {
-          // Start at 15% speed, linearly blend to 100% — no inflection, no stutter
+          // Ease-out cubic ramp: starts at 40% speed, accelerates to 100%
           const t = elapsed / rampDuration
-          speed = cs.targetSpeed * (0.15 + 0.85 * t)
+          const eased = 1 - Math.pow(1 - t, 2)
+          speed = cs.targetSpeed * (0.4 + 0.6 * eased)
         } else {
           cs.hasRamped = true
         }
@@ -195,11 +202,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
       if (!cs.dragging) {
         if (Math.abs(cs.velocity) > 0.3) {
           // Momentum coast from flick
-          cs.velocity *= 0.975
-          cs.position += cs.velocity
+          cs.velocity *= Math.pow(0.975, dtScale)
+          cs.position += cs.velocity * dtScale
         } else {
           cs.velocity = 0
-          cs.position -= speed
+          cs.position -= speed * dtScale
         }
       }
 
