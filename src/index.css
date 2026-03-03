@@ -433,7 +433,7 @@ background-color: #E8F6FF;
   .home-time-component { order: 1; margin: 0 auto 15px; }
   .home-heading { order: 2; text-align: center; margin-bottom: 20px; }
   .home-video-frame { order: 3; margin-top: 0 !important; max-width: 100% !important; }
-  .home-bio { order: 4; text-align: left; margin-top: 28px; padding: 0 8px; width: 100%; }
+  .home-bio { order: 4; text-align: center; margin-top: 28px; padding: 0 8px; width: 100%; }
 
   /* Vertical padding — more top space so clock clears nav bar comfortably */
   main.page-enter {

@@ -463,7 +463,7 @@ export const MusicModalContent = ({ currentTrack }) => {
 
       {/* Last.fm link */}
       <a
-        href="https://www.last.fm/user/joonzambia123"
+        href="https://www.last.fm/user/joonzambia"
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-center gap-2 mt-4 pt-3 border-t border-black/[0.04] font-graphik text-[12px] text-[#999] hover:text-[#666] transition-colors"
