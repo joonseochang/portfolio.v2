@@ -175,7 +175,8 @@
       "iso": "400",
       "alt": "Kumamoto, Japan",
       "fileSize": "",
-      "noExposureBoost": true
+      "noExposureBoost": true,
+      "objectPosition": "50% 100%"
     },
     {
       "id": 6,
@@ -233,7 +234,8 @@
       "iso": "400",
       "alt": "Lotte World, Korea",
       "fileSize": "",
-      "noExposureBoost": true
+      "noExposureBoost": true,
+      "objectPosition": "50% 100%"
     },
     {
       "id": 2,

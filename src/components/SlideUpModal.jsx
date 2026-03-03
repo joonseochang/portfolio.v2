@@ -789,7 +789,6 @@ export const ShortcutsModalContent = ({ isMac, onAction }) => {
     { icon: PaletteIcons.resume, label: 'View resume', action: () => handleAction('viewResume') },
     { icon: PaletteIcons.expand, label: 'Enter theater mode', action: () => handleAction('enterTheaterMode') },
     { icon: PaletteIcons.calendar, label: 'Book a call (30 mins)', href: '#' },
-    { icon: PaletteIcons.compass, label: 'What is Joon up to now?', action: () => handleAction('navigate', '/now') },
   ];
 
   const miscItems = [
