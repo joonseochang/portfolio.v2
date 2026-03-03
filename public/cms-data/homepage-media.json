@@ -163,6 +163,21 @@
       "noExposureBoost": true
     },
     {
+      "id": 24,
+      "type": "video",
+      "src": "https://joonseo-videos.b-cdn.net/premium/Kumamoto2_Premium.mp4",
+      "location": "Kumamoto, Japan",
+      "coordinates": "32.8032\u00b0N, 130.7079\u00b0E",
+      "coordinatesUrl": "https://www.google.com/maps?q=32.8032,130.7079",
+      "camera": "Sony FX3 \u00b7 Sigma 24-70",
+      "aperture": "\u01922.8",
+      "shutter": "1/60s",
+      "iso": "400",
+      "alt": "Kumamoto, Japan",
+      "fileSize": "",
+      "noExposureBoost": true
+    },
+    {
       "id": 6,
       "type": "video",
       "src": "https://joonseo-videos.b-cdn.net/premium/Fukuoka_Premium.mp4",

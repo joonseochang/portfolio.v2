@@ -202,6 +202,126 @@ const TwitterIcon = ({ hovered }) => (
   </motion.svg>
 );
 
+// Letterboxd: Film frame flicker
+const LetterboxdIcon = ({ hovered }) => (
+  <motion.svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    style={{ overflow: 'visible' }}
+  >
+    {/* Three overlapping circles - the Letterboxd logo */}
+    <motion.circle
+      cx="5" cy="12" r="5"
+      fill={hovered ? "#FF8000" : "#a3a3a3"}
+      style={{ transition: 'fill 300ms ease' }}
+      animate={hovered ? { cx: [5, 3.5, 5], opacity: [0.85, 1, 0.85] } : { cx: 5, opacity: 0.85 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+    />
+    <motion.circle
+      cx="12" cy="12" r="5"
+      fill={hovered ? "#00E054" : "#a3a3a3"}
+      opacity={0.7}
+      animate={hovered ? { scale: [1, 1.1, 1], opacity: [0.7, 0.9, 0.7] } : { scale: 1, opacity: 0.7 }}
+      transition={{ duration: 0.5, ease: "easeInOut", delay: 0.05 }}
+    />
+    <motion.circle
+      cx="19" cy="12" r="5"
+      fill={hovered ? "#40BCF4" : "#a3a3a3"}
+      style={{ transition: 'fill 300ms ease' }}
+      animate={hovered ? { cx: [19, 20.5, 19], opacity: [0.85, 1, 0.85] } : { cx: 19, opacity: 0.85 }}
+      transition={{ duration: 0.5, ease: "easeInOut", delay: 0.1 }}
+    />
+  </motion.svg>
+);
+
+// GitHub: Octocat tentacle wiggle
+const GitHubIcon = ({ hovered }) => (
+  <motion.svg
+    width="19"
+    height="19"
+    viewBox="0 0 24 24"
+    fill={hovered ? "#6b7280" : "#a3a3a3"}
+    style={{ transition: 'fill 300ms ease' }}
+    animate={hovered ? {
+      rotate: [0, -6, 5, -3, 2, 0],
+      y: [0, -1, 0.5, -0.3, 0]
+    } : { rotate: 0, y: 0 }}
+    transition={{
+      duration: 0.55,
+      ease: [0.36, 0.07, 0.19, 0.97]
+    }}
+  >
+    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+  </motion.svg>
+);
+
+// Chess.com: Official pawn logo with bounce
+const ChessIcon = ({ hovered }) => (
+  <motion.svg
+    width="17"
+    height="17"
+    viewBox="0 0 24 24"
+    fill={hovered ? "#81B64C" : "#a3a3a3"}
+    style={{ transition: 'fill 300ms ease' }}
+  >
+    <motion.path
+      d="M12 0a3.85 3.85 0 0 0-3.875 3.846A3.84 3.84 0 0 0 9.73 6.969l-2.79 1.85c0 .622.144 1.114.434 1.649H9.83c-.014.245-.014.549-.014.925 0 .025.003.048.006.071-.064 1.353-.507 3.472-3.62 5.842-.816.625-1.423 1.495-1.806 2.533a.33.33 0 0 0-.045.084 8.124 8.124 0 0 0-.39 2.516c0 .1.216 1.561 8.038 1.561s8.038-1.46 8.038-1.561c0-2.227-.824-4.048-2.24-5.133-4.034-3.08-3.586-5.74-3.644-6.838h2.458c.29-.535.434-1.027.434-1.649l-2.79-1.836a3.86 3.86 0 0 0 1.604-3.123A3.873 3.873 0 0 0 13.445.275c-.004-.002-.01.004-.015.004A3.76 3.76 0 0 0 12 0Z"
+      animate={hovered ? {
+        y: [0, -2.5, 0, -1, 0],
+      } : { y: 0 }}
+      transition={{
+        duration: 0.5,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
+    />
+  </motion.svg>
+);
+
+// Hinge: Stylized H lettermark with tilt
+const HingeIcon = ({ hovered }) => (
+  <motion.svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill={hovered ? "#6b7280" : "#a3a3a3"}
+    style={{ transition: 'fill 300ms ease' }}
+    animate={hovered ? {
+      rotate: [0, -8, 6, -3, 0],
+      scale: [1, 1.08, 1.05, 1]
+    } : { rotate: 0, scale: 1 }}
+    transition={{
+      duration: 0.5,
+      ease: [0.36, 0.07, 0.19, 0.97]
+    }}
+  >
+    {/* Stylized H - Hinge lettermark */}
+    <path d="M4 2h3.5v8.5H16.5V2H20v20h-3.5v-8.5H7.5V22H4V2z"/>
+  </motion.svg>
+);
+
+// Spotify: Sound wave pulse
+const SpotifyIcon = ({ hovered }) => (
+  <motion.svg
+    width="19"
+    height="19"
+    viewBox="0 0 24 24"
+    fill={hovered ? "#1DB954" : "#a3a3a3"}
+    style={{ transition: 'fill 300ms ease' }}
+    animate={hovered ? {
+      scale: [1, 1.1, 1.05, 1],
+      rotate: [0, -5, 3, 0]
+    } : { scale: 1, rotate: 0 }}
+    transition={{
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94]
+    }}
+  >
+    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.622.622 0 0 1-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 0 1-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 0 1 .207.857zm1.224-2.719a.78.78 0 0 1-1.072.257c-2.687-1.652-6.785-2.131-9.965-1.166a.78.78 0 0 1-.452-1.493c3.632-1.102 8.147-.568 11.234 1.329a.78.78 0 0 1 .255 1.073zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71a.934.934 0 1 1-.542-1.79c3.533-1.072 9.404-.865 13.115 1.338a.934.934 0 0 1-1.955 1.611z"/>
+  </motion.svg>
+);
+
 const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, children }) => {
   const popoverRef = useRef(null);
   const positionRef = useRef(0);
@@ -526,15 +646,20 @@ export const ActivityModalContent = () => (
 );
 
 // Shortcut row sub-component
-const ShortcutRow = ({ icon, label, keys, isMac, onClick, href }) => {
+const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href }) => {
   const content = (
-    <div className="shortcut-row-inner w-full flex items-center gap-[10px] px-[10px] py-[5px]">
+    <div className={`shortcut-row-inner w-full flex items-center gap-[10px] px-[10px] ${subtitle ? 'py-[7px]' : 'py-[5px]'}`}>
       <div className="shortcut-icon-box w-[30px] h-[28px] flex items-center justify-center rounded-[6px] flex-shrink-0">
         {icon}
       </div>
-      <span className="font-graphik text-[14px] text-[#5B5B5E] flex-1">{label}</span>
+      <div className="flex-1 min-w-0">
+        <span className="font-graphik text-[14px] text-[#5B5B5E] block truncate">{label}</span>
+        {subtitle && (
+          <span className="block font-graphik text-[12px] text-[#999] mt-[1px] truncate">{subtitle}</span>
+        )}
+      </div>
       {keys && (
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-shrink-0">
           {keys.map((key, j) => (
             <kbd
               key={j}
@@ -562,61 +687,87 @@ const ShortcutRow = ({ icon, label, keys, isMac, onClick, href }) => {
   );
 };
 
-// Palette section icons — 16x16, stroke #a3a3a3, strokeWidth 1.5, strokeLinecap round
+// Palette section icons — 16x16, viewBox 0 0 24 24, stroke #a3a3a3, strokeWidth 1.5, strokeLinecap round
 const PaletteIcons = {
-  home: (
+  // Open book — Read latest writing
+  book: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
-      <path d="M9 21V12h6v9"/>
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
     </svg>
   ),
-  person: (
+  // List with checks — Visit changelog
+  changelog: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="8" r="4"/>
-      <path d="M5 21v-1a7 7 0 0 1 14 0v1"/>
+      <path d="M4 7l2 2 4-4"/>
+      <path d="M4 15l2 2 4-4"/>
+      <path d="M14 8h6"/>
+      <path d="M14 16h6"/>
     </svg>
   ),
-  panel: (
+  // Document with folded corner — View resume
+  resume: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2"/>
-      <path d="M9 3v18"/>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="9" y1="13" x2="15" y2="13"/>
+      <line x1="9" y1="17" x2="13" y2="17"/>
     </svg>
   ),
-  clipboard: (
+  // Expand arrows — Theater mode
+  expand: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="8" y="2" width="8" height="4" rx="1"/>
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+      <polyline points="15 3 21 3 21 9"/>
+      <polyline points="9 21 3 21 3 15"/>
+      <line x1="21" y1="3" x2="14" y2="10"/>
+      <line x1="3" y1="21" x2="10" y2="14"/>
     </svg>
   ),
-  arrows: (
+  // Calendar with clock — Book a call
+  calendar: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M7 16L3 12l4-4"/>
-      <path d="M17 8l4 4-4 4"/>
-      <path d="M3 12h18"/>
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+      <circle cx="15" cy="16" r="3"/>
+      <path d="M15 15v1.5l1 .5"/>
     </svg>
   ),
-  darkMode: (
+  // Compass — What is Joon up to
+  compass: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      <circle cx="12" cy="12" r="10"/>
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="none"/>
     </svg>
   ),
-  code: (
+  // Download arrow — Time capsule
+  download: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="16 18 22 12 16 6"/>
-      <polyline points="8 6 2 12 8 18"/>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
     </svg>
   ),
-  link: (
+  // Speaker — Pronounce name
+  speaker: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
     </svg>
   ),
-  camera: (
+  // Paper airplane — Send a Wuphf
+  paperPlane: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="5"/>
-      <circle cx="12" cy="12" r="4"/>
-      <circle cx="17.5" cy="6.5" r="1.5" fill="#a3a3a3" stroke="none"/>
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2" fill="none"/>
+    </svg>
+  ),
+  // Pen writing — Sign guestbook
+  pen: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>
     </svg>
   ),
 };
@@ -630,21 +781,22 @@ export const ShortcutsModalContent = ({ isMac, onAction }) => {
   };
 
   const navigationItems = [
-    { icon: PaletteIcons.home, label: 'Home', action: () => handleAction('navigate', '/') },
-    { icon: PaletteIcons.person, label: 'About', action: () => handleAction('navigate', '/about') },
-    { icon: PaletteIcons.panel, label: 'Open about panel', keys: isMac ? ['⌘', 'J'] : ['Ctrl', 'J'], action: () => handleAction('openAboutPanel') },
+    { icon: PaletteIcons.book, label: 'Read latest writing', subtitle: 'Notes on disappearing (03.03.25)', href: '#' },
+    { icon: PaletteIcons.changelog, label: 'Visit changelog', subtitle: 'v2.3 — Modal redesign', href: '#' },
   ];
 
   const actionItems = [
-    { icon: PaletteIcons.clipboard, label: 'Copy email', action: () => handleAction('copyEmail') },
-    { icon: PaletteIcons.darkMode, label: 'Toggle dark mode', keys: isMac ? ['⌘', 'D'] : ['Ctrl', 'D'], action: () => handleAction('toggleDarkMode') },
-    { icon: PaletteIcons.arrows, label: 'Navigate videos', keys: ['←', '→'] },
+    { icon: PaletteIcons.resume, label: 'View resume', action: () => handleAction('viewResume') },
+    { icon: PaletteIcons.expand, label: 'Enter theater mode', action: () => handleAction('enterTheaterMode') },
+    { icon: PaletteIcons.calendar, label: 'Book a call (30 mins)', href: '#' },
+    { icon: PaletteIcons.compass, label: 'What is Joon up to now?', action: () => handleAction('navigate', '/now') },
   ];
 
-  const linkItems = [
-    { icon: PaletteIcons.code, label: 'GitHub', href: 'https://github.com/joonseochang' },
-    { icon: PaletteIcons.link, label: 'LinkedIn', href: 'https://linkedin.com/in/joonseo-chang' },
-    { icon: PaletteIcons.camera, label: 'Instagram', href: 'https://instagram.com/joonseochang' },
+  const miscItems = [
+    { icon: PaletteIcons.download, label: 'Download time capsule', action: () => handleAction('downloadTimeCapsule') },
+    { icon: PaletteIcons.speaker, label: 'How to pronounce my name', action: () => handleAction('pronounceName') },
+    { icon: PaletteIcons.paperPlane, label: 'Send a Wuphf', action: () => handleAction('sendWuphf') },
+    { icon: PaletteIcons.pen, label: 'Sign guestbook', action: () => handleAction('signGuestbook') },
   ];
 
   const renderSection = (label, items, isLast) => (
@@ -657,6 +809,7 @@ export const ShortcutsModalContent = ({ isMac, onAction }) => {
           key={`${label}-${i}`}
           icon={item.icon}
           label={item.label}
+          subtitle={item.subtitle}
           keys={item.keys}
           isMac={isMac}
           onClick={item.action}
@@ -672,11 +825,11 @@ export const ShortcutsModalContent = ({ isMac, onAction }) => {
   return (
     <div className="flex flex-col items-center">
       {/* Inner white card */}
-      <div className="shortcuts-palette-inner w-[340px]">
+      <div className="shortcuts-palette-inner w-[355px]">
         <div className="pt-[14px] pb-[10px] flex flex-col">
           {renderSection('Navigation', navigationItems, false)}
           {renderSection('Actions', actionItems, false)}
-          {renderSection('Links', linkItems, true)}
+          {renderSection('Miscellaneous', miscItems, true)}
         </div>
       </div>
 
@@ -782,34 +935,39 @@ export const ContactModalContent = ({ darkMode = false }) => {
 
   const extraItems = [
     {
+      id: 'letterboxd',
+      title: 'Letterboxd',
+      description: '/joonseochang',
+      Icon: LetterboxdIcon,
+      href: 'https://letterboxd.com/joonseochang',
+    },
+    {
       id: 'github',
       title: 'GitHub',
       description: '@joonseochang',
+      Icon: GitHubIcon,
       href: 'https://github.com/joonseochang',
     },
     {
-      id: 'readcv',
-      title: 'Read.cv',
-      description: '/joonseochang',
-      href: 'https://read.cv/joonseochang',
+      id: 'chess',
+      title: 'Chess',
+      description: 'chess.com',
+      Icon: ChessIcon,
+      href: 'https://chess.com/member/joonseochang',
     },
     {
-      id: 'dribbble',
-      title: 'Dribbble',
-      description: '@joonseochang',
-      href: 'https://dribbble.com/joonseochang',
+      id: 'hinge',
+      title: 'Hinge',
+      description: 'Designed to be deleted',
+      Icon: HingeIcon,
+      href: 'https://www.airbnb.com/users/profile/1495771288037820635',
     },
     {
-      id: 'threads',
-      title: 'Threads',
+      id: 'spotify',
+      title: 'Spotify',
       description: '@joonseochang',
-      href: 'https://threads.net/@joonseochang',
-    },
-    {
-      id: 'youtube',
-      title: 'YouTube',
-      description: '@joonseochang',
-      href: 'https://youtube.com/@joonseochang',
+      Icon: SpotifyIcon,
+      href: 'https://open.spotify.com/user/joonseochang',
     },
   ];
 
