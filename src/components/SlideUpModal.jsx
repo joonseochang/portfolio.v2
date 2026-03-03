@@ -203,56 +203,70 @@ const TwitterIcon = ({ hovered }) => (
 );
 
 const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, children }) => {
-  const [position, setPosition] = useState({ left: 0 });
   const popoverRef = useRef(null);
+  const positionRef = useRef(0);
+  const positionDivRef = useRef(null);
   const isMobile = useMediaQuery('(max-width: 813px)');
+  const prevTypeRef = useRef(null);
+  const switchedTypesRef = useRef(new Set());
 
-  // Calculate position based on anchor button
+  const isContactModal = type === 'contact';
+  const isShortcutsModal = type === 'shortcuts';
+
+  // Track which modal types were reached via switching (not fresh open)
+  // so we can suppress their content-level CSS entry animations
+  if (isOpen && prevTypeRef.current !== null && prevTypeRef.current !== type) {
+    switchedTypesRef.current.add(type);
+  }
+  if (!isOpen) {
+    switchedTypesRef.current.clear();
+  }
+  prevTypeRef.current = isOpen ? type : null;
+
+  const wasSwitchedTo = switchedTypesRef.current.has(type);
+
+  // Calculate position synchronously — read from anchor ref during render
+  if (isOpen && anchorRef?.current) {
+    const rect = anchorRef.current.getBoundingClientRect();
+    positionRef.current = rect.left + rect.width / 2;
+  }
+
+  // Keep position updated on resize
   useEffect(() => {
-    const updatePosition = () => {
-      if (isOpen && anchorRef?.current) {
+    if (!isOpen) return;
+    const onResize = () => {
+      if (anchorRef?.current && positionDivRef.current) {
         const rect = anchorRef.current.getBoundingClientRect();
-        const buttonCenterX = rect.left + rect.width / 2;
-        setPosition({ left: buttonCenterX });
+        positionDivRef.current.style.left = (rect.left + rect.width / 2) + 'px';
       }
     };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [isOpen, anchorRef]);
 
-    updatePosition();
-
-    // Update position on window resize
-    window.addEventListener('resize', updatePosition);
-    return () => window.removeEventListener('resize', updatePosition);
-  }, [isOpen, anchorRef, type]);
+  // Update position div immediately when anchor changes (for switching modals)
+  useEffect(() => {
+    if (isOpen && anchorRef?.current && positionDivRef.current && !isMobile) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      positionDivRef.current.style.left = (rect.left + rect.width / 2) + 'px';
+    }
+  }, [isOpen, anchorRef, type, isMobile]);
 
   // Click outside to close
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (e) => {
-      // Don't close if clicking inside the modal
-      if (popoverRef.current?.contains(e.target)) {
-        return;
-      }
+      if (popoverRef.current?.contains(e.target)) return;
+      if (anchorRef?.current?.contains(e.target)) return;
 
-      // Don't close if clicking on the anchor button (toggling is handled by button's onClick)
-      if (anchorRef?.current?.contains(e.target)) {
-        return;
-      }
-
-      // For contact modal, close on any other outside click
-      if (type === 'contact') {
-        onClose();
-        return;
-      }
-
-      // For other modals, don't close if clicking on bottom pill
+      // Don't close if clicking on bottom pill — button handlers manage modal switching
       const bottomPill = e.target.closest('.bottom-pill-container');
-      if (!bottomPill) {
-        onClose();
-      }
+      if (bottomPill) return;
+
+      onClose();
     };
 
-    // Use a small delay to avoid immediate close when opening
     const timer = setTimeout(() => {
       document.addEventListener('click', handleClickOutside, true);
     }, 0);
@@ -263,163 +277,87 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
     };
   }, [isOpen, onClose, type, anchorRef]);
 
-  // Get modal title based on type
   const getTitle = () => {
     switch (type) {
       case 'music': return 'Now Playing';
       case 'activity': return 'Activity';
-      case 'shortcuts': return 'Keyboard Shortcuts';
       case 'contact': return 'Get in Touch';
       default: return '';
     }
   };
 
-  // Contact modal has a different design (no header)
-  const isContactModal = type === 'contact';
-
-  // Mobile: Same slide-up popover as desktop, but anchored to pill center
-  if (isMobile) {
+  // Content wrapper based on modal type
+  const renderContent = () => {
+    if (isContactModal) {
+      return (
+        <div className="contact-modal-outer rounded-[18px] flex justify-center">
+          {children}
+        </div>
+      );
+    }
+    if (isShortcutsModal) {
+      return (
+        <div className="shortcuts-palette-outer flex justify-center">
+          {children}
+        </div>
+      );
+    }
+    // Default modal with header
     return (
-      <AnimatePresence mode="wait">
-        {isOpen && (
-          <motion.div
-            ref={popoverRef}
-            key={type}
-            className="fixed z-[200]"
-            style={{
-              bottom: 'calc(24px + 64px + 10px)',
-              left: '50%',
-              x: '-50%',
-              maxWidth: 'calc(100vw - 32px)'
-            }}
-            initial={isContactModal
-              ? { opacity: 0, y: 24 }
-              : { opacity: 0, y: 32, filter: 'blur(2px)' }
-            }
-            animate={isContactModal
-              ? { opacity: 1, y: 0 }
-              : { opacity: 1, y: 0, filter: 'blur(0px)' }
-            }
-            exit={isContactModal
-              ? { opacity: 0, y: 16 }
-              : { opacity: 0, y: 20, filter: 'blur(2px)' }
-            }
-            transition={isContactModal
-              ? {
-                  type: 'spring',
-                  stiffness: 400,
-                  damping: 35,
-                  mass: 0.8
-                }
-              : {
-                  type: 'tween',
-                  duration: 0.25,
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }
-            }
-          >
-            {isContactModal ? (
-              <div className="contact-modal-outer rounded-[18px] flex justify-center">
-                {children}
-              </div>
-            ) : (
-              <div className="bg-white rounded-[16px] shadow-[0_8px_40px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden border border-black/[0.04]">
-                <div className="px-5 pt-4 pb-3 border-b border-black/[0.06]">
-                  <div className="flex items-center justify-between gap-8">
-                    <h2 className="font-graphik text-[15px] font-medium text-[#1a1a1a]">
-                      {getTitle()}
-                    </h2>
-                    <button
-                      onClick={onClose}
-                      className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/[0.04] transition-colors"
-                    >
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M9 3L3 9M3 3L9 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div className="p-5 overflow-y-auto" style={{ maxHeight: 'calc(70vh - 60px)' }}>
-                  {children}
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="bg-white rounded-[16px] shadow-[0_8px_40px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden border border-black/[0.04]">
+        <div className="px-5 pt-4 pb-3 border-b border-black/[0.06]">
+          <div className="flex items-center justify-between gap-8">
+            <h2 className="font-graphik text-[15px] font-medium text-[#1a1a1a]">
+              {getTitle()}
+            </h2>
+            <button
+              onClick={onClose}
+              className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/[0.04] transition-colors"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div className={`p-5${isMobile ? ' overflow-y-auto' : ''}`} style={isMobile ? { maxHeight: 'calc(70vh - 60px)' } : undefined}>
+          {children}
+        </div>
+      </div>
     );
-  }
+  };
 
-  // Desktop: Original popover positioned above bottom pill
+  const bottomOffset = isMobile ? 'calc(24px + 64px + 10px)' : 'calc(50px + 64px + 10px)';
+
+  // Separate positioning (plain div, instant) from animation (motion.div, spring)
+  // This prevents Framer Motion from animating position changes when switching modals
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {isOpen && (
         <motion.div
-          ref={popoverRef}
-          key={type}
-          className="fixed z-[200]"
-          style={{
-            bottom: 'calc(50px + 64px + 10px)',
-            left: position.left,
-            x: '-50%'
+          key="modal-container"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
+          transition={{
+            type: 'spring',
+            stiffness: 400,
+            damping: 35,
+            mass: 0.8,
           }}
-          initial={isContactModal
-            ? { opacity: 0, y: 24 }
-            : { opacity: 0, y: 32, filter: 'blur(2px)' }
-          }
-          animate={isContactModal
-            ? { opacity: 1, y: 0 }
-            : { opacity: 1, y: 0, filter: 'blur(0px)' }
-          }
-          exit={isContactModal
-            ? { opacity: 0, y: 16 }
-            : { opacity: 0, y: 20, filter: 'blur(2px)' }
-          }
-          transition={isContactModal
-            ? {
-                type: 'spring',
-                stiffness: 400,
-                damping: 35,
-                mass: 0.8
-              }
-            : {
-                type: 'tween',
-                duration: 0.25,
-                ease: [0.25, 0.46, 0.45, 0.94]
-              }
-          }
+          style={{ position: 'fixed', zIndex: 200, bottom: bottomOffset, left: 0, right: 0, pointerEvents: 'none' }}
         >
-          {isContactModal ? (
-            // Contact modal - skeuomorphic design
-            <div className="contact-modal-outer rounded-[18px] flex justify-center">
-              {children}
+          <div
+            ref={(el) => { popoverRef.current = el; positionDivRef.current = el; }}
+            style={isMobile
+              ? { position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', maxWidth: 'calc(100vw - 32px)', pointerEvents: 'auto' }
+              : { position: 'absolute', bottom: 0, left: positionRef.current, transform: 'translateX(-50%)', pointerEvents: 'auto' }
+            }
+          >
+            <div className={wasSwitchedTo ? 'modal-switched' : undefined}>
+              {renderContent()}
             </div>
-          ) : (
-            // Default modal with header
-            <div className="bg-white rounded-[16px] shadow-[0_8px_40px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden border border-black/[0.04]">
-              {/* Header */}
-              <div className="px-5 pt-4 pb-3 border-b border-black/[0.06]">
-                <div className="flex items-center justify-between gap-8">
-                  <h2 className="font-graphik text-[15px] font-medium text-[#1a1a1a]">
-                    {getTitle()}
-                  </h2>
-                  <button
-                    onClick={onClose}
-                    className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/[0.04] transition-colors"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M9 3L3 9M3 3L9 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-5">
-                {children}
-              </div>
-            </div>
-          )}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -587,32 +525,168 @@ export const ActivityModalContent = () => (
   </div>
 );
 
-export const ShortcutsModalContent = ({ isMac }) => (
-  <div className="w-[300px] space-y-2">
-    {[
-      { keys: isMac ? ['⌘', 'K'] : ['Ctrl', 'K'], action: 'Quick actions' },
-      { keys: isMac ? ['⌘', '/'] : ['Ctrl', '/'], action: 'Search' },
-      { keys: ['←', '→'], action: 'Navigate videos' },
-      { keys: ['Space'], action: 'Play/Pause music' },
-      { keys: ['Esc'], action: 'Close modal' },
-      { keys: isMac ? ['⌘', 'D'] : ['Ctrl', 'D'], action: 'Toggle dark mode' },
-    ].map((shortcut, i) => (
-      <div key={i} className="flex items-center justify-between py-2 px-1">
-        <span className="font-graphik text-[13px] text-[#666]">{shortcut.action}</span>
+// Shortcut row sub-component
+const ShortcutRow = ({ icon, label, keys, isMac, onClick, href }) => {
+  const content = (
+    <div className="shortcut-row-inner w-full flex items-center gap-[10px] px-[10px] py-[5px]">
+      <div className="shortcut-icon-box w-[30px] h-[28px] flex items-center justify-center rounded-[6px] flex-shrink-0">
+        {icon}
+      </div>
+      <span className="font-graphik text-[14px] text-[#5B5B5E] flex-1">{label}</span>
+      {keys && (
         <div className="flex gap-1">
-          {shortcut.keys.map((key, j) => (
+          {keys.map((key, j) => (
             <kbd
               key={j}
-              className="min-w-[24px] h-6 px-1.5 rounded-[5px] bg-[#f0f0f0] border border-[#ddd] border-b-2 font-graphik text-[11px] text-[#555] flex items-center justify-center"
+              className="min-w-[22px] h-[20px] px-[5px] rounded-[5px] bg-[#f0f0f0] border border-[#ddd] border-b-[1.5px] font-graphik text-[11px] text-[#888] flex items-center justify-center"
             >
               {key}
             </kbd>
           ))}
         </div>
+      )}
+    </div>
+  );
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="shortcut-row">
+        {content}
+      </a>
+    );
+  }
+  return (
+    <button onClick={onClick} className="shortcut-row w-full text-left">
+      {content}
+    </button>
+  );
+};
+
+// Palette section icons — 16x16, stroke #a3a3a3, strokeWidth 1.5, strokeLinecap round
+const PaletteIcons = {
+  home: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+      <path d="M9 21V12h6v9"/>
+    </svg>
+  ),
+  person: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M5 21v-1a7 7 0 0 1 14 0v1"/>
+    </svg>
+  ),
+  panel: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <path d="M9 3v18"/>
+    </svg>
+  ),
+  clipboard: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="8" y="2" width="8" height="4" rx="1"/>
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+    </svg>
+  ),
+  arrows: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 16L3 12l4-4"/>
+      <path d="M17 8l4 4-4 4"/>
+      <path d="M3 12h18"/>
+    </svg>
+  ),
+  darkMode: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  ),
+  code: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="16 18 22 12 16 6"/>
+      <polyline points="8 6 2 12 8 18"/>
+    </svg>
+  ),
+  link: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </svg>
+  ),
+  camera: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="1.5" fill="#a3a3a3" stroke="none"/>
+    </svg>
+  ),
+};
+
+export const ShortcutsModalContent = ({ isMac, onAction }) => {
+  const { playClick } = useSounds();
+
+  const handleAction = (action, payload) => {
+    playClick();
+    if (onAction) onAction(action, payload);
+  };
+
+  const navigationItems = [
+    { icon: PaletteIcons.home, label: 'Home', action: () => handleAction('navigate', '/') },
+    { icon: PaletteIcons.person, label: 'About', action: () => handleAction('navigate', '/about') },
+    { icon: PaletteIcons.panel, label: 'Open about panel', keys: isMac ? ['⌘', 'J'] : ['Ctrl', 'J'], action: () => handleAction('openAboutPanel') },
+  ];
+
+  const actionItems = [
+    { icon: PaletteIcons.clipboard, label: 'Copy email', action: () => handleAction('copyEmail') },
+    { icon: PaletteIcons.darkMode, label: 'Toggle dark mode', keys: isMac ? ['⌘', 'D'] : ['Ctrl', 'D'], action: () => handleAction('toggleDarkMode') },
+    { icon: PaletteIcons.arrows, label: 'Navigate videos', keys: ['←', '→'] },
+  ];
+
+  const linkItems = [
+    { icon: PaletteIcons.code, label: 'GitHub', href: 'https://github.com/joonseochang' },
+    { icon: PaletteIcons.link, label: 'LinkedIn', href: 'https://linkedin.com/in/joonseo-chang' },
+    { icon: PaletteIcons.camera, label: 'Instagram', href: 'https://instagram.com/joonseochang' },
+  ];
+
+  const renderSection = (label, items, isLast) => (
+    <>
+      <div className="px-[14px] pb-[6px]">
+        <span className="section-label">{label}</span>
       </div>
-    ))}
-  </div>
-);
+      {items.map((item, i) => (
+        <ShortcutRow
+          key={`${label}-${i}`}
+          icon={item.icon}
+          label={item.label}
+          keys={item.keys}
+          isMac={isMac}
+          onClick={item.action}
+          href={item.href}
+        />
+      ))}
+      {!isLast && (
+        <div className="w-full border-t border-dashed border-[#EBEEF5] my-[8px]" />
+      )}
+    </>
+  );
+
+  return (
+    <div className="flex flex-col items-center">
+      {/* Inner white card */}
+      <div className="shortcuts-palette-inner w-[340px]">
+        <div className="pt-[14px] pb-[10px] flex flex-col">
+          {renderSection('Navigation', navigationItems, false)}
+          {renderSection('Actions', actionItems, false)}
+          {renderSection('Links', linkItems, true)}
+        </div>
+      </div>
+
+      {/* Footer keyboard hints */}
+      <div className="shortcuts-palette-footer">
+        <span>esc close</span>
+      </div>
+    </div>
+  );
+};
 
 export const ContactModalContent = ({ darkMode = false }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -622,10 +696,18 @@ export const ContactModalContent = ({ darkMode = false }) => {
   const composing = activePanel === 'msg';
   const showMore = activePanel === 'ext';
   const showQR = activePanel === 'bot';
-  const togglePanel = (panel) => { playClick(); setActivePanel(prev => prev === panel ? null : panel); };
+  const togglePanel = (panel) => { playClick(); setScrolledToBottom(false); setActivePanel(prev => prev === panel ? null : panel); };
   const [message, setMessage] = useState('');
   const [sendState, setSendState] = useState('idle'); // idle | sending | sent | error
+  const [scrolledToBottom, setScrolledToBottom] = useState(false);
+  const scrollRef = useRef(null);
   const { playClick } = useSounds();
+
+  // Track scroll position to hide fade when at bottom
+  const handleContactScroll = (e) => {
+    const el = e.target;
+    setScrolledToBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 5);
+  };
 
   // Check if device is mobile/tablet
   const isMobileOrTablet = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -710,6 +792,24 @@ export const ContactModalContent = ({ darkMode = false }) => {
       title: 'Read.cv',
       description: '/joonseochang',
       href: 'https://read.cv/joonseochang',
+    },
+    {
+      id: 'dribbble',
+      title: 'Dribbble',
+      description: '@joonseochang',
+      href: 'https://dribbble.com/joonseochang',
+    },
+    {
+      id: 'threads',
+      title: 'Threads',
+      description: '@joonseochang',
+      href: 'https://threads.net/@joonseochang',
+    },
+    {
+      id: 'youtube',
+      title: 'YouTube',
+      description: '@joonseochang',
+      href: 'https://youtube.com/@joonseochang',
     },
   ];
 
@@ -809,13 +909,20 @@ export const ContactModalContent = ({ darkMode = false }) => {
 
         {/* Contact links view */}
         {!composing && (
-          <div className="contact-view-anim pt-[15px] pb-[10px] flex flex-col items-center gap-[10px]">
-            {contactItems.map((item, index) =>
-              renderContactRow(item, index < contactItems.length - 1 || showMore)
-            )}
-            {showMore && extraItems.map((item, index) =>
-              renderContactRow(item, index < extraItems.length - 1)
-            )}
+          <div className="contact-scroll-wrapper" style={{ position: 'relative' }}>
+            <div
+              ref={showMore ? scrollRef : undefined}
+              onScroll={showMore ? handleContactScroll : undefined}
+              className={`contact-view-anim pt-[15px] pb-[10px] flex flex-col items-center gap-[10px]${showMore ? ' contact-scrollable' : ''}`}
+            >
+              {contactItems.map((item, index) =>
+                renderContactRow(item, index < contactItems.length - 1 || showMore)
+              )}
+              {showMore && extraItems.map((item, index) =>
+                renderContactRow(item, index < extraItems.length - 1)
+              )}
+            </div>
+            {showMore && !scrolledToBottom && <div className="contact-scroll-fade" />}
           </div>
         )}
 

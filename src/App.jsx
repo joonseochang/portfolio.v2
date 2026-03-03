@@ -1018,29 +1018,17 @@ function App() {
         return;
       }
 
-      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
+      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux) — toggle shortcuts palette
       if ((e.metaKey || e.ctrlKey) && e.code === 'KeyK') {
         e.preventDefault();
 
-        // If modal is open, close it and show shortcuts
-        if (activeModal) {
+        if (activeModal === 'shortcuts') {
           setActiveModal(null);
+          setActiveAnchorRef(null);
+        } else {
+          setActiveModal('shortcuts');
+          setActiveAnchorRef(shortcutsButtonRef);
         }
-
-        // Show active state animation
-        setIsShortcutsActive(true);
-
-        // Also show the hover state briefly
-        setIsShortcutsHovered(true);
-
-        setTimeout(() => {
-          setIsShortcutsActive(false);
-          setIsShortcutsModalExiting(true);
-          setTimeout(() => {
-            setIsShortcutsHovered(false);
-            setIsShortcutsModalExiting(false);
-          }, 200);
-        }, 300);
       }
     };
 
@@ -3142,7 +3130,7 @@ function App() {
           {/* Right side - Buttons */}
           <div className={`pill-buttons-section h-[64px] flex items-center px-[12px] py-[14px] relative flex-shrink-0 ${isTabletOrBelow ? 'w-auto' : 'w-[292px]'}`}>
             {/* ⌘K indicator - desktop only */}
-            {!isTabletOrBelow && (isShortcutsHovered || isShortcutsModalExiting) && (
+            {!isTabletOrBelow && activeModal !== 'shortcuts' && (isShortcutsHovered || isShortcutsModalExiting) && (
               <div
                 className={`shortcuts-modal absolute z-[100] ${isShortcutsModalExiting ? 'exiting' : ''}`}
                 onAnimationEnd={() => {
@@ -3195,7 +3183,16 @@ function App() {
                   setIsShortcutsModalExiting(false);
                   setIsShortcutsHovered(true);
                 }}
-                onClick={() => { playClick(); setActiveModal('shortcuts'); }}
+                onClick={() => {
+                  playClick();
+                  if (activeModal === 'shortcuts') {
+                    setActiveModal(null);
+                    setActiveAnchorRef(null);
+                  } else {
+                    setActiveModal('shortcuts');
+                    setActiveAnchorRef(shortcutsButtonRef);
+                  }
+                }}
                 onMouseLeave={() => {
                   setIsShortcutsModalExiting(true);
                   shortcutsModalTimeoutRef.current = setTimeout(() => {
@@ -3252,7 +3249,34 @@ function App() {
           <Suspense fallback={<div className="p-4 text-center text-gray-400" role="status" aria-live="polite">Loading...</div>}>
             {activeModal === 'music' && <MusicModalContent currentTrack={currentTrack} />}
             {activeModal === 'activity' && <ActivityModalContent />}
-            {activeModal === 'shortcuts' && <ShortcutsModalContent isMac={isMac} />}
+            {activeModal === 'shortcuts' && (
+              <ShortcutsModalContent
+                isMac={isMac}
+                onAction={(action, payload) => {
+                  switch (action) {
+                    case 'navigate':
+                      setActiveModal(null);
+                      // Scroll to top for home navigation
+                      if (payload === '/') window.scrollTo({ top: 0, behavior: 'smooth' });
+                      break;
+                    case 'openAboutPanel':
+                      setActiveModal(null);
+                      setIsAboutPanelOpen(true);
+                      break;
+                    case 'copyEmail':
+                      navigator.clipboard.writeText('changjoonseo126@gmail.com').catch(() => {});
+                      setActiveModal(null);
+                      break;
+                    case 'toggleDarkMode':
+                      setActiveModal(null);
+                      break;
+                    case 'close':
+                      setActiveModal(null);
+                      break;
+                  }
+                }}
+              />
+            )}
             {activeModal === 'contact' && <ContactModalContent />}
           </Suspense>
         </SlideUpModal>

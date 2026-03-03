@@ -1878,7 +1878,7 @@ background-color: #E8F6FF;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 /* TE-inspired control strip */
@@ -1976,6 +1976,30 @@ background-color: #E8F6FF;
 
 .contact-view-anim {
   animation: contact-view-in 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Scrollable contact list when EXT is active */
+.contact-scrollable {
+  max-height: 410px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.contact-scrollable::-webkit-scrollbar {
+  display: none;
+}
+
+/* Bottom fade hint for scrollable contact list */
+.contact-scroll-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 50%, #ffffff 100%);
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 0 0 14px 14px;
 }
 
 /* Composer textarea */
@@ -2196,6 +2220,195 @@ background-color: #E8F6FF;
     inset 0 0 1px rgba(0, 0, 0, 0.04);
   border-color: #DCDFE6;
 }
+
+
+/* ========================================
+   Shortcuts Command Palette
+   ======================================== */
+
+/* Outer grey container (mirrors contact-modal-outer) */
+.shortcuts-palette-outer {
+  background: linear-gradient(180deg, #fafafa 0%, #f5f5f6 100%);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(235, 238, 245, 0.9);
+  border-radius: 18px;
+  position: relative;
+  overflow: visible;
+}
+
+/* Inner white card (mirrors contact-modal-inner) */
+.shortcuts-palette-inner {
+  background: linear-gradient(180deg, #ffffff 0%, #fcfcfc 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(235, 238, 245, 0.85);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  position: relative;
+  overflow: visible;
+}
+
+/* Section labels */
+.shortcuts-palette-inner .section-label {
+  font-family: 'Graphik', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b3b3b3;
+  line-height: 1;
+}
+
+/* Shortcut icon box — smaller version of contact-icon-box */
+.shortcut-icon-box {
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+  border: 1px solid #EBEEF5;
+  position: relative;
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.shortcut-icon-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+  border-radius: 5px 5px 0 0;
+  pointer-events: none;
+}
+
+/* Shortcut row — anti-flicker two-layer pattern */
+.shortcut-row {
+  background: transparent;
+  border: none;
+  position: relative;
+  user-select: none;
+  overflow: visible;
+  outline: none;
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.shortcut-row-inner {
+  position: relative;
+  transition: transform 200ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  border-radius: 10px;
+  will-change: transform;
+}
+
+/* Hover background box — ::after pseudo like contact-row-inner */
+.shortcut-row-inner::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 4px;
+  right: 4px;
+  bottom: -1px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  pointer-events: none;
+  transition: background 200ms cubic-bezier(0.34, 1.2, 0.64, 1),
+              box-shadow 200ms cubic-bezier(0.34, 1.2, 0.64, 1),
+              border-color 200ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: -1;
+}
+
+.shortcut-row:hover .shortcut-row-inner {
+  transform: translateY(-0.5px);
+}
+
+.shortcut-row:hover .shortcut-row-inner::after {
+  background: linear-gradient(180deg, #fafafa 0%, #f7f7f8 100%);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(220, 224, 235, 0.9);
+}
+
+.shortcut-row:active .shortcut-row-inner {
+  transform: translateY(0) scale(0.995);
+  transition: all 70ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shortcut-row:active .shortcut-row-inner::after {
+  background: linear-gradient(180deg, #f3f3f5 0%, #f7f7f8 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    inset 0 0.5px 1px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(210, 214, 225, 0.9);
+}
+
+/* Icon box hover/active states */
+.shortcut-row:hover .shortcut-icon-box {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  border-color: #E0E3EA;
+}
+
+.shortcut-row:active .shortcut-icon-box {
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.06),
+    inset 0 0 1px rgba(0, 0, 0, 0.04);
+  border-color: #DCDFE6;
+}
+
+/* Icon color transition on hover */
+.shortcut-icon-box svg {
+  transition: stroke 200ms ease, fill 200ms ease;
+}
+.shortcut-row:hover .shortcut-icon-box svg {
+  stroke: #6b7280;
+}
+
+/* Footer keyboard hints */
+.shortcuts-palette-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px 10px;
+  font-family: 'Graphik', sans-serif;
+  font-size: 11px;
+  color: #b3b3b3;
+  user-select: none;
+}
+
+.shortcuts-palette-footer .footer-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #d0d0d0;
+  flex-shrink: 0;
+}
+
+/* Suppress content-level CSS entry animations when switching between modal types.
+   The outer spring handles the initial open; switching should be instant. */
+.modal-switched .contact-view-anim,
+.modal-switched .contact-scroll-wrapper {
+  animation: none !important;
+}
+
 
 /* Coordinates link expanded hitbox */
 .coord-link {
