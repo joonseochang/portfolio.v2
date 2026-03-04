@@ -47,7 +47,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const facts = [
     { label: 'Current age', value: decimalAge },
     { label: 'School', value: 'Yonsei University' },
-    { label: 'Favorite song', value: 'Dream Lover - Faye Wong' },
+    { label: 'Favorite song', value: '夢中人 - Faye Wong' },
     { label: 'Can speak', value: '4 languages' },
     { label: 'Favorite author', value: 'Kazuo Ishiguro' },
     { label: 'Favorite movie', value: 'Cinema Paradiso' },
