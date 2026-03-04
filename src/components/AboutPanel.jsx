@@ -11,7 +11,14 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const [imageColorized, setImageColorized] = useState(false)
   const carouselRef = useRef(null)
   const carouselWrapRef = useRef(null)
-  const carouselAnimRef = useRef({ started: false })
+  const carouselState = useRef({
+    halfWidth: 0,
+    speed: 30,          // px/s — same on every browser/frame-rate
+    openTime: null,     // performance.now() when panel last opened
+    openPosition: null, // position (px, negative) at last open; null = first open
+    running: false,
+    frame: null,
+  })
   const [decimalAge, setDecimalAge] = useState('')
 
   useEffect(() => {
@@ -88,36 +95,54 @@ const AboutPanel = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
-  // CSS-driven carousel — compositor-threaded, smooth at any frame rate on any browser
+  // Time-based carousel — position is a pure function of elapsed wall-clock time.
+  // Identical speed on every browser and frame rate; no per-frame accumulation or jitter.
   useEffect(() => {
     const track = carouselRef.current
     if (!track) return
+    const cs = carouselState.current
 
     if (!isOpen) {
-      track.style.animationPlayState = 'paused'
+      // Save current visual position so resuming is seamless
+      if (cs.running && cs.openTime !== null) {
+        const elapsed = (performance.now() - cs.openTime) * cs.speed / 1000
+        let pos = (cs.openPosition - elapsed) % cs.halfWidth
+        if (pos > 0) pos -= cs.halfWidth
+        cs.openPosition = pos
+      }
+      cs.running = false
+      cancelAnimationFrame(cs.frame)
       return
     }
 
-    // Wait one frame for DOM to be laid out before measuring
-    const frame = requestAnimationFrame(() => {
-      const halfWidth = track.scrollWidth / 2
-      if (!halfWidth) return
+    const setupFrame = requestAnimationFrame(() => {
+      cs.halfWidth = track.scrollWidth / 2
+      if (!cs.halfWidth) return
 
-      const speed = 30 // px/s
-      const duration = halfWidth / speed // seconds
+      if (cs.openPosition === null) {
+        // First open: position so "Current age" is centered
+        cs.openPosition = -(cs.halfWidth - 110)
+      }
+      cs.openTime = performance.now()
+      cs.running = true
 
-      if (!carouselAnimRef.current.started) {
-        // First open: offset so "Current age" opens more centered
-        const startOffset = halfWidth - 110
-        track.style.animationDelay = `${-(startOffset / speed)}s`
-        carouselAnimRef.current.started = true
+      const tick = (now) => {
+        if (!cs.running) return
+        const elapsed = (now - cs.openTime) * cs.speed / 1000
+        let pos = (cs.openPosition - elapsed) % cs.halfWidth
+        if (pos > 0) pos -= cs.halfWidth
+        track.style.transform = `translate3d(${pos}px, 0, 0)`
+        cs.frame = requestAnimationFrame(tick)
       }
 
-      track.style.animationDuration = `${duration}s`
-      track.style.animationPlayState = 'running'
+      cs.frame = requestAnimationFrame(tick)
     })
 
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      cs.running = false
+      cancelAnimationFrame(cs.frame)
+      cancelAnimationFrame(setupFrame)
+    }
   }, [isOpen])
 
   // Reset image color state when panel closes

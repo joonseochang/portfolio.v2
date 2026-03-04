@@ -3058,14 +3058,8 @@ background-color: #E8F6FF;
 .fact-carousel-track {
   display: inline-flex;
   will-change: transform;
-  animation: carousel-scroll linear infinite;
-  animation-play-state: paused;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@keyframes carousel-scroll {
-  to { transform: translateX(-50%); }
 }
 
 /* Video loading shimmer - subtle sweep animation */
