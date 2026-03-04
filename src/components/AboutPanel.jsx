@@ -57,7 +57,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
     { label: 'Favorite show', value: 'Mad Men' },
     { label: 'LoL rank', value: 'Platinum (KR)' },
     { label: 'Favorite artist', value: 'The Strokes' },
-    { label: 'Favorite dish to make', value: 'Doenjang-jjigae' },
+    { label: 'Favorite dish to make', value: 'Doenjang-jjigae (된장찌개)' },
     { label: 'Favorite sports', value: 'Taekwondo, Table tennis' },
     { label: 'Favorite book', value: 'The Fellowship of the Ring' },
     { label: 'Currently watching', value: 'AKOTSK, Frieren, The Pitt' },
