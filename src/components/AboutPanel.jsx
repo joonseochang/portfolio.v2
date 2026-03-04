@@ -11,21 +11,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const [imageColorized, setImageColorized] = useState(false)
   const carouselRef = useRef(null)
   const carouselWrapRef = useRef(null)
-  const carouselState = useRef({
-    position: 0,
-    targetSpeed: 0.6,   // cruising speed: ~36px/s
-    dragging: false,
-    dragStartX: 0,
-    dragStartPos: 0,
-    velocity: 0,
-    lastX: 0,
-    lastTime: 0,
-    frame: null,
-    running: false,
-    halfWidth: 0,
-    loopStartTime: 0,
-    hasRamped: false,
-  })
+  const carouselAnimRef = useRef({ started: false })
   const [decimalAge, setDecimalAge] = useState('')
 
   useEffect(() => {
@@ -83,11 +69,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
   // Mark text reveal as done after first open completes
   useEffect(() => {
     if (isOpen && !hasRevealedRef.current) {
-      // Last element (index 7) finishes at: 500ms delay + 7*30ms stagger + 1100ms animation ≈ 1810ms
+      // Last element (index 7) finishes at: 700ms delay + 7*100ms stagger + 1400ms animation = 2800ms
       const timer = setTimeout(() => {
         hasRevealedRef.current = true
         setFirstReveal(false)
-      }, 1900)
+      }, 2900)
       return () => clearTimeout(timer)
     }
   }, [isOpen])
@@ -95,136 +81,43 @@ const AboutPanel = ({ isOpen, onClose }) => {
   // Delay flowers until panel has settled; reset immediately on close
   useEffect(() => {
     if (isOpen) {
-      const timer = setTimeout(() => setShowFlowers(true), 1900)
+      const timer = setTimeout(() => setShowFlowers(true), 2900)
       return () => clearTimeout(timer)
     } else {
       setShowFlowers(false)
     }
   }, [isOpen])
 
-  // JS-driven carousel: auto-scroll + drag + flick momentum
-  useEffect(() => {
-    const wrap = carouselWrapRef.current
-    const track = carouselRef.current
-    if (!wrap || !track) return
-    const cs = carouselState.current
-
-    const onMouseDown = (e) => {
-      e.preventDefault()
-      cs.dragging = true
-      cs.dragStartX = e.clientX
-      cs.dragStartPos = cs.position
-      cs.velocity = 0
-      cs.lastX = e.clientX
-      cs.lastTime = performance.now()
-      wrap.style.cursor = 'grabbing'
-    }
-
-    const onMouseMove = (e) => {
-      if (!cs.dragging) return
-      const now = performance.now()
-      const dt = now - cs.lastTime
-      const dx = e.clientX - cs.lastX
-      if (dt > 0) {
-        // Weighted average for smoother velocity tracking
-        const instantVel = dx / dt * 10
-        cs.velocity = cs.velocity * 0.4 + instantVel * 0.6
-      }
-      cs.lastX = e.clientX
-      cs.lastTime = now
-      cs.position = cs.dragStartPos + (e.clientX - cs.dragStartX)
-    }
-
-    const onMouseUp = () => {
-      if (!cs.dragging) return
-      cs.dragging = false
-      wrap.style.cursor = ''
-    }
-
-    wrap.addEventListener('mousedown', onMouseDown)
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('mouseup', onMouseUp)
-
-    return () => {
-      wrap.removeEventListener('mousedown', onMouseDown)
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
-    }
-  }, [])
-
-  // Animation loop — runs when panel is open
+  // CSS-driven carousel — compositor-threaded, smooth at any frame rate on any browser
   useEffect(() => {
     const track = carouselRef.current
     if (!track) return
-    const cs = carouselState.current
 
     if (!isOpen) {
-      cs.running = false
-      cancelAnimationFrame(cs.frame)
+      track.style.animationPlayState = 'paused'
       return
     }
 
-    // Measure half-width for seamless wrapping
-    cs.halfWidth = track.scrollWidth / 2
-    cs.running = true
-    cs.lastTickTime = null
-    if (!cs.hasRamped) {
-      cs.loopStartTime = performance.now()
-      // Start 110px to the right so "Current age" opens more centered
-      cs.position = -(cs.halfWidth - 110)
-    }
+    // Wait one frame for DOM to be laid out before measuring
+    const frame = requestAnimationFrame(() => {
+      const halfWidth = track.scrollWidth / 2
+      if (!halfWidth) return
 
-    const rampDuration = 1500 // ms to reach full speed on first open
+      const speed = 30 // px/s
+      const duration = halfWidth / speed // seconds
 
-    const tick = (now) => {
-      if (!cs.running) return
-      const h = cs.halfWidth
-
-      // Delta time — normalized to 60fps so speed is frame-rate independent
-      const dt = cs.lastTickTime ? Math.min(now - cs.lastTickTime, 50) : 16.667
-      cs.lastTickTime = now
-      const dtScale = dt / 16.667
-
-      // Calculate current auto-scroll speed with ramp
-      let speed = cs.targetSpeed
-      if (!cs.hasRamped) {
-        const elapsed = now - cs.loopStartTime
-        if (elapsed < rampDuration) {
-          // Ease-out ramp: starts at 60% speed, accelerates to 100%
-          const t = elapsed / rampDuration
-          const eased = 1 - Math.pow(1 - t, 2)
-          speed = cs.targetSpeed * (0.6 + 0.4 * eased)
-        } else {
-          cs.hasRamped = true
-        }
+      if (!carouselAnimRef.current.started) {
+        // First open: offset so "Current age" opens more centered
+        const startOffset = halfWidth - 110
+        track.style.animationDelay = `${-(startOffset / speed)}s`
+        carouselAnimRef.current.started = true
       }
 
-      if (!cs.dragging) {
-        if (Math.abs(cs.velocity) > 0.3) {
-          // Momentum coast from flick
-          cs.velocity *= Math.pow(0.975, dtScale)
-          cs.position += cs.velocity * dtScale
-        } else {
-          cs.velocity = 0
-          cs.position -= speed * dtScale
-        }
-      }
+      track.style.animationDuration = `${duration}s`
+      track.style.animationPlayState = 'running'
+    })
 
-      // Wrap for seamless loop
-      if (h > 0) {
-        cs.position = cs.position % h
-        if (cs.position > 0) cs.position -= h
-      }
-
-      track.style.transform = `translate3d(${cs.position}px, 0, 0)`
-      cs.frame = requestAnimationFrame(tick)
-    }
-
-    cs.frame = requestAnimationFrame(tick)
-    return () => {
-      cs.running = false
-      cancelAnimationFrame(cs.frame)
-    }
+    return () => cancelAnimationFrame(frame)
   }, [isOpen])
 
   // Reset image color state when panel closes

@@ -3058,8 +3058,14 @@ background-color: #E8F6FF;
 .fact-carousel-track {
   display: inline-flex;
   will-change: transform;
+  animation: carousel-scroll linear infinite;
+  animation-play-state: paused;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes carousel-scroll {
+  to { transform: translateX(-50%); }
 }
 
 /* Video loading shimmer - subtle sweep animation */
@@ -3620,7 +3626,7 @@ a {
 
 .about-panel.open .about-reveal {
   animation: aboutReveal 1400ms cubic-bezier(0.25, 1, 0.5, 1) both;
-  animation-delay: calc(var(--reveal-i, 0) * 50ms + 550ms);
+  animation-delay: calc(var(--reveal-i, 0) * 100ms + 700ms);
 }
 
 .about-flowers-wrap {
