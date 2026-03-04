@@ -142,7 +142,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
       const dt = now - cs.dragLastTime
       if (dt > 0) {
         const instantVel = (x - cs.dragLastX) / dt // px/ms
-        cs.dragVelocity = cs.dragVelocity * 0.4 + instantVel * 0.6
+        cs.dragVelocity = cs.dragVelocity * 0.15 + instantVel * 0.85
       }
       cs.dragLastX = x
       cs.dragLastTime = now
@@ -160,9 +160,9 @@ const AboutPanel = ({ isOpen, onClose }) => {
       cs.openTime = now
       cs.dragDelta = 0
       // Hand off to momentum if flicked (cap to avoid wild throws)
-      const velPxFrame = cs.dragVelocity * 16.667 // px/ms → px/frame @60fps equiv
-      const capped = Math.max(-18, Math.min(18, velPxFrame))
-      if (Math.abs(capped) > 0.8) {
+      const velPxFrame = cs.dragVelocity * 16.667 * 2.2 // amplify for flicky feel
+      const capped = Math.max(-40, Math.min(40, velPxFrame))
+      if (Math.abs(capped) > 0.3) {
         cs.momentumVel = capped
         cs.momentumOffset = 0
         cs.inMomentum = true
@@ -223,10 +223,10 @@ const AboutPanel = ({ isOpen, onClose }) => {
         if (cs.dragging) {
           pos = cs.dragFrozenPos + cs.dragDelta
         } else if (cs.inMomentum) {
-          // Per-frame decay — brief effect, cross-browser diff is imperceptible
-          cs.momentumVel *= 0.88
+          // Long liquid coast — 0.95 decay gives ~2s of momentum at 60fps
+          cs.momentumVel *= 0.95
           cs.momentumOffset += cs.momentumVel
-          if (Math.abs(cs.momentumVel) < 0.4) {
+          if (Math.abs(cs.momentumVel) < 0.3) {
             // Momentum exhausted — absorb offset and resume pure auto-scroll
             const elapsed = (now - cs.openTime) * cs.speed / 1000
             cs.openPosition = cs.openPosition - elapsed + cs.momentumOffset
