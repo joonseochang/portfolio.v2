@@ -12,12 +12,25 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const carouselRef = useRef(null)
   const carouselWrapRef = useRef(null)
   const carouselState = useRef({
+    // Auto-scroll (time-based)
     halfWidth: 0,
-    speed: 30,          // px/s — same on every browser/frame-rate
-    openTime: null,     // performance.now() when panel last opened
-    openPosition: null, // position (px, negative) at last open; null = first open
+    speed: 30,            // px/s — consistent on every browser/frame-rate
+    openTime: null,       // performance.now() at last panel open
+    openPosition: null,   // saved position (px, negative); null = first open
     running: false,
     frame: null,
+    // Drag
+    dragging: false,
+    dragStartX: 0,
+    dragFrozenPos: 0,     // auto-scroll position frozen at drag start
+    dragDelta: 0,
+    dragVelocity: 0,      // px/ms, weighted
+    dragLastX: 0,
+    dragLastTime: 0,
+    // Momentum
+    inMomentum: false,
+    momentumVel: 0,       // px/frame equivalent
+    momentumOffset: 0,    // accumulated px offset from momentum
   })
   const [decimalAge, setDecimalAge] = useState('')
 
@@ -95,15 +108,92 @@ const AboutPanel = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
-  // Time-based carousel — position is a pure function of elapsed wall-clock time.
-  // Identical speed on every browser and frame rate; no per-frame accumulation or jitter.
+  // Drag handlers — mouse + touch, attached once
+  useEffect(() => {
+    const wrap = carouselWrapRef.current
+    if (!wrap) return
+    const cs = carouselState.current
+
+    const getX = (e) => e.touches ? e.touches[0].clientX : e.clientX
+
+    const onDragStart = (e) => {
+      if (e.type === 'mousedown') e.preventDefault()
+      const now = performance.now()
+      // Freeze current visual position (auto-scroll + any momentum)
+      const elapsed = cs.openTime ? (now - cs.openTime) * cs.speed / 1000 : 0
+      const basePos = (cs.openPosition ?? 0) - elapsed + (cs.inMomentum ? cs.momentumOffset : 0)
+      cs.dragging = true
+      cs.inMomentum = false
+      cs.momentumOffset = 0
+      cs.momentumVel = 0
+      cs.dragFrozenPos = basePos
+      cs.dragDelta = 0
+      cs.dragStartX = getX(e)
+      cs.dragLastX = cs.dragStartX
+      cs.dragLastTime = now
+      cs.dragVelocity = 0
+      if (e.type === 'mousedown') wrap.style.cursor = 'grabbing'
+    }
+
+    const onDragMove = (e) => {
+      if (!cs.dragging) return
+      const now = performance.now()
+      const x = getX(e)
+      const dt = now - cs.dragLastTime
+      if (dt > 0) {
+        const instantVel = (x - cs.dragLastX) / dt // px/ms
+        cs.dragVelocity = cs.dragVelocity * 0.4 + instantVel * 0.6
+      }
+      cs.dragLastX = x
+      cs.dragLastTime = now
+      cs.dragDelta = x - cs.dragStartX
+    }
+
+    const onDragEnd = () => {
+      if (!cs.dragging) return
+      cs.dragging = false
+      wrap.style.cursor = ''
+      // Absorb drag delta into the base position so auto-scroll resumes from here
+      const now = performance.now()
+      const elapsed = cs.openTime ? (now - cs.openTime) * cs.speed / 1000 : 0
+      cs.openPosition = (cs.openPosition ?? 0) - elapsed + cs.dragDelta
+      cs.openTime = now
+      cs.dragDelta = 0
+      // Hand off to momentum if flicked (cap to avoid wild throws)
+      const velPxFrame = cs.dragVelocity * 16.667 // px/ms → px/frame @60fps equiv
+      const capped = Math.max(-18, Math.min(18, velPxFrame))
+      if (Math.abs(capped) > 0.8) {
+        cs.momentumVel = capped
+        cs.momentumOffset = 0
+        cs.inMomentum = true
+      }
+    }
+
+    wrap.addEventListener('mousedown', onDragStart)
+    wrap.addEventListener('touchstart', onDragStart, { passive: true })
+    window.addEventListener('mousemove', onDragMove)
+    window.addEventListener('touchmove', onDragMove, { passive: true })
+    window.addEventListener('mouseup', onDragEnd)
+    window.addEventListener('touchend', onDragEnd)
+
+    return () => {
+      wrap.removeEventListener('mousedown', onDragStart)
+      wrap.removeEventListener('touchstart', onDragStart)
+      window.removeEventListener('mousemove', onDragMove)
+      window.removeEventListener('touchmove', onDragMove)
+      window.removeEventListener('mouseup', onDragEnd)
+      window.removeEventListener('touchend', onDragEnd)
+    }
+  }, [])
+
+  // Time-based animation tick — position is a pure function of elapsed wall-clock time
   useEffect(() => {
     const track = carouselRef.current
     if (!track) return
     const cs = carouselState.current
 
     if (!isOpen) {
-      // Save current visual position so resuming is seamless
+      // Save visual position for seamless resume
       if (cs.running && cs.openTime !== null) {
         const elapsed = (performance.now() - cs.openTime) * cs.speed / 1000
         let pos = (cs.openPosition - elapsed) % cs.halfWidth
@@ -120,7 +210,6 @@ const AboutPanel = ({ isOpen, onClose }) => {
       if (!cs.halfWidth) return
 
       if (cs.openPosition === null) {
-        // First open: position so "Current age" is centered
         cs.openPosition = -(cs.halfWidth - 110)
       }
       cs.openTime = performance.now()
@@ -128,9 +217,35 @@ const AboutPanel = ({ isOpen, onClose }) => {
 
       const tick = (now) => {
         if (!cs.running) return
-        const elapsed = (now - cs.openTime) * cs.speed / 1000
-        let pos = (cs.openPosition - elapsed) % cs.halfWidth
-        if (pos > 0) pos -= cs.halfWidth
+        const h = cs.halfWidth
+        let pos
+
+        if (cs.dragging) {
+          pos = cs.dragFrozenPos + cs.dragDelta
+        } else if (cs.inMomentum) {
+          // Per-frame decay — brief effect, cross-browser diff is imperceptible
+          cs.momentumVel *= 0.88
+          cs.momentumOffset += cs.momentumVel
+          if (Math.abs(cs.momentumVel) < 0.4) {
+            // Momentum exhausted — absorb offset and resume pure auto-scroll
+            const elapsed = (now - cs.openTime) * cs.speed / 1000
+            cs.openPosition = cs.openPosition - elapsed + cs.momentumOffset
+            cs.openTime = now
+            cs.momentumOffset = 0
+            cs.momentumVel = 0
+            cs.inMomentum = false
+            pos = cs.openPosition
+          } else {
+            const elapsed = (now - cs.openTime) * cs.speed / 1000
+            pos = cs.openPosition - elapsed + cs.momentumOffset
+          }
+        } else {
+          const elapsed = (now - cs.openTime) * cs.speed / 1000
+          pos = cs.openPosition - elapsed
+        }
+
+        pos = pos % h
+        if (pos > 0) pos -= h
         track.style.transform = `translate3d(${pos}px, 0, 0)`
         cs.frame = requestAnimationFrame(tick)
       }
