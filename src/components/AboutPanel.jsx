@@ -27,10 +27,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
     dragVelocity: 0,      // px/ms, weighted
     dragLastX: 0,
     dragLastTime: 0,
-    // Momentum
+    // Momentum (analytical — position is a time function, no per-frame accumulation)
     inMomentum: false,
-    momentumVel: 0,       // px/frame equivalent
-    momentumOffset: 0,    // accumulated px offset from momentum
+    momentumV0: 0,        // initial velocity (px/s) at moment of release
+    momentumStartTime: 0, // performance.now() when momentum began
+    momentumK: 2.5,       // deceleration constant (lower = more liquid)
   })
   const [decimalAge, setDecimalAge] = useState('')
 
@@ -153,19 +154,18 @@ const AboutPanel = ({ isOpen, onClose }) => {
       if (!cs.dragging) return
       cs.dragging = false
       wrap.style.cursor = ''
-      // Absorb drag delta into the base position so auto-scroll resumes from here
       const now = performance.now()
+      // Absorb drag delta into the base position
       const elapsed = cs.openTime ? (now - cs.openTime) * cs.speed / 1000 : 0
       cs.openPosition = (cs.openPosition ?? 0) - elapsed + cs.dragDelta
       cs.openTime = now
       cs.dragDelta = 0
-      // Hand off to momentum if flicked (cap to avoid wild throws)
-      const velPxFrame = cs.dragVelocity * 16.667 * 2.2 // amplify for flicky feel
-      const capped = Math.max(-40, Math.min(40, velPxFrame))
-      if (Math.abs(capped) > 0.3) {
-        cs.momentumVel = capped
-        cs.momentumOffset = 0
+      // If finger paused before lifting (>80ms since last move), no momentum
+      const v0 = (now - cs.dragLastTime > 80) ? 0 : cs.dragVelocity * 1000 // px/s
+      if (Math.abs(v0) > 15) {
         cs.inMomentum = true
+        cs.momentumV0 = v0
+        cs.momentumStartTime = now
       }
     }
 
@@ -223,21 +223,23 @@ const AboutPanel = ({ isOpen, onClose }) => {
         if (cs.dragging) {
           pos = cs.dragFrozenPos + cs.dragDelta
         } else if (cs.inMomentum) {
-          // Long liquid coast — 0.95 decay gives ~2s of momentum at 60fps
-          cs.momentumVel *= 0.95
-          cs.momentumOffset += cs.momentumVel
-          if (Math.abs(cs.momentumVel) < 0.3) {
-            // Momentum exhausted — absorb offset and resume pure auto-scroll
-            const elapsed = (now - cs.openTime) * cs.speed / 1000
-            cs.openPosition = cs.openPosition - elapsed + cs.momentumOffset
+          // Analytical momentum: p(t) = v0/k * (1 - e^(-kt))
+          // Velocity is continuous at release — starts at exact finger speed
+          const t = (now - cs.momentumStartTime) / 1000
+          const k = cs.momentumK
+          const momentumOffset = (cs.momentumV0 / k) * (1 - Math.exp(-k * t))
+          const currentSpeed = Math.abs(cs.momentumV0 * Math.exp(-k * t))
+          if (currentSpeed < 1) {
+            // Effectively stopped — absorb final offset and resume auto-scroll
+            const finalOffset = cs.momentumV0 / k
+            const autoElapsed = (now - cs.openTime) * cs.speed / 1000
+            cs.openPosition = cs.openPosition - autoElapsed + finalOffset
             cs.openTime = now
-            cs.momentumOffset = 0
-            cs.momentumVel = 0
             cs.inMomentum = false
             pos = cs.openPosition
           } else {
-            const elapsed = (now - cs.openTime) * cs.speed / 1000
-            pos = cs.openPosition - elapsed + cs.momentumOffset
+            const autoElapsed = (now - cs.openTime) * cs.speed / 1000
+            pos = cs.openPosition - autoElapsed + momentumOffset
           }
         } else {
           const elapsed = (now - cs.openTime) * cs.speed / 1000
