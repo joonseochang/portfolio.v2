@@ -639,7 +639,27 @@ function App() {
   const musicEnterTimeoutRef = useRef(null);
   const shortcutsModalTimeoutRef = useRef(null);
   const shortcutsButtonRef = useRef(null);
-  
+  const barPoseRef = useRef(-1);
+  const barIntervalRef = useRef(null);
+  const barRefs = useRef([null, null, null]);
+  const barPoses = [[8, 10, 5], [10, 5, 8], [5, 8, 10]];
+  const setBarWidths = (widths) => {
+    barRefs.current.forEach((el, i) => { if (el) el.style.width = widths[i] + 'px'; });
+  };
+  const onBarsEnter = () => {
+    barPoseRef.current = 0;
+    setBarWidths(barPoses[0]);
+    barIntervalRef.current = setInterval(() => {
+      barPoseRef.current = (barPoseRef.current + 1) % barPoses.length;
+      setBarWidths(barPoses[barPoseRef.current]);
+    }, 1800);
+  };
+  const onBarsLeave = () => {
+    clearInterval(barIntervalRef.current);
+    barPoseRef.current = -1;
+    setBarWidths([10, 10, 10]);
+  };
+
   // CMS data - fetched at runtime for live updates
   const [videoData, setVideoData] = useState([]);
   const [websiteCopy, setWebsiteCopy] = useState({});
@@ -2504,18 +2524,22 @@ function App() {
 
           {/* Right - Ask me anything button (hidden on mobile) */}
           {!isTabletOrBelow && (
-            <div className="hover-trigger">
+            <div className="hover-trigger" onMouseEnter={onBarsEnter} onMouseLeave={onBarsLeave}>
             <button
               className="nav-info-button relative h-[37px] pl-[12px] pr-[8px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[190px]"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
               }}
-              aria-label="About - Introduction"
+              aria-label="About - README"
             >
-              <span className="font-graphik text-[14px] text-[#666] group-hover:text-[#555] whitespace-nowrap transition-colors duration-[180ms]">Introduction...</span>
+              <span className="font-graphik text-[14px] text-[#9F9FA3] group-hover:text-[#555] whitespace-nowrap transition-colors duration-[180ms]">README.md</span>
               <span className="nav-info-badge h-[24px] w-[24px] rounded-[5px] flex items-center justify-center flex-shrink-0">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-[180ms] group-hover:stroke-[#777]"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <div className="nav-bars-icon">
+                  <span className="nav-bar-1" ref={el => barRefs.current[0] = el} />
+                  <span className="nav-bar-2" ref={el => barRefs.current[1] = el} />
+                  <span className="nav-bar-3" ref={el => barRefs.current[2] = el} />
+                </div>
               </span>
             </button>
             </div>
@@ -2582,7 +2606,7 @@ function App() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Introduction..."
+                      placeholder="README.md"
                       className="flex-1 bg-transparent font-graphik text-[14px] text-[#333] placeholder-[#8f8f8f] outline-none"
                     />
                     <span className="bg-[#eeeeee] border border-[#e0e0e0] h-[25px] w-[29px] rounded-[5px] flex items-center justify-center flex-shrink-0">
