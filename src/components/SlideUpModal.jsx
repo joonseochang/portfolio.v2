@@ -410,7 +410,7 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
   const renderContent = () => {
     if (isContactModal) {
       return (
-        <div className="contact-modal-outer rounded-[18px] flex justify-center">
+        <div className="contact-modal-outer rounded-[20px] flex justify-center">
           {children}
         </div>
       );

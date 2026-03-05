@@ -2313,7 +2313,7 @@ background-color: #E8F6FF;
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
     inset 0 -1px 0 rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(235, 238, 245, 0.9);
-  border-radius: 18px;
+  border-radius: 20px;
   position: relative;
   overflow: visible;
 }

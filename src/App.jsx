@@ -984,10 +984,18 @@ function App() {
     console.warn(`Video ${videoId} failed to load:`, videoElement?.src);
   };
 
-  // Close about panel on route change
+  // Route /about → open About side panel (desktop) or redirect home (mobile)
   useEffect(() => {
-    setIsAboutPanelOpen(false);
-  }, [location.pathname]);
+    if (location.pathname === '/about') {
+      if (isTabletOrBelow) {
+        navigate('/', { replace: true });
+      } else {
+        setIsAboutPanelOpen(true);
+      }
+    } else {
+      setIsAboutPanelOpen(false);
+    }
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pause/resume video when about panel opens/closes
   useEffect(() => {
@@ -1558,20 +1566,7 @@ function App() {
   // Clock pill click — show random city fact as toast
   const handleClockClick = useCallback(() => {
     playClick();
-    const facts = websiteCopy?.clock_facts;
-    if (!facts?.length) return;
-
-    const arrivalDate = websiteCopy?.clock_arrival_date;
-    const daysAgo = arrivalDate
-      ? Math.floor((Date.now() - new Date(arrivalDate).getTime()) / 86400000)
-      : null;
-
-    const processed = facts.map(f =>
-      daysAgo !== null ? f.replace('{days_ago}', daysAgo) : f
-    );
-
-    toast(processed[Math.floor(Math.random() * processed.length)]);
-  }, [websiteCopy, playClick]);
+  }, [playClick]);
 
   // Ambient data for expanded clock card
   const clockCity = getCopy('clock_location') || 'Saigon';
@@ -2349,7 +2344,7 @@ function App() {
           WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',
         }}
       >
-        <div className="light-nav-bar h-[62px] w-full px-[15px] flex items-center justify-between">
+        <div className="light-nav-bar h-[62px] pt-[3px] w-full px-[15px] flex items-center justify-between">
           {/* Gary Section - Face Icon + Name + Hover Info Box */}
           <div className="gary-section relative">
             {/* Mouse proximity detection zone */}
@@ -2481,28 +2476,11 @@ function App() {
 
           {/* Center - Navigation Links */}
           <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-[20px]" aria-label="Main navigation">
-            {isTabletOrBelow ? (
-              <Link
-                to="/about"
-                className={`nav-text-link font-graphik text-[14px] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px] ${location.pathname === '/about' ? 'text-[#5b5b5e]' : 'text-[#9f9fa3]'}`}
-                onClick={playClick}
-              >
-                Experience
-              </Link>
-            ) : (
-              <Link
-                to="/about"
-                className={`nav-text-link font-graphik text-[14px] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px] ${location.pathname === '/about' ? 'text-[#5b5b5e]' : 'text-[#9f9fa3]'}`}
-                onClick={playClick}
-              >
-                Experience
-              </Link>
-            )}
             <button
               className="nav-text-link font-graphik text-[14px] text-[#9f9fa3] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
               onClick={playClick}
             >
-              Work
+              Experience
             </button>
             <button
               className="nav-text-link font-graphik text-[14px] text-[#9f9fa3] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
@@ -2569,18 +2547,11 @@ function App() {
           >
             <div className="mobile-nav-drawer-inner">
               <nav className="flex flex-col px-[16px] pt-[8px] pb-[16px] gap-[4px]" aria-label="Mobile navigation">
-                <Link
-                  to="/about"
-                  className={`mobile-nav-link font-graphik text-[15px] py-[12px] px-[12px] rounded-[8px] transition-colors ${location.pathname === '/about' ? 'text-[#333] bg-[#f3f3f3]' : 'text-[#5b5b5e]'}`}
-                  onClick={() => { playClick(); setIsMobileMenuOpen(false); }}
-                >
-                  Experience
-                </Link>
                 <button
                   className="mobile-nav-link font-graphik text-[15px] text-[#5b5b5e] py-[12px] px-[12px] rounded-[8px] text-left transition-colors"
                   onClick={() => { playClick(); setIsMobileMenuOpen(false); }}
                 >
-                  Work
+                  Experience
                 </button>
                 <button
                   className="mobile-nav-link font-graphik text-[15px] text-[#5b5b5e] py-[12px] px-[12px] rounded-[8px] text-left transition-colors"
@@ -2629,9 +2600,11 @@ function App() {
       </div>
 
       {/* Main Content - All pages always mounted, toggled via display */}
+      {/* ARCHIVED: About3 experience page
       <div style={{ display: location.pathname === '/about' ? 'block' : 'none' }}>
         <About3 isVisible={location.pathname === '/about'} />
       </div>
+      */}
 
       <div style={{ display: location.pathname === '/about2' ? 'block' : 'none' }}>
         <About isVisible={location.pathname === '/about2'} />
@@ -3386,7 +3359,7 @@ function App() {
 
     {/* About Panel (desktop slide-in) */}
     {!isTabletOrBelow && (
-      <AboutPanel isOpen={isAboutPanelOpen} onClose={() => setIsAboutPanelOpen(false)} />
+      <AboutPanel isOpen={isAboutPanelOpen} onClose={() => { setIsAboutPanelOpen(false); navigate('/'); }} />
     )}
 
     <Toaster
