@@ -1071,14 +1071,25 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   );
 };
 
-export const ContactModalContent = ({ darkMode = false, activePanel = null, onPanelChange }) => {
+// Module-level variable: persists panel state across component unmounts/remounts
+// (switching modals, closing and reopening). Resets only on page refresh.
+let _persistedContactPanel = null;
+
+export const ContactModalContent = ({ darkMode = false }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const [activePanel, setActivePanel] = useState(_persistedContactPanel);
   const composing = activePanel === 'msg';
   const showMore = activePanel === 'ext';
   const showQR = activePanel === 'bot';
-  const togglePanel = (panel) => { playClick(); setScrolledToBottom(false); onPanelChange(prev => prev === panel ? null : panel); };
+  const togglePanel = (panel) => {
+    playClick();
+    setScrolledToBottom(false);
+    const next = activePanel === panel ? null : panel;
+    _persistedContactPanel = next;
+    setActivePanel(next);
+  };
   const [message, setMessage] = useState('');
   const [sendState, setSendState] = useState('idle'); // idle | sending | sent | error
   const [scrolledToBottom, setScrolledToBottom] = useState(false);

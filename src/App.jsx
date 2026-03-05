@@ -620,7 +620,6 @@ function App() {
   const [isMac, setIsMac] = useState(true);
   const [activeModal, setActiveModal] = useState(null); // 'music' | 'activity' | 'shortcuts' | 'contact' | null
   const [activeAnchorRef, setActiveAnchorRef] = useState(null);
-  const [contactActivePanel, setContactActivePanel] = useState(null); // null | 'ext' | 'msg' | 'bot'
 
   // Dynamic popup conflict detection — hides hover popups only when the open
   // modal actually overlaps them in the viewport. Reacts to pill width changes
@@ -3330,7 +3329,7 @@ function App() {
                 }}
               />
             )}
-            {activeModal === 'contact' && <ContactModalContent activePanel={contactActivePanel} onPanelChange={setContactActivePanel} />}
+            {activeModal === 'contact' && <ContactModalContent />}
           </Suspense>
         </SlideUpModal>
       </Suspense>
