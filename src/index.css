@@ -832,12 +832,8 @@ background-color: #E8F6FF;
 }
 
 .safari .black-box-text {
-  animation: textFadeInSafari 300ms ease-in-out;
-}
-
-@keyframes textFadeInSafari {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  transform: translateZ(0);
+  animation: textFadeIn 300ms ease-in-out;
 }
 
 /* Component loader animations — directional variants with spring settle */
