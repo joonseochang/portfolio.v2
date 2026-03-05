@@ -2480,9 +2480,9 @@ function App() {
             <div className="hover-trigger">
             <button
               className="nav-search-button relative h-[34px] px-[14px] rounded-[10px] flex items-center cursor-pointer group transition-all duration-[180ms]"
-              style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(0,0,0,0.04)' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.75)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.55)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.04)'; }}
+              style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: 'rgba(235,235,238,0.5)', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 0.5px 1px rgba(0,0,0,0.03)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(225,225,230,0.55)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.12)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(235,235,238,0.5)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)'; }}
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
