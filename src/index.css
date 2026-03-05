@@ -1945,10 +1945,25 @@ background-color: #E8F6FF;
   flex-shrink: 0;
 }
 
-.te-btn.on .te-led {
+/* EXT — orange */
+.te-btn-ext.on .te-led {
   background: #f09a40;
   box-shadow:
     0 0 3px rgba(240, 154, 64, 0.45),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
+}
+/* MSG — blue */
+.te-btn-msg.on .te-led {
+  background: #5b9cf0;
+  box-shadow:
+    0 0 3px rgba(91, 156, 240, 0.45),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
+}
+/* BOT — green */
+.te-btn-bot.on .te-led {
+  background: #5cc98a;
+  box-shadow:
+    0 0 3px rgba(92, 201, 138, 0.45),
     inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -2253,7 +2268,7 @@ background-color: #E8F6FF;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 /* Section labels */

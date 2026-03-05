@@ -850,6 +850,11 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
       return;
     }
     const rows = list.querySelectorAll('[data-shortcut-row]');
+    // Last item: scroll fully to bottom so it isn't clipped
+    if (selectedIndex === flatItemsRef.current.length - 1) {
+      list.scrollTop = list.scrollHeight;
+      return;
+    }
     if (rows[selectedIndex]) {
       rows[selectedIndex].scrollIntoView({ block: 'nearest' });
     }
@@ -1065,7 +1070,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
   // Get the email description color based on state
   const getEmailDescriptionColor = () => {
     if (copiedEmail) return '#5AABEE';
-    return '#B7B7B9';
+    return '#999';
   };
 
   const contactItems = [
@@ -1176,7 +1181,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
               <item.Icon hovered={hoveredRow === item.id} />
             </div>
             <div className="flex flex-col overflow-hidden">
-              <span className="font-graphik text-[14px] leading-[18px] text-[#333333]">
+              <span className="font-graphik text-[14px] leading-[18px] text-[#444]">
                 {item.title}
               </span>
               <span
@@ -1209,10 +1214,10 @@ export const ContactModalContent = ({ darkMode = false }) => {
               </div>
             )}
             <div className="flex flex-col">
-              <span className="font-graphik text-[14px] leading-[18px] text-[#333333]">
+              <span className="font-graphik text-[14px] leading-[18px] text-[#444]">
                 {item.title}
               </span>
-              <span className="font-graphik text-[14px] leading-[20px] text-[#B7B7B9]">
+              <span className="font-graphik text-[14px] leading-[20px] text-[#999]">
                 {item.description}
               </span>
             </div>
@@ -1286,21 +1291,21 @@ export const ContactModalContent = ({ darkMode = false }) => {
         )}
         <div className="flex items-center gap-[5px]">
           <button
-            className={`te-btn${showMore ? ' on' : ''}`}
+            className={`te-btn te-btn-ext${showMore ? ' on' : ''}`}
             onClick={() => togglePanel('ext')}
           >
             <span className="te-led" />
             <span className="te-btn-label">ext</span>
           </button>
           <button
-            className={`te-btn${composing ? ' on' : ''}`}
+            className={`te-btn te-btn-msg${composing ? ' on' : ''}`}
             onClick={() => togglePanel('msg')}
           >
             <span className="te-led" />
             <span className="te-btn-label">msg</span>
           </button>
           <button
-            className={`te-btn${showQR ? ' on' : ''}`}
+            className={`te-btn te-btn-bot${showQR ? ' on' : ''}`}
             onClick={() => togglePanel('bot')}
           >
             <span className="te-led" />
