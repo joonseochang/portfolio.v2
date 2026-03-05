@@ -2479,15 +2479,15 @@ function App() {
           {!isTabletOrBelow && (
             <div className="hover-trigger">
             <button
-              className="nav-search-button relative border h-[37px] pl-[12px] pr-[8px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[190px] bg-[#fafafa] border-[#e2e2e2] shadow-[0_0.5px_1px_rgba(0,0,0,0.03),0_1px_1px_rgba(0,0,0,0.02),inset_0_0.5px_0_rgba(255,255,255,0.5)] hover:bg-[#f6f6f6] hover:border-[#d6d6d6] hover:shadow-[0_1px_2px_rgba(0,0,0,0.05),0_2px_4px_rgba(0,0,0,0.03),inset_0_0.5px_0_rgba(255,255,255,0.6)] transition-all duration-[180ms]"
+              className="nav-search-button relative border h-[37px] pl-[12px] pr-[8px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[190px] bg-white border-[#ebeef5]/85 shadow-[0_0.5px_1px_rgba(0,0,0,0.02),inset_0_0.5px_0_rgba(255,255,255,0.5)] hover:bg-[#fafafa] hover:border-[#d8dce5] hover:shadow-[0_1px_3px_rgba(0,0,0,0.05),inset_0_0.5px_0_rgba(255,255,255,0.6)] transition-all duration-[180ms]"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
               }}
               aria-label="About - Information"
             >
-              <span className="font-graphik text-[14px] text-[#777] group-hover:text-[#555] whitespace-nowrap transition-colors duration-[180ms]">Information...</span>
-              <span className="bg-[#f0f0f0] border border-[#ddd] shadow-[0_0.5px_1px_rgba(0,0,0,0.04),inset_0_0.5px_0_rgba(255,255,255,0.4)] h-[24px] w-[24px] rounded-[5px] flex items-center justify-center transition-all duration-[180ms] flex-shrink-0 group-hover:bg-[#eaeaea] group-hover:border-[#d2d2d2]">
+              <span className="font-graphik text-[14px] text-[#666] group-hover:text-[#444] whitespace-nowrap transition-colors duration-[180ms]">Information...</span>
+              <span className="bg-[#f5f5f7] border border-[#ebeef5]/85 h-[24px] w-[24px] rounded-[5px] flex items-center justify-center transition-all duration-[180ms] flex-shrink-0 group-hover:bg-[#ededef]">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-[180ms] group-hover:stroke-[#666]"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               </span>
             </button>
