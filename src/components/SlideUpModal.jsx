@@ -1140,7 +1140,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
   // Get the email description color based on state
   const getEmailDescriptionColor = () => {
     if (copiedEmail) return '#5AABEE';
-    return '#c3c3c3';
+    return '#ababab';
   };
 
   const contactItems = [
@@ -1287,7 +1287,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
               <span className="font-graphik text-[14px] leading-[18px] text-[#444]">
                 {item.title}
               </span>
-              <span className="font-graphik text-[14px] leading-[20px] text-[#c3c3c3]">
+              <span className="font-graphik text-[14px] leading-[20px] text-[#ababab]">
                 {item.description}
               </span>
             </div>
