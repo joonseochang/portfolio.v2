@@ -1952,18 +1952,18 @@ background-color: #E8F6FF;
     0 0 3px rgba(240, 154, 64, 0.45),
     inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
-/* MSG — blue */
+/* MSG — warm coral */
 .te-btn-msg.on .te-led {
-  background: #5b9cf0;
+  background: #e08a7e;
   box-shadow:
-    0 0 3px rgba(91, 156, 240, 0.45),
+    0 0 3px rgba(224, 138, 126, 0.45),
     inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
-/* BOT — green */
+/* BOT — soft teal */
 .te-btn-bot.on .te-led {
-  background: #5cc98a;
+  background: #5ab8a9;
   box-shadow:
-    0 0 3px rgba(92, 201, 138, 0.45),
+    0 0 3px rgba(90, 184, 169, 0.45),
     inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
 
