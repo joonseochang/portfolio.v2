@@ -433,7 +433,7 @@ background-color: #E8F6FF;
   .home-time-component { order: 1; margin: 0 auto 15px; }
   .home-heading { order: 2; text-align: center; margin-bottom: 20px; }
   .home-video-frame { order: 3; margin-top: 0 !important; max-width: 100% !important; }
-  .home-bio { order: 4; text-align: center; margin-top: 28px; padding: 0 8px; width: 100%; }
+  .home-bio { order: 4; text-align: left; margin-top: 28px; padding: 0 8px; width: 100%; }
 
   /* Vertical padding — more top space so clock clears nav bar comfortably */
   main.page-enter {
@@ -2330,20 +2330,7 @@ background-color: #E8F6FF;
   z-index: -1;
 }
 
-.shortcut-row:hover .shortcut-row-inner {
-  transform: translateY(-0.5px);
-}
-
-.shortcut-row:hover .shortcut-row-inner::after {
-  background: linear-gradient(180deg, #fafafa 0%, #f7f7f8 100%);
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.05),
-    0 1px 2px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(220, 224, 235, 0.9);
-}
-
+/* Active (press) feedback */
 .shortcut-row:active .shortcut-row-inner {
   transform: translateY(0) scale(0.995);
   transition: all 70ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -2357,15 +2344,6 @@ background-color: #E8F6FF;
   border: 1px solid rgba(210, 214, 225, 0.9);
 }
 
-/* Icon box hover/active states */
-.shortcut-row:hover .shortcut-icon-box {
-  box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-  border-color: #E0E3EA;
-}
-
 .shortcut-row:active .shortcut-icon-box {
   box-shadow:
     inset 0 1px 2px rgba(0, 0, 0, 0.06),
@@ -2373,23 +2351,9 @@ background-color: #E8F6FF;
   border-color: #DCDFE6;
 }
 
-/* Icon color transition on hover */
+/* Icon color transition */
 .shortcut-icon-box svg {
   transition: stroke 200ms ease, fill 200ms ease;
-}
-.shortcut-row:hover .shortcut-icon-box svg {
-  stroke: #6b7280;
-}
-
-/* Icon micro-bounce on hover — subtle */
-.shortcut-row:hover .shortcut-icon-box {
-  animation: shortcut-icon-bounce 250ms cubic-bezier(0.34, 1.2, 0.64, 1);
-}
-
-@keyframes shortcut-icon-bounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.04); }
-  100% { transform: scale(1); }
 }
 
 /* Keyboard-selected row — mirrors hover state */
@@ -2419,9 +2383,13 @@ background-color: #E8F6FF;
   stroke: #6b7280;
 }
 
-/* Scrollable list — height set to clip a row mid-way as scroll hint */
+/* Scrollable list — height clips a row mid-way as scroll hint */
+.shortcuts-palette-list-wrapper {
+  position: relative;
+}
+
 .shortcuts-palette-list {
-  max-height: 290px;
+  max-height: 296px;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -2429,6 +2397,16 @@ background-color: #E8F6FF;
 
 .shortcuts-palette-list::-webkit-scrollbar {
   display: none;
+}
+
+.shortcuts-palette-list-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: linear-gradient(180deg, transparent 0%, rgba(252, 252, 252, 0.85) 100%);
+  pointer-events: none;
 }
 
 /* Footer keyboard hints */
@@ -2472,6 +2450,16 @@ background-color: #E8F6FF;
   border-radius: 50%;
   background: #d0d0d0;
   flex-shrink: 0;
+}
+
+/* Mobile shortcuts palette */
+@media (max-width: 813px) {
+  .shortcuts-palette-footer {
+    display: none;
+  }
+  .shortcuts-palette-list {
+    max-height: 50vh;
+  }
 }
 
 /* Suppress content-level CSS entry animations when switching between modal types.

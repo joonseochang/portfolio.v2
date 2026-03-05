@@ -646,7 +646,7 @@ export const ActivityModalContent = () => (
 );
 
 // Shortcut row sub-component
-const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSelected }) => {
+const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSelected, onMouseEnter }) => {
   const rowClass = `shortcut-row${isSelected ? ' shortcut-row-selected' : ''}`;
   const content = (
     <div className={`shortcut-row-inner w-full flex items-center gap-[10px] px-[10px] ${subtitle ? 'py-[7px]' : 'py-[5px]'}`}>
@@ -676,13 +676,13 @@ const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSele
 
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={rowClass} data-shortcut-row>
+      <a href={href} target="_blank" rel="noopener noreferrer" className={rowClass} data-shortcut-row onMouseEnter={onMouseEnter}>
         {content}
       </a>
     );
   }
   return (
-    <button onClick={onClick} className={`${rowClass} w-full text-left`} data-shortcut-row>
+    <button onClick={onClick} className={`${rowClass} w-full text-left`} data-shortcut-row onMouseEnter={onMouseEnter}>
       {content}
     </button>
   );
@@ -777,6 +777,8 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
   const listRef = useRef(null);
+  const isKeyboardNavRef = useRef(false);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
 
   const handleAction = (action, payload) => {
     playClick();
@@ -838,8 +840,10 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
     setSelectedIndex(0);
   }, [query]);
 
-  // Scroll selected row into view
+  // Scroll selected row into view — only on keyboard nav, not mouse hover
   useEffect(() => {
+    if (!isKeyboardNavRef.current) return;
+    isKeyboardNavRef.current = false;
     const list = listRef.current;
     if (!list) return;
     if (selectedIndex === 0) {
@@ -866,9 +870,11 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
       const items = flatItemsRef.current;
       if (e.key === 'ArrowDown') {
         e.preventDefault();
+        isKeyboardNavRef.current = true;
         setSelectedIndex(prev => items.length ? (prev + 1) % items.length : 0);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
+        isKeyboardNavRef.current = true;
         setSelectedIndex(prev => items.length ? (prev - 1 + items.length) % items.length : 0);
       } else if (e.key === 'Enter') {
         e.preventDefault();
@@ -914,6 +920,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
             onClick={item.action}
             href={item.href}
             isSelected={currentFlatIndex === selectedIndex}
+            onMouseEnter={() => setSelectedIndex(currentFlatIndex)}
           />
         );
       });
@@ -935,7 +942,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   return (
     <div className="flex flex-col items-center">
       {/* Inner white card */}
-      <div className="shortcuts-palette-inner w-[355px]">
+      <div className="shortcuts-palette-inner w-[355px] max-w-[calc(100vw-48px)]">
         {/* Search input */}
         <div className="px-[12px] pt-[12px] pb-[10px]" style={{ borderBottom: '1px solid rgba(235, 238, 245, 0.85)' }}>
           <div className="flex items-center gap-[8px] rounded-[8px] px-[10px] py-[8px]" style={{ background: '#f5f5f5', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)', border: '1px solid #e0e0e0' }}>
@@ -955,14 +962,24 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
         </div>
 
         {/* Items list — height clips last visible item mid-row to hint scrollability */}
-        <div ref={listRef} className="shortcuts-palette-list pt-[10px] pb-[10px] flex flex-col">
-          {flatItems.length > 0 ? (
-            renderFilteredSections()
-          ) : (
-            <div className="flex items-center justify-center py-[24px]">
-              <span className="font-graphik text-[13px] text-[#999]">No results found</span>
-            </div>
-          )}
+        <div className="shortcuts-palette-list-wrapper">
+          <div
+            ref={listRef}
+            className="shortcuts-palette-list pt-[10px] pb-[10px] flex flex-col"
+            onScroll={(e) => {
+              const el = e.target;
+              setIsScrolledToBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 5);
+            }}
+          >
+            {flatItems.length > 0 ? (
+              renderFilteredSections()
+            ) : (
+              <div className="flex items-center justify-center py-[24px]">
+                <span className="font-graphik text-[13px] text-[#999]">No results found</span>
+              </div>
+            )}
+          </div>
+          {!isScrolledToBottom && <div className="shortcuts-palette-list-fade" />}
         </div>
       </div>
 
