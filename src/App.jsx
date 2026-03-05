@@ -2479,14 +2479,14 @@ function App() {
           {!isTabletOrBelow && (
             <div className="hover-trigger">
             <button
-              className="nav-search-button relative border h-[30px] px-[13px] rounded-[14px] flex items-center cursor-pointer group bg-[#f2f2f2] border-[#e8e8e8] hover:bg-[#ececec] hover:border-[#e0e0e0] transition-all duration-[180ms]"
+              className="nav-search-button relative border h-[34px] px-[14px] rounded-[8px] flex items-center cursor-pointer group bg-gradient-to-b from-white to-[#fafafa] border-[#d8d8d8] shadow-[0_0.5px_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.03),inset_0_0.5px_0_rgba(255,255,255,0.7),inset_0_-0.5px_0_rgba(0,0,0,0.02)] hover:from-[#fefefe] hover:to-[#f5f5f5] hover:border-[#cacaca] hover:shadow-[0_1px_2px_rgba(0,0,0,0.06),0_2px_4px_rgba(0,0,0,0.04),inset_0_0.5px_0_rgba(255,255,255,0.8)] transition-all duration-[180ms]"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
               }}
               aria-label="About - Prologue"
             >
-              <span className="font-graphik text-[13px] text-[#999] group-hover:text-[#666] whitespace-nowrap transition-colors duration-[180ms]">Prologue</span>
+              <span className="font-graphik text-[14px] text-[#555] group-hover:text-[#333] whitespace-nowrap transition-colors duration-[180ms]">Prologue</span>
             </button>
             </div>
           )}
