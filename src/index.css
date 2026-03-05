@@ -266,6 +266,10 @@ select:focus {
 .safari .clock-pill-text span {
   transform: translateY(1px);
 }
+/* Temperature span was already aligned — cancel the global font-graphik rule */
+.safari .clock-weather-section .font-graphik {
+  transform: none;
+}
 
 /* Coordinates arrow alignment - all browsers */
 .coord-arrow-svg {
