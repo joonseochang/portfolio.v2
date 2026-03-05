@@ -1945,26 +1945,46 @@ background-color: #E8F6FF;
   flex-shrink: 0;
 }
 
-/* EXT — orange */
+/* EXT — amber */
 .te-btn-ext.on .te-led {
-  background: #f09a40;
+  background: radial-gradient(circle at 35% 35%, #ffc36e, #e8922a);
   box-shadow:
-    0 0 3px rgba(240, 154, 64, 0.45),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
+    0 0 3px rgba(232, 146, 42, 0.5),
+    0 0 6px rgba(232, 146, 42, 0.2),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+  animation: led-breathe-amber 3.5s ease-in-out infinite;
 }
-/* MSG — warm coral */
+/* MSG — rose */
 .te-btn-msg.on .te-led {
-  background: #e08a7e;
+  background: radial-gradient(circle at 35% 35%, #f5a0a0, #d46a6a);
   box-shadow:
-    0 0 3px rgba(224, 138, 126, 0.45),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
+    0 0 3px rgba(212, 106, 106, 0.5),
+    0 0 6px rgba(212, 106, 106, 0.2),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+  animation: led-breathe-rose 3.5s ease-in-out infinite;
 }
-/* BOT — soft teal */
+/* BOT — warm yellow */
 .te-btn-bot.on .te-led {
-  background: #5ab8a9;
+  background: radial-gradient(circle at 35% 35%, #f5e07a, #d4b83a);
   box-shadow:
-    0 0 3px rgba(90, 184, 169, 0.45),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.3);
+    0 0 3px rgba(212, 184, 58, 0.5),
+    0 0 6px rgba(212, 184, 58, 0.2),
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+  animation: led-breathe-yellow 3.5s ease-in-out infinite;
+}
+
+/* Slow, subtle glow pulse — like a real indicator LED */
+@keyframes led-breathe-amber {
+  0%, 100% { box-shadow: 0 0 3px rgba(232, 146, 42, 0.5), 0 0 6px rgba(232, 146, 42, 0.15), inset 0 0.5px 0 rgba(255,255,255,0.4); }
+  50%      { box-shadow: 0 0 4px rgba(232, 146, 42, 0.65), 0 0 8px rgba(232, 146, 42, 0.25), inset 0 0.5px 0 rgba(255,255,255,0.4); }
+}
+@keyframes led-breathe-rose {
+  0%, 100% { box-shadow: 0 0 3px rgba(212, 106, 106, 0.5), 0 0 6px rgba(212, 106, 106, 0.15), inset 0 0.5px 0 rgba(255,255,255,0.4); }
+  50%      { box-shadow: 0 0 4px rgba(212, 106, 106, 0.65), 0 0 8px rgba(212, 106, 106, 0.25), inset 0 0.5px 0 rgba(255,255,255,0.4); }
+}
+@keyframes led-breathe-yellow {
+  0%, 100% { box-shadow: 0 0 3px rgba(212, 184, 58, 0.5), 0 0 6px rgba(212, 184, 58, 0.15), inset 0 0.5px 0 rgba(255,255,255,0.4); }
+  50%      { box-shadow: 0 0 4px rgba(212, 184, 58, 0.65), 0 0 8px rgba(212, 184, 58, 0.25), inset 0 0.5px 0 rgba(255,255,255,0.4); }
 }
 
 /* Button label */
