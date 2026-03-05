@@ -25,25 +25,26 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const carouselRef = useRef(null)
   const carouselWrapRef = useRef(null)
   const carouselState = useRef({
-    // Track geometry
+    // Auto-scroll (time-based — position is a pure function of wall-clock time)
     halfWidth: 0,
-    // Position state — pos is the current offset in px (negative = scrolled left)
-    pos: null,            // null = first open, will be initialized
+    speed: 38,            // px/s
+    openTime: null,       // performance.now() when auto-scroll epoch started
+    openPosition: null,   // position at epoch (px, negative); null = first open
     running: false,
     frame: null,
-    lastTickTime: null,
-    // Auto-scroll
-    autoSpeed: 38,        // px/s — constant leftward drift
     // Drag
     dragging: false,
     dragStartX: 0,
-    dragStartPos: 0,      // carousel pos when drag started
-    // Velocity tracking — ring buffer of last N samples for reliable flick detection
-    velSamples: [],       // [{dx, dt, time}] — last ~6 move events
+    dragFrozenPos: 0,     // visual position frozen at drag start
+    dragDelta: 0,
+    // Velocity — ring buffer for reliable flick detection
+    velSamples: [],
     velMaxSamples: 6,
-    // Momentum — per-frame deceleration for natural iOS-like feel
-    velocity: 0,          // current velocity in px/s (positive = rightward)
-    friction: 0.97,       // per-frame multiplier (~0.97 at 60fps = smooth coast)
+    // Momentum (analytical — no per-frame accumulation)
+    inMomentum: false,
+    momentumV0: 0,        // px/s at release
+    momentumStartTime: 0,
+    momentumK: 1.8,       // exponential decay constant (lower = longer coast)
   })
   const facts = [
     { label: 'Current age', value: <AgeTicker /> },
@@ -111,12 +112,25 @@ const AboutPanel = ({ isOpen, onClose }) => {
 
     const getX = (e) => e.touches ? e.touches[0].clientX : e.clientX
 
+    // Compute the current visual position from time-based state
+    const getCurrentPos = (now) => {
+      const elapsed = cs.openTime ? (now - cs.openTime) * cs.speed / 1000 : 0
+      let pos = (cs.openPosition ?? 0) - elapsed
+      if (cs.inMomentum) {
+        const t = (now - cs.momentumStartTime) / 1000
+        pos += (cs.momentumV0 / cs.momentumK) * (1 - Math.exp(-cs.momentumK * t))
+      }
+      return pos
+    }
+
     const onDragStart = (e) => {
       if (e.type === 'mousedown') e.preventDefault()
+      const now = performance.now()
       cs.dragging = true
-      cs.velocity = 0              // kill any coasting momentum
+      cs.dragFrozenPos = getCurrentPos(now)  // snapshot exact visual position
+      cs.inMomentum = false
+      cs.dragDelta = 0
       cs.dragStartX = getX(e)
-      cs.dragStartPos = cs.pos     // snapshot current position
       cs.velSamples = []
       if (e.type === 'mousedown') wrap.style.cursor = 'grabbing'
     }
@@ -125,9 +139,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
       if (!cs.dragging) return
       const now = performance.now()
       const x = getX(e)
-      const dx = x - cs.dragStartX
-      cs.pos = cs.dragStartPos + dx
-      // Record sample for velocity estimation
+      cs.dragDelta = x - cs.dragStartX
       cs.velSamples.push({ x, time: now })
       if (cs.velSamples.length > cs.velMaxSamples) cs.velSamples.shift()
     }
@@ -136,10 +148,13 @@ const AboutPanel = ({ isOpen, onClose }) => {
       if (!cs.dragging) return
       cs.dragging = false
       wrap.style.cursor = ''
-      // Compute release velocity from recent samples (last ~80ms)
       const now = performance.now()
+      // Rebase: absorb drag into openPosition, reset epoch
+      cs.openPosition = cs.dragFrozenPos + cs.dragDelta
+      cs.openTime = now
+      cs.dragDelta = 0
+      // Compute release velocity from ring buffer
       const samples = cs.velSamples
-      // Find the oldest sample within 100ms window
       let v = 0
       if (samples.length >= 2) {
         const cutoff = now - 100
@@ -150,12 +165,13 @@ const AboutPanel = ({ isOpen, onClose }) => {
         }
         const newest = samples[samples.length - 1]
         const dt = newest.time - oldest.time
-        if (dt > 5) {  // need at least 5ms of data
-          v = ((newest.x - oldest.x) / dt) * 1000 // px/s
-        }
+        if (dt > 5) v = ((newest.x - oldest.x) / dt) * 1000
       }
-      // Only apply momentum if the flick was meaningful
-      cs.velocity = Math.abs(v) > 20 ? v : 0
+      if (Math.abs(v) > 20) {
+        cs.inMomentum = true
+        cs.momentumV0 = v
+        cs.momentumStartTime = now
+      }
     }
 
     wrap.addEventListener('mousedown', onDragStart)
@@ -175,67 +191,79 @@ const AboutPanel = ({ isOpen, onClose }) => {
     }
   }, [])
 
-  // Per-frame animation tick — integrates velocity + auto-scroll each frame
+  // Time-based animation tick — position is a pure function of wall-clock time
   useEffect(() => {
     const track = carouselRef.current
     if (!track) return
     const cs = carouselState.current
 
     if (!isOpen) {
+      // Save current visual position for seamless resume
+      if (cs.running && cs.openTime !== null) {
+        const now = performance.now()
+        const elapsed = (now - cs.openTime) * cs.speed / 1000
+        let pos = (cs.openPosition - elapsed) % cs.halfWidth
+        if (pos > 0) pos -= cs.halfWidth
+        cs.openPosition = pos
+        cs.inMomentum = false
+      }
       cs.running = false
-      cs.lastTickTime = null
       cancelAnimationFrame(cs.frame)
       return
     }
 
-    // Delay carousel start until after the reveal animation completes
-    // reveal-i=2 → delay = 2*100ms + 700ms = 900ms, duration = 1400ms → done at ~2300ms
-    const startDelay = setTimeout(() => {
-      if (!cs.running) return  // panel closed during wait
+    const setupFrame = requestAnimationFrame(() => {
+      cs.halfWidth = track.scrollWidth / 2
+      if (!cs.halfWidth) return
 
-      const sw = track.scrollWidth
-      cs.halfWidth = (sw - 24) / 2
-      if (!cs.halfWidth || cs.halfWidth <= 0) return
-
-      if (cs.pos === null) {
-        cs.pos = -(cs.halfWidth - 110)
+      if (cs.openPosition === null) {
+        cs.openPosition = -(cs.halfWidth - 110)
       }
-      cs.lastTickTime = performance.now()
-
-      const decayPerSec = Math.log(cs.friction) * 60
+      cs.openTime = performance.now()
+      cs.running = true
 
       const tick = (now) => {
         if (!cs.running) return
-        const dt = (now - cs.lastTickTime) / 1000
-        cs.lastTickTime = now
-        const dtClamped = Math.min(dt, 0.1)
+        const h = cs.halfWidth
+        let pos
 
-        if (!cs.dragging) {
-          if (Math.abs(cs.velocity) > 0.5) {
-            cs.pos += cs.velocity * dtClamped
-            cs.velocity *= Math.exp(decayPerSec * dtClamped)
-          } else {
-            cs.velocity = 0
+        if (cs.dragging) {
+          pos = cs.dragFrozenPos + cs.dragDelta
+        } else {
+          // Auto-scroll: pure function of elapsed time (no accumulation)
+          const elapsed = (now - cs.openTime) * cs.speed / 1000
+          pos = cs.openPosition - elapsed
+
+          // Momentum overlay (analytical exponential decay)
+          if (cs.inMomentum) {
+            const t = (now - cs.momentumStartTime) / 1000
+            const k = cs.momentumK
+            const offset = (cs.momentumV0 / k) * (1 - Math.exp(-k * t))
+            pos += offset
+            // Stop momentum when velocity < 1 px/s
+            if (Math.abs(cs.momentumV0 * Math.exp(-k * t)) < 1) {
+              const finalOffset = cs.momentumV0 / k
+              cs.openPosition = cs.openPosition - elapsed + finalOffset
+              cs.openTime = now
+              cs.inMomentum = false
+              pos = cs.openPosition
+            }
           }
-          cs.pos -= cs.autoSpeed * dtClamped
         }
 
-        // Display-only wrap — cs.pos stays unbounded for clean drag math
-        const h = cs.halfWidth
-        let d = cs.pos % h
-        if (d > 0) d -= h
-        track.style.transform = `translate3d(${d}px, 0, 0)`
+        pos = pos % h
+        if (pos > 0) pos -= h
+        track.style.transform = `translate3d(${pos}px, 0, 0)`
         cs.frame = requestAnimationFrame(tick)
       }
 
       cs.frame = requestAnimationFrame(tick)
-    }, 2400)
-    cs.running = true
+    })
 
     return () => {
       cs.running = false
-      clearTimeout(startDelay)
       cancelAnimationFrame(cs.frame)
+      cancelAnimationFrame(setupFrame)
     }
   }, [isOpen])
 
