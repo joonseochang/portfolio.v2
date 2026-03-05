@@ -190,6 +190,13 @@ select:focus {
   }
 }
 
+/* Safari global: Graphik font baseline sits high in flex containers — nudge down 1px */
+.safari input[type="text"],
+.safari input[type="search"],
+.safari .font-graphik {
+  transform: translateY(1px);
+}
+
 /* Safari fallback - use simple underline instead of dotted */
 /* Safari doesn't properly support text-decoration: underline dotted */
 .safari .dotted-underline-blue,
@@ -252,10 +259,7 @@ select:focus {
   justify-content: center !important;
 }
 
-/* Safari-specific fix: move time component text down by 1px */
-.safari div[class*="h-[35px]"][class*="rounded-[20px]"] > div[class*="flex"][class*="font-graphik"][class*="gap-[8px]"] {
-  transform: translateY(1px);
-}
+/* Safari time component: covered by global .font-graphik rule */
 
 /* Coordinates arrow alignment - all browsers */
 .coord-arrow-svg {
@@ -1871,14 +1875,7 @@ background-color: #E8F6FF;
   transform: translateY(-0.5px);
 }
 
-/* Safari global: compensate Graphik baseline offset in all nav flex buttons */
-.safari .nav-button > span,
-.safari .nav-name-button > span,
-.safari .nav-search-button > span,
-.safari .nav-search-button input,
-.safari .nav-info-button > span {
-  transform: translateY(0.5px);
-}
+/* Safari nav baseline: covered by global .font-graphik rule above */
 
 /* Shared border between adjacent buttons - seamless connection */
 /* Buttons are inside .hover-trigger wrappers for flicker prevention */
