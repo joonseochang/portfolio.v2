@@ -974,7 +974,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
         </div>
         <span className="footer-dot" />
         <div className="footer-hint">
-          <kbd className="footer-kbd">↵</kbd>
+          <kbd className="footer-kbd" style={{ paddingTop: '2px' }}>↵</kbd>
           <span>open</span>
         </div>
         <span className="footer-dot" />
