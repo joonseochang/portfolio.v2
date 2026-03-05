@@ -692,6 +692,8 @@ background-color: #E8F6FF;
               filter 450ms cubic-bezier(0.34, 1.35, 0.64, 1);
   opacity: 1;
   filter: blur(0px);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .group:hover .black-box-slide {
@@ -715,6 +717,9 @@ background-color: #E8F6FF;
               transform 450ms cubic-bezier(0.34, 1.35, 0.64, 1);
   opacity: 0;
   transform: translateY(10px);
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .group:hover .metadata-fade {
@@ -775,6 +780,9 @@ background-color: #E8F6FF;
   opacity: 1;
   transform: translateY(0);
   animation: textFadeIn 300ms ease-in-out;
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 @keyframes textFadeIn {
@@ -786,6 +794,40 @@ background-color: #E8F6FF;
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ─── Safari animation optimizations ────────────────────────────────────────
+   1. Remove filter from transitions — GPU filter compositing is expensive
+   2. Simplify spring easings — values >1 interpolate poorly in Safari
+   3. Disable jiggle hint — compound transform animation causes stutter
+   4. Simplify textFadeIn — translateY + opacity simultaneously causes flicker
+   ──────────────────────────────────────────────────────────────────────────── */
+.safari .black-box-slide,
+.safari .group:hover .black-box-slide,
+.safari .group:not(:hover) .black-box-slide {
+  transition: height 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  filter: none !important;
+}
+
+.safari .metadata-fade,
+.safari .group:hover .metadata-fade,
+.safari .group:not(:hover) .metadata-fade {
+  transition: opacity 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.safari .black-box-jiggle {
+  animation: none !important;
+}
+
+.safari .black-box-text {
+  animation: textFadeInSafari 280ms ease-out;
+}
+
+@keyframes textFadeInSafari {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Component loader animations — directional variants with spring settle */
