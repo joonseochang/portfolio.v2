@@ -855,7 +855,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
       label: 'Navigation',
       items: [
         { icon: PaletteIcons.book, label: 'Read latest writing', subtitle: 'Notes on disappearing (03.03.25)', href: '#' },
-        { icon: PaletteIcons.video, label: 'Watch recent video', subtitle: 'scotland-2025.mp4', href: '#' },
+        { icon: PaletteIcons.video, label: 'Watch recent movie', subtitle: 'scotland-2025.mp4', href: '#' },
       ],
     },
     {
