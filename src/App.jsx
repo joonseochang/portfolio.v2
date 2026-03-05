@@ -2479,17 +2479,17 @@ function App() {
           {!isTabletOrBelow && (
             <div className="hover-trigger">
             <button
-              className="nav-search-button relative h-[34px] px-[14px] rounded-[10px] flex items-center cursor-pointer group transition-all duration-[180ms]"
-              style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: 'rgba(235,235,238,0.5)', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 0.5px 1px rgba(0,0,0,0.03)' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(225,225,230,0.55)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.12)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(235,235,238,0.5)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)'; }}
+              className="nav-search-button relative border h-[37px] pl-[12px] pr-[8px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[190px] bg-[#fafafa] border-[#e2e2e2] shadow-[0_0.5px_1px_rgba(0,0,0,0.03),0_1px_1px_rgba(0,0,0,0.02),inset_0_0.5px_0_rgba(255,255,255,0.5)] hover:bg-[#f6f6f6] hover:border-[#d6d6d6] hover:shadow-[0_1px_2px_rgba(0,0,0,0.05),0_2px_4px_rgba(0,0,0,0.03),inset_0_0.5px_0_rgba(255,255,255,0.6)] transition-all duration-[180ms]"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
               }}
               aria-label="About - Prologue"
             >
-              <span className="font-graphik text-[14px] text-[#555] group-hover:text-[#333] whitespace-nowrap transition-colors duration-[180ms]">Prologue</span>
+              <span className="font-graphik text-[14px] text-[#777] group-hover:text-[#555] whitespace-nowrap transition-colors duration-[180ms]">Prologue...</span>
+              <span className="bg-[#f0f0f0] border border-[#ddd] shadow-[0_0.5px_1px_rgba(0,0,0,0.04),inset_0_0.5px_0_rgba(255,255,255,0.4)] h-[24px] w-[24px] rounded-[5px] flex items-center justify-center transition-all duration-[180ms] flex-shrink-0 group-hover:bg-[#eaeaea] group-hover:border-[#d2d2d2]">
+                <span className="font-graphik text-[11px] text-[#888] transition-colors duration-[180ms] group-hover:text-[#666]">P</span>
+              </span>
             </button>
             </div>
           )}
