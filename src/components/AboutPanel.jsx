@@ -1,5 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import WatercolorFlowers from './WatercolorFlowers'
+
+// Isolated age ticker — re-renders only itself, not the carousel
+const AgeTicker = () => {
+  const [age, setAge] = useState('')
+  useEffect(() => {
+    const birth = new Date('2000-04-21')
+    const getAge = () => (Date.now() - birth.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+    setAge(getAge().toFixed(9))
+    const interval = setInterval(() => setAge(getAge().toFixed(9)), 1300)
+    return () => clearInterval(interval)
+  }, [])
+  return <span style={{ fontVariantNumeric: 'tabular-nums' }}>{age}</span>
+}
 
 const AboutPanel = ({ isOpen, onClose }) => {
   const panelRef = useRef(null)
@@ -32,26 +45,8 @@ const AboutPanel = ({ isOpen, onClose }) => {
     velocity: 0,          // current velocity in px/s (positive = rightward)
     friction: 0.97,       // per-frame multiplier (~0.97 at 60fps = smooth coast)
   })
-  const [decimalAge, setDecimalAge] = useState('')
-
-  useEffect(() => {
-    const birth = new Date('2000-04-21')
-    const getAge = () => (Date.now() - birth.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
-    // Show enough decimals so one digit visibly ticks every ~1.3s
-    // 1 year ≈ 31,557,600s → 8th decimal changes every ~0.32s, 7th every ~3.2s
-    // We want ~1.3s per tick → show to 8 decimals (last digit ticks ~0.3s,
-    // but the visible "slow roll" effect comes from the leading decimals being stable)
-    // Actually: to tick every ~1.3s, we need fewer decimals.
-    // 6th decimal changes every ~31.6s — too slow
-    // 7th decimal changes every ~3.16s — close
-    // Let's use a custom approach: update every 1300ms
-    setDecimalAge(getAge().toFixed(9))
-    const interval = setInterval(() => setDecimalAge(getAge().toFixed(9)), 1300)
-    return () => clearInterval(interval)
-  }, [])
-
   const facts = [
-    { label: 'Current age', value: decimalAge },
+    { label: 'Current age', value: <AgeTicker /> },
     { label: 'School', value: 'Yonsei University' },
     { label: 'Favorite song', value: '夢中人 - Faye Wong' },
     { label: 'Can speak', value: '4 languages' },
@@ -194,8 +189,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
     }
 
     const setupFrame = requestAnimationFrame(() => {
-      cs.halfWidth = track.scrollWidth / 2
-      if (!cs.halfWidth) return
+      // Measure the repeat distance = half of the duplicated content
+      // Track has pl-24 which only appears once, so subtract it
+      const sw = track.scrollWidth
+      cs.halfWidth = (sw - 24) / 2
+      if (!cs.halfWidth || cs.halfWidth <= 0) return
 
       if (cs.pos === null) {
         cs.pos = -(cs.halfWidth - 110)
@@ -203,31 +201,29 @@ const AboutPanel = ({ isOpen, onClose }) => {
       cs.lastTickTime = performance.now()
       cs.running = true
 
+      const decayPerSec = Math.log(cs.friction) * 60
+
       const tick = (now) => {
         if (!cs.running) return
-        const dt = (now - cs.lastTickTime) / 1000  // seconds
+        const dt = (now - cs.lastTickTime) / 1000
         cs.lastTickTime = now
-        // Clamp dt to avoid jumps on tab-switch or stutter
         const dtClamped = Math.min(dt, 0.1)
 
         if (!cs.dragging) {
-          // Apply momentum velocity (decays each frame via friction)
           if (Math.abs(cs.velocity) > 0.5) {
             cs.pos += cs.velocity * dtClamped
-            // Frame-rate-independent friction: friction^(dt*60) for ~60fps baseline
-            cs.velocity *= Math.pow(cs.friction, dtClamped * 60)
+            cs.velocity *= Math.exp(decayPerSec * dtClamped)
           } else {
             cs.velocity = 0
           }
-          // Auto-scroll: constant leftward drift
           cs.pos -= cs.autoSpeed * dtClamped
         }
 
-        // Seamless looping
+        // Display-only wrap — cs.pos stays unbounded for clean drag math
         const h = cs.halfWidth
-        let displayPos = cs.pos % h
-        if (displayPos > 0) displayPos -= h
-        track.style.transform = `translate3d(${displayPos}px, 0, 0)`
+        let d = cs.pos % h
+        if (d > 0) d -= h
+        track.style.transform = `translate3d(${d}px, 0, 0)`
         cs.frame = requestAnimationFrame(tick)
       }
 
@@ -352,18 +348,12 @@ const AboutPanel = ({ isOpen, onClose }) => {
           }}
         >
           <div ref={carouselRef} className="fact-carousel-track gap-[25px] pl-[24px]">
-            {[...facts, ...facts].map((fact, i) => {
-              const isAge = fact.label === 'Current age'
-              return (
-                <div key={i} className="flex flex-col gap-[6px] shrink-0">
-                  <span className="font-graphik text-[14px] leading-[15px] text-[#5b5b5e] whitespace-nowrap">{fact.label}</span>
-                  <span
-                    className="font-graphik text-[14px] leading-[15px] text-[#c3c3c3] whitespace-nowrap"
-                    style={isAge ? { fontVariantNumeric: 'tabular-nums' } : undefined}
-                  >{fact.value}</span>
-                </div>
-              )
-            })}
+            {[...facts, ...facts].map((fact, i) => (
+              <div key={i} className="flex flex-col gap-[6px] shrink-0">
+                <span className="font-graphik text-[14px] leading-[15px] text-[#5b5b5e] whitespace-nowrap">{fact.label}</span>
+                <span className="font-graphik text-[14px] leading-[15px] text-[#c3c3c3] whitespace-nowrap">{fact.value}</span>
+              </div>
+            ))}
           </div>
         </div>
 
