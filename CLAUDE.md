@@ -262,3 +262,22 @@ If build fails, fix before committing — never commit a broken build.
 - Verify mobile media queries exist for new components
 - Modals: centered overlay on mobile
 - Bottom pill: icon-only on mobile
+
+---
+
+## Command Palette — Future Ideas (TODO)
+
+The search bar should be a **universal entry point**, not just for 9 static items. Value = discoverability on a personal site.
+
+### Content categories to add:
+1. **Project deep-links** — Each portfolio project becomes searchable by title + tech stack. Scales naturally.
+2. **Writing / blog posts** — Title + first ~60 chars as subtitle. Scales automatically from `cms-data/`.
+3. **Media collections** — Album-level tagging (not per-photo). e.g. "Seoul 2024", "Studio shots". Stored in `cms-data/media-collections.json` with `{ name, tags[], thumbnail, count }`.
+4. **Easter eggs / personality** — Specific queries trigger special responses: `"coffee"` → go-to order, `"stack"` → tech stack card, `"reading"` → current book, `"playlist"` → current playlist, `"uses"` → setup/tools, `"location"` → ties into weather/clock.
+5. **Contextual / live items** — Music playing → "Now playing: [track]" in results. Time-based greetings. "Latest commit: [msg]" from GitHub hook.
+6. **Quick actions** — Toggle dark mode, share site (copy URL), view source (GitHub repo link), colophon page.
+
+### Implementation approach:
+- `cms-data/palette-items.json` — flat JSON array, each entry `{ label, subtitle?, category, action, icon? }`. Component reads at build time.
+- Dynamic items (music, weather) injected at runtime via hook.
+- **Rotating placeholder hint** for first-time visitors: cycle through `"Try 'resume'..."`, `"Try 'coffee'..."`, `"Try 'photos'..."` every few seconds.

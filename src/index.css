@@ -2421,7 +2421,7 @@ background-color: #E8F6FF;
 
 /* Scrollable list — height set to clip a row mid-way as scroll hint */
 .shortcuts-palette-list {
-  max-height: 305px;
+  max-height: 290px;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
