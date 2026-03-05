@@ -188,9 +188,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
       return
     }
 
-    const setupFrame = requestAnimationFrame(() => {
-      // Measure the repeat distance = half of the duplicated content
-      // Track has pl-24 which only appears once, so subtract it
+    // Delay carousel start until after the reveal animation completes
+    // reveal-i=2 → delay = 2*100ms + 700ms = 900ms, duration = 1400ms → done at ~2300ms
+    const startDelay = setTimeout(() => {
+      if (!cs.running) return  // panel closed during wait
+
       const sw = track.scrollWidth
       cs.halfWidth = (sw - 24) / 2
       if (!cs.halfWidth || cs.halfWidth <= 0) return
@@ -199,7 +201,6 @@ const AboutPanel = ({ isOpen, onClose }) => {
         cs.pos = -(cs.halfWidth - 110)
       }
       cs.lastTickTime = performance.now()
-      cs.running = true
 
       const decayPerSec = Math.log(cs.friction) * 60
 
@@ -228,12 +229,13 @@ const AboutPanel = ({ isOpen, onClose }) => {
       }
 
       cs.frame = requestAnimationFrame(tick)
-    })
+    }, 2400)
+    cs.running = true
 
     return () => {
       cs.running = false
+      clearTimeout(startDelay)
       cancelAnimationFrame(cs.frame)
-      cancelAnimationFrame(setupFrame)
     }
   }, [isOpen])
 
