@@ -2479,17 +2479,14 @@ function App() {
           {!isTabletOrBelow && (
             <div className="hover-trigger">
             <button
-              className="nav-search-button relative border h-[37px] pl-[10px] pr-[7px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[197px] bg-[#f7f7f7] border-[#eaeaea] shadow-[0_0.5px_1px_rgba(0,0,0,0.03),0_1px_1px_rgba(0,0,0,0.02),inset_0_0.5px_0_rgba(255,255,255,0.5),inset_0_-0.5px_0_rgba(0,0,0,0.015)] hover:bg-[#fcfcfc] hover:border-[#e0e0e0] hover:shadow-[0_1px_2px_rgba(0,0,0,0.05),0_2px_4px_rgba(0,0,0,0.03),inset_0_0.5px_0_rgba(255,255,255,0.6),inset_0_-0.5px_0_rgba(0,0,0,0.02)] transition-all duration-[180ms]"
+              className="nav-search-button relative border h-[30px] px-[13px] rounded-[14px] flex items-center cursor-pointer group bg-[#f2f2f2] border-[#e8e8e8] hover:bg-[#ececec] hover:border-[#e0e0e0] transition-all duration-[180ms]"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
               }}
-              aria-label="About - Ask me anything"
+              aria-label="About - Prologue"
             >
-              <span className="font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#666] whitespace-nowrap transition-colors duration-[180ms]">Prologue...</span>
-              <span className="bg-[#eeeeee] border border-[#e0e0e0] shadow-[0_0.5px_1px_rgba(0,0,0,0.04),inset_0_0.5px_0_rgba(255,255,255,0.4),inset_0_-0.5px_0_rgba(0,0,0,0.02)] h-[25px] w-[25px] rounded-[5px] flex items-center justify-center transition-all duration-[180ms] flex-shrink-0 group-hover:bg-[#e9e9e9] group-hover:border-[#d8d8d8]">
-                <span className="font-graphik text-[12px] text-[#888] transition-colors duration-[180ms] group-hover:text-[#666]">P</span>
-              </span>
+              <span className="font-graphik text-[13px] text-[#999] group-hover:text-[#666] whitespace-nowrap transition-colors duration-[180ms]">Prologue</span>
             </button>
             </div>
           )}
