@@ -1022,7 +1022,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder={placeholder}
-              className="font-graphik text-[14px] text-[#444] bg-transparent outline-none w-full placeholder-[#b3b3b3]"
+              className="shortcuts-palette-search-input font-graphik text-[14px] text-[#444] bg-transparent outline-none w-full placeholder-[#b3b3b3]"
             />
           </div>
         </div>

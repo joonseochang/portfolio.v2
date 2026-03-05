@@ -1784,6 +1784,23 @@ background-color: #E8F6FF;
   -webkit-box-align: center;
 }
 
+/* Safari: buttons don't always respect flex alignment without this */
+.nav-info-button {
+  -webkit-appearance: none;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+/* Safari: inputs inside flex containers need explicit line-height */
+.shortcuts-palette-search-input {
+  -webkit-appearance: none;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+}
+
 /* Information button — skeuomorphic nav button */
 .nav-info-button {
   background: linear-gradient(180deg, #ffffff 0%, #f9f9fb 100%);

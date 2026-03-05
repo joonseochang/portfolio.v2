@@ -2704,12 +2704,12 @@ function App() {
                 {/* Weather section - expands on hover with smooth animation */}
                 {ambientWeather && (
                   <div
-                    className="clock-weather-section overflow-hidden flex"
+                    className="clock-weather-section overflow-hidden flex justify-end"
                     style={{
                       // Fixed pixel width - collapse to 3px (not 0) to allow bounce undershoot
                       width: isClockHovered ? '48px' : '3px',
-                      // -6px cancels parent gap-[6px]; inner pl-[8px] gives consistent 8px city→divider gap
-                      marginLeft: isClockHovered ? '-6px' : '-11px',
+                      // Constant -8px margin fully compensates for parent's gap, extra -3px hides the 3px collapsed width
+                      marginLeft: isClockHovered ? '-8px' : '-11px',
                       // Expand: 480ms with bounce, Collapse: 560ms with bounce
                       transition: isClockHovered
                         ? 'width 480ms cubic-bezier(0.22, 1.4, 0.36, 1), margin-left 480ms cubic-bezier(0.22, 1.4, 0.36, 1)'
@@ -2717,7 +2717,7 @@ function App() {
                     }}
                   >
                     <div
-                      className="flex items-center gap-[8px] pl-[8px] whitespace-nowrap"
+                      className="flex items-center gap-[8px] whitespace-nowrap"
                       style={{
                         opacity: isClockHovered ? 1 : 0,
                         // visibility:hidden fully removes text from rendering when collapsed
