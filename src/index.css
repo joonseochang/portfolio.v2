@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Focus ring — hide on mouse, show custom ring on keyboard nav only */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible:not(input):not(textarea):not(select) {
+  outline: 2px solid rgba(36, 128, 237, 0.45);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Text inputs: never show outline (cursor position indicates focus) */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
 /* Safe area insets for notched phones (iPhone X+) */
 :root {
   --safe-area-top: env(safe-area-inset-top, 0px);

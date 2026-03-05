@@ -1071,15 +1071,14 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   );
 };
 
-export const ContactModalContent = ({ darkMode = false }) => {
+export const ContactModalContent = ({ darkMode = false, activePanel = null, onPanelChange }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [activePanel, setActivePanel] = useState(null); // null | 'msg' | 'ext' | 'bot'
   const composing = activePanel === 'msg';
   const showMore = activePanel === 'ext';
   const showQR = activePanel === 'bot';
-  const togglePanel = (panel) => { playClick(); setScrolledToBottom(false); setActivePanel(prev => prev === panel ? null : panel); };
+  const togglePanel = (panel) => { playClick(); setScrolledToBottom(false); onPanelChange(prev => prev === panel ? null : panel); };
   const [message, setMessage] = useState('');
   const [sendState, setSendState] = useState('idle'); // idle | sending | sent | error
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
