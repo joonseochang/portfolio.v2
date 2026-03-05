@@ -259,7 +259,13 @@ select:focus {
   justify-content: center !important;
 }
 
-/* Safari time component: covered by global .font-graphik rule */
+/* Safari clock pill: apply baseline fix to text spans directly, not the container */
+.safari .clock-pill-text {
+  transform: none;
+}
+.safari .clock-pill-text span {
+  transform: translateY(1px);
+}
 
 /* Coordinates arrow alignment - all browsers */
 .coord-arrow-svg {
