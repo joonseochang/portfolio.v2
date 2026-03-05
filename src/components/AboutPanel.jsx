@@ -20,7 +20,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
     frame: null,
     lastTickTime: null,
     // Auto-scroll
-    autoSpeed: 30,        // px/s — constant leftward drift
+    autoSpeed: 38,        // px/s — constant leftward drift
     // Drag
     dragging: false,
     dragStartX: 0,
