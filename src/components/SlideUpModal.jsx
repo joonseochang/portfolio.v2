@@ -1255,7 +1255,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
                 {item.title}
               </span>
               <span
-                className="font-graphik text-[12px] leading-[17px] transition-all duration-200 ease-out"
+                className="font-graphik text-[14px] leading-[20px] transition-all duration-200 ease-out"
                 style={{ color: getEmailDescriptionColor() }}
               >
                 {getEmailDescription()}
@@ -1287,7 +1287,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
               <span className="font-graphik text-[14px] leading-[18px] text-[#444]">
                 {item.title}
               </span>
-              <span className="font-graphik text-[12px] leading-[17px] text-[#c3c3c3]">
+              <span className="font-graphik text-[14px] leading-[20px] text-[#c3c3c3]">
                 {item.description}
               </span>
             </div>
