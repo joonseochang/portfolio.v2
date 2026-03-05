@@ -646,14 +646,15 @@ export const ActivityModalContent = () => (
 );
 
 // Shortcut row sub-component
-const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href }) => {
+const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSelected }) => {
+  const rowClass = `shortcut-row${isSelected ? ' shortcut-row-selected' : ''}`;
   const content = (
     <div className={`shortcut-row-inner w-full flex items-center gap-[10px] px-[10px] ${subtitle ? 'py-[7px]' : 'py-[5px]'}`}>
       <div className="shortcut-icon-box w-[30px] h-[28px] flex items-center justify-center rounded-[6px] flex-shrink-0">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <span className="font-graphik text-[14px] text-[#5B5B5E] block truncate">{label}</span>
+        <span className="font-graphik text-[14px] text-[#444] block truncate">{label}</span>
         {subtitle && (
           <span className="block font-graphik text-[12px] text-[#999] mt-[1px] truncate">{subtitle}</span>
         )}
@@ -675,13 +676,13 @@ const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href }) => {
 
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="shortcut-row">
+      <a href={href} target="_blank" rel="noopener noreferrer" className={rowClass} data-shortcut-row>
         {content}
       </a>
     );
   }
   return (
-    <button onClick={onClick} className="shortcut-row w-full text-left">
+    <button onClick={onClick} className={`${rowClass} w-full text-left`} data-shortcut-row>
       {content}
     </button>
   );
@@ -723,15 +724,13 @@ const PaletteIcons = {
       <line x1="3" y1="21" x2="10" y2="14"/>
     </svg>
   ),
-  // Calendar with clock — Book a call
+  // Calendar — Book a call
   calendar: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="4" width="18" height="18" rx="2"/>
       <line x1="16" y1="2" x2="16" y2="6"/>
       <line x1="8" y1="2" x2="8" y2="6"/>
       <line x1="3" y1="10" x2="21" y2="10"/>
-      <circle cx="15" cy="16" r="3"/>
-      <path d="M15 15v1.5l1 .5"/>
     </svg>
   ),
   // Compass — What is Joon up to
@@ -772,69 +771,217 @@ const PaletteIcons = {
   ),
 };
 
-export const ShortcutsModalContent = ({ isMac, onAction }) => {
+export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   const { playClick } = useSounds();
+  const [query, setQuery] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
 
   const handleAction = (action, payload) => {
     playClick();
     if (onAction) onAction(action, payload);
   };
 
-  const navigationItems = [
-    { icon: PaletteIcons.book, label: 'Read latest writing', subtitle: 'Notes on disappearing (03.03.25)', href: '#' },
-    { icon: PaletteIcons.changelog, label: 'Visit changelog', subtitle: 'v2.3 — Modal redesign', href: '#' },
+  // Auto-focus search input on mount
+  useEffect(() => {
+    const timer = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const sections = [
+    {
+      label: 'Navigation',
+      items: [
+        { icon: PaletteIcons.book, label: 'Read latest writing', subtitle: 'Notes on disappearing (03.03.25)', href: '#' },
+        { icon: PaletteIcons.changelog, label: 'Visit changelog', subtitle: 'v2.3 — Modal redesign', href: '#' },
+      ],
+    },
+    {
+      label: 'Actions',
+      items: [
+        { icon: PaletteIcons.resume, label: 'View resume', action: () => handleAction('viewResume') },
+        { icon: PaletteIcons.calendar, label: 'Book a call (30 mins)', href: '#' },
+        { icon: PaletteIcons.expand, label: 'Enter theater mode', action: () => handleAction('enterTheaterMode') },
+      ],
+    },
+    {
+      label: 'Miscellaneous',
+      items: [
+        { icon: PaletteIcons.download, label: 'Download time capsule', action: () => handleAction('downloadTimeCapsule') },
+        { icon: PaletteIcons.speaker, label: 'How to pronounce my name', action: () => handleAction('pronounceName') },
+        { icon: PaletteIcons.paperPlane, label: 'Send a Wuphf', action: () => handleAction('sendWuphf') },
+        { icon: PaletteIcons.pen, label: 'Sign guestbook', action: () => handleAction('signGuestbook') },
+      ],
+    },
   ];
 
-  const actionItems = [
-    { icon: PaletteIcons.resume, label: 'View resume', action: () => handleAction('viewResume') },
-    { icon: PaletteIcons.expand, label: 'Enter theater mode', action: () => handleAction('enterTheaterMode') },
-    { icon: PaletteIcons.calendar, label: 'Book a call (30 mins)', href: '#' },
-  ];
+  // Filter sections by query
+  const q = query.toLowerCase().trim();
+  const filteredSections = sections
+    .map(section => ({
+      ...section,
+      items: q
+        ? section.items.filter(item =>
+            item.label.toLowerCase().includes(q) ||
+            (item.subtitle && item.subtitle.toLowerCase().includes(q))
+          )
+        : section.items,
+    }))
+    .filter(section => section.items.length > 0);
 
-  const miscItems = [
-    { icon: PaletteIcons.download, label: 'Download time capsule', action: () => handleAction('downloadTimeCapsule') },
-    { icon: PaletteIcons.speaker, label: 'How to pronounce my name', action: () => handleAction('pronounceName') },
-    { icon: PaletteIcons.paperPlane, label: 'Send a Wuphf', action: () => handleAction('sendWuphf') },
-    { icon: PaletteIcons.pen, label: 'Sign guestbook', action: () => handleAction('signGuestbook') },
-  ];
+  // Flat list of visible items for keyboard nav
+  const flatItems = filteredSections.flatMap(s => s.items);
 
-  const renderSection = (label, items, isLast) => (
-    <>
-      <div className="px-[14px] pb-[6px]">
-        <span className="section-label">{label}</span>
-      </div>
-      {items.map((item, i) => (
-        <ShortcutRow
-          key={`${label}-${i}`}
-          icon={item.icon}
-          label={item.label}
-          subtitle={item.subtitle}
-          keys={item.keys}
-          isMac={isMac}
-          onClick={item.action}
-          href={item.href}
-        />
-      ))}
-      {!isLast && (
-        <div className="w-full border-t border-dashed border-[#EBEEF5] my-[8px]" />
-      )}
-    </>
-  );
+  // Reset selectedIndex when query changes
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [query]);
+
+  // Scroll selected row into view
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    if (selectedIndex === 0) {
+      list.scrollTop = 0;
+      return;
+    }
+    const rows = list.querySelectorAll('[data-shortcut-row]');
+    if (rows[selectedIndex]) {
+      rows[selectedIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
+  // Keep refs current for the document-level keydown listener
+  const flatItemsRef = useRef(flatItems);
+  const selectedIndexRef = useRef(selectedIndex);
+  const queryRef = useRef(query);
+  flatItemsRef.current = flatItems;
+  selectedIndexRef.current = selectedIndex;
+  queryRef.current = query;
+
+  // Document-level keydown — works regardless of focus
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const items = flatItemsRef.current;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(prev => items.length ? (prev + 1) % items.length : 0);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(prev => items.length ? (prev - 1 + items.length) % items.length : 0);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const item = items[selectedIndexRef.current];
+        if (item) {
+          playClick();
+          if (item.href) {
+            window.open(item.href, '_blank', 'noopener,noreferrer');
+          } else if (item.action) {
+            item.action();
+          }
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        if (queryRef.current) {
+          setQuery('');
+          inputRef.current?.focus();
+        } else if (onClose) {
+          onClose();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, playClick]);
+
+  // Render filtered sections with flat index tracking
+  let flatIndex = 0;
+  const renderFilteredSections = () => {
+    flatIndex = 0;
+    return filteredSections.map((section, sIdx) => {
+      const sectionRows = section.items.map((item) => {
+        const currentFlatIndex = flatIndex;
+        flatIndex++;
+        return (
+          <ShortcutRow
+            key={`${section.label}-${item.label}`}
+            icon={item.icon}
+            label={item.label}
+            subtitle={item.subtitle}
+            keys={item.keys}
+            isMac={isMac}
+            onClick={item.action}
+            href={item.href}
+            isSelected={currentFlatIndex === selectedIndex}
+          />
+        );
+      });
+      const isLast = sIdx === filteredSections.length - 1;
+      return (
+        <div key={section.label}>
+          <div className="px-[14px] pb-[6px]">
+            <span className="section-label">{section.label}</span>
+          </div>
+          {sectionRows}
+          {!isLast && (
+            <div className="w-full border-t border-dashed border-[#EBEEF5] my-[8px]" />
+          )}
+        </div>
+      );
+    });
+  };
 
   return (
     <div className="flex flex-col items-center">
       {/* Inner white card */}
       <div className="shortcuts-palette-inner w-[355px]">
-        <div className="pt-[14px] pb-[10px] flex flex-col">
-          {renderSection('Navigation', navigationItems, false)}
-          {renderSection('Actions', actionItems, false)}
-          {renderSection('Miscellaneous', miscItems, true)}
+        {/* Search input */}
+        <div className="px-[12px] pt-[12px] pb-[10px]" style={{ borderBottom: '1px solid rgba(235, 238, 245, 0.85)' }}>
+          <div className="flex items-center gap-[8px] rounded-[8px] px-[10px] py-[8px]" style={{ background: '#f5f5f5', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)', border: '1px solid #e0e0e0' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Type a command..."
+              className="font-graphik text-[14px] text-[#444] bg-transparent outline-none w-full placeholder-[#b3b3b3]"
+            />
+          </div>
+        </div>
+
+        {/* Items list — height clips last visible item mid-row to hint scrollability */}
+        <div ref={listRef} className="shortcuts-palette-list pt-[10px] pb-[10px] flex flex-col">
+          {flatItems.length > 0 ? (
+            renderFilteredSections()
+          ) : (
+            <div className="flex items-center justify-center py-[24px]">
+              <span className="font-graphik text-[13px] text-[#999]">No results found</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Footer keyboard hints */}
       <div className="shortcuts-palette-footer">
-        <span>esc close</span>
+        <div className="footer-hint">
+          <kbd className="footer-kbd">↑↓</kbd>
+          <span>navigate</span>
+        </div>
+        <span className="footer-dot" />
+        <div className="footer-hint">
+          <kbd className="footer-kbd">↵</kbd>
+          <span>open</span>
+        </div>
+        <span className="footer-dot" />
+        <div className="footer-hint">
+          <kbd className="footer-kbd">esc</kbd>
+          <span>close</span>
+        </div>
       </div>
     </div>
   );
@@ -1120,18 +1267,18 @@ export const ContactModalContent = ({ darkMode = false }) => {
         )}
         <div className="flex items-center gap-[5px]">
           <button
-            className={`te-btn${composing ? ' on' : ''}`}
-            onClick={() => togglePanel('msg')}
-          >
-            <span className="te-led" />
-            <span className="te-btn-label">msg</span>
-          </button>
-          <button
             className={`te-btn${showMore ? ' on' : ''}`}
             onClick={() => togglePanel('ext')}
           >
             <span className="te-led" />
             <span className="te-btn-label">ext</span>
+          </button>
+          <button
+            className={`te-btn${composing ? ' on' : ''}`}
+            onClick={() => togglePanel('msg')}
+          >
+            <span className="te-led" />
+            <span className="te-btn-label">msg</span>
           </button>
           <button
             className={`te-btn${showQR ? ' on' : ''}`}
