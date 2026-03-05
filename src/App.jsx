@@ -2486,9 +2486,9 @@ function App() {
               }}
               aria-label="About - Ask me anything"
             >
-              <span className="font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#666] whitespace-nowrap transition-colors duration-[180ms]">Ask me anything...</span>
-              <span className="bg-[#eeeeee] border border-[#e0e0e0] shadow-[0_0.5px_1px_rgba(0,0,0,0.04),inset_0_0.5px_0_rgba(255,255,255,0.4),inset_0_-0.5px_0_rgba(0,0,0,0.02)] h-[25px] w-[29px] rounded-[5px] flex items-center justify-center transition-all duration-[180ms] flex-shrink-0 group-hover:bg-[#e9e9e9] group-hover:border-[#d8d8d8]">
-                <span className="font-graphik text-[12px] text-[#888] transition-colors duration-[180ms] group-hover:text-[#666]">⌘J</span>
+              <span className="font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#666] whitespace-nowrap transition-colors duration-[180ms]">Prologue...</span>
+              <span className="bg-[#eeeeee] border border-[#e0e0e0] shadow-[0_0.5px_1px_rgba(0,0,0,0.04),inset_0_0.5px_0_rgba(255,255,255,0.4),inset_0_-0.5px_0_rgba(0,0,0,0.02)] h-[25px] w-[25px] rounded-[5px] flex items-center justify-center transition-all duration-[180ms] flex-shrink-0 group-hover:bg-[#e9e9e9] group-hover:border-[#d8d8d8]">
+                <span className="font-graphik text-[12px] text-[#888] transition-colors duration-[180ms] group-hover:text-[#666]">P</span>
               </span>
             </button>
             </div>
@@ -2562,7 +2562,7 @@ function App() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Ask me anything..."
+                      placeholder="Prologue..."
                       className="flex-1 bg-transparent font-graphik text-[14px] text-[#333] placeholder-[#8f8f8f] outline-none"
                     />
                     <span className="bg-[#eeeeee] border border-[#e0e0e0] h-[25px] w-[29px] rounded-[5px] flex items-center justify-center flex-shrink-0">
@@ -3252,6 +3252,7 @@ function App() {
             {activeModal === 'shortcuts' && (
               <ShortcutsModalContent
                 isMac={isMac}
+                onClose={() => setActiveModal(null)}
                 onAction={(action, payload) => {
                   switch (action) {
                     case 'navigate':
