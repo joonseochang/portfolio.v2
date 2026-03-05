@@ -2356,6 +2356,10 @@ background-color: #E8F6FF;
   transition: stroke 200ms ease, fill 200ms ease;
 }
 
+.shortcut-icon-box svg.palette-video-icon polygon {
+  transition: fill 200ms ease;
+}
+
 /* Keyboard-selected row — mirrors hover state */
 .shortcut-row-selected .shortcut-row-inner {
   transform: translateY(-0.5px);
@@ -2381,6 +2385,10 @@ background-color: #E8F6FF;
 
 .shortcut-row-selected .shortcut-icon-box svg {
   stroke: #6b7280;
+}
+
+.shortcut-row-selected .shortcut-icon-box svg.palette-video-icon polygon {
+  fill: #6b7280;
 }
 
 /* Scrollable list — height clips a row mid-way as scroll hint */

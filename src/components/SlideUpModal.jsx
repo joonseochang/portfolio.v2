@@ -697,13 +697,11 @@ const PaletteIcons = {
       <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
     </svg>
   ),
-  // List with checks — Visit changelog
-  changelog: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 7l2 2 4-4"/>
-      <path d="M4 15l2 2 4-4"/>
-      <path d="M14 8h6"/>
-      <path d="M14 16h6"/>
+  // Play circle — Watch recent video
+  video: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="palette-video-icon">
+      <circle cx="12" cy="12" r="10"/>
+      <polygon points="10 8 16 12 10 16 10 8" fill="#a3a3a3" stroke="none"/>
     </svg>
   ),
   // Document with folded corner — View resume
@@ -778,6 +776,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   const inputRef = useRef(null);
   const listRef = useRef(null);
   const isKeyboardNavRef = useRef(false);
+  const suppressMouseRef = useRef(false);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
 
   const handleAction = (action, payload) => {
@@ -796,7 +795,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
       label: 'Navigation',
       items: [
         { icon: PaletteIcons.book, label: 'Read latest writing', subtitle: 'Notes on disappearing (03.03.25)', href: '#' },
-        { icon: PaletteIcons.changelog, label: 'Visit changelog', subtitle: 'v2.3 — Modal redesign', href: '#' },
+        { icon: PaletteIcons.video, label: 'Watch recent video', subtitle: 'scotland-2025.mp4', href: '#' },
       ],
     },
     {
@@ -871,10 +870,12 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         isKeyboardNavRef.current = true;
+        suppressMouseRef.current = true;
         setSelectedIndex(prev => items.length ? (prev + 1) % items.length : 0);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         isKeyboardNavRef.current = true;
+        suppressMouseRef.current = true;
         setSelectedIndex(prev => items.length ? (prev - 1 + items.length) % items.length : 0);
       } else if (e.key === 'Enter') {
         e.preventDefault();
@@ -920,7 +921,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
             onClick={item.action}
             href={item.href}
             isSelected={currentFlatIndex === selectedIndex}
-            onMouseEnter={() => setSelectedIndex(currentFlatIndex)}
+            onMouseEnter={() => { if (!suppressMouseRef.current) setSelectedIndex(currentFlatIndex); }}
           />
         );
       });
@@ -966,6 +967,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
           <div
             ref={listRef}
             className="shortcuts-palette-list pt-[10px] pb-[10px] flex flex-col"
+            onMouseMove={() => { suppressMouseRef.current = false; }}
             onScroll={(e) => {
               const el = e.target;
               setIsScrolledToBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 5);
