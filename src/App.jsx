@@ -2479,7 +2479,10 @@ function App() {
           {!isTabletOrBelow && (
             <div className="hover-trigger">
             <button
-              className="nav-search-button relative border h-[34px] px-[14px] rounded-[8px] flex items-center cursor-pointer group bg-gradient-to-b from-white to-[#fafafa] border-[#d8d8d8] shadow-[0_0.5px_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.03),inset_0_0.5px_0_rgba(255,255,255,0.7),inset_0_-0.5px_0_rgba(0,0,0,0.02)] hover:from-[#fefefe] hover:to-[#f5f5f5] hover:border-[#cacaca] hover:shadow-[0_1px_2px_rgba(0,0,0,0.06),0_2px_4px_rgba(0,0,0,0.04),inset_0_0.5px_0_rgba(255,255,255,0.8)] transition-all duration-[180ms]"
+              className="nav-search-button relative h-[34px] px-[14px] rounded-[10px] flex items-center cursor-pointer group transition-all duration-[180ms]"
+              style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(0,0,0,0.04)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.75)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.08)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.55)'; e.currentTarget.style.borderColor = 'rgba(0,0,0,0.04)'; }}
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
