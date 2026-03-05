@@ -1871,8 +1871,12 @@ background-color: #E8F6FF;
   transform: translateY(-0.5px);
 }
 
-/* Safari-specific fix: adjust search button text position */
-.safari .nav-search-button > span:first-child {
+/* Safari global: compensate Graphik baseline offset in all nav flex buttons */
+.safari .nav-button > span,
+.safari .nav-name-button > span,
+.safari .nav-search-button > span,
+.safari .nav-search-button input,
+.safari .nav-info-button > span {
   transform: translateY(0.5px);
 }
 
