@@ -2454,11 +2454,6 @@ function App() {
               {(isHomeButtonHovered || isFaceHoverExiting) && (
                 <div
                   className={`face-hover-box absolute z-[100] ${isFaceHoverExiting ? 'exiting' : ''}`}
-                  onAnimationEnd={() => {
-                    if (isFaceHoverExiting) {
-                      setIsFaceHoverExiting(false);
-                    }
-                  }}
                 >
                   <div className="face-hover-box-inner rounded-[12px] p-[4px]">
                     <button
@@ -3027,13 +3022,8 @@ function App() {
         <div className="flex h-full bottom-pill-container rounded-[14px] relative" style={{ '--music-pill-width': `${musicPillWidth}px` }}>
           {/* Status Tab - aligned to right edge of music hover box, 10px above pill */}
           {!musicTabConflicts && (isMusicHovered || isModalExiting) && currentTrack && (
-            <div 
+            <div
               className={`music-status-tab absolute z-[100] ${isModalExiting ? 'exiting' : ''}`}
-              onAnimationEnd={() => {
-                if (isModalExiting) {
-                  setIsModalExiting(false);
-                }
-              }}
             >
               <div className="status-tab-inner rounded-[8px] px-[12px] py-[7px] flex items-center justify-center gap-[6px]">
                 {currentTrack.isNowPlaying ? (
@@ -3180,11 +3170,6 @@ function App() {
             {!isTabletOrBelow && !shortcutsTooltipConflicts && (isShortcutsHovered || isShortcutsModalExiting) && (
               <div
                 className={`shortcuts-modal absolute z-[100] ${isShortcutsModalExiting ? 'exiting' : ''}`}
-                onAnimationEnd={() => {
-                  if (isShortcutsModalExiting) {
-                    setIsShortcutsModalExiting(false);
-                  }
-                }}
               >
                 <div className="shortcuts-modal-inner rounded-[8px] px-[12px] py-[7px] flex items-center justify-center">
                   <span className="font-graphik text-[14px] leading-[20px] text-[#5b5b5e] whitespace-nowrap">{isMac ? '⌘K' : 'Ctrl+K'}</span>
