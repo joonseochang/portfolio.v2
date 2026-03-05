@@ -621,6 +621,12 @@ function App() {
   const [activeModal, setActiveModal] = useState(null); // 'music' | 'activity' | 'shortcuts' | 'contact' | null
   const [activeAnchorRef, setActiveAnchorRef] = useState(null);
 
+  // Dynamic popup conflict detection — hides hover popups only when the open
+  // modal actually overlaps them in the viewport. Reacts to pill width changes
+  // (track title length) and window resizes.
+  const [musicTabConflicts, setMusicTabConflicts] = useState(false);
+  const [shortcutsTooltipConflicts, setShortcutsTooltipConflicts] = useState(false);
+
   // Bunny CDN base URL for video hosting
   const BUNNY_CDN_BASE = 'https://joonseo-videos.b-cdn.net';
   const musicButtonRef = useRef(null);
@@ -1035,6 +1041,49 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeModal, isAboutPanelOpen]);
+
+  // Compute whether the current modal's horizontal extent overlaps each hover popup.
+  // Modals are ~340px wide (half = 170px). Music tab is ~120px wide (half = 60px).
+  // ⌘K tooltip is ~50px wide (half = 25px). Overlap = intervals intersect.
+  const updatePopupConflicts = useCallback(() => {
+    if (!activeModal || !activeAnchorRef?.current) {
+      setMusicTabConflicts(false);
+      setShortcutsTooltipConflicts(false);
+      return;
+    }
+    const anchorRect = activeAnchorRef.current.getBoundingClientRect();
+    const anchorCenter = anchorRect.left + anchorRect.width / 2;
+    const modalHalf = 170;
+
+    if (musicButtonRef.current) {
+      const r = musicButtonRef.current.getBoundingClientRect();
+      const musicCenter = r.left + r.width / 2;
+      const conflict = (anchorCenter - modalHalf) < (musicCenter + 60) &&
+                       (anchorCenter + modalHalf) > (musicCenter - 60);
+      setMusicTabConflicts(conflict);
+      if (conflict) setIsMusicHovered(false);
+    }
+
+    if (activeModal === 'shortcuts') {
+      setShortcutsTooltipConflicts(true);
+      setIsShortcutsHovered(false);
+      return;
+    }
+    if (shortcutsButtonRef.current) {
+      const r = shortcutsButtonRef.current.getBoundingClientRect();
+      const shortcutsCenter = r.left + r.width / 2;
+      const conflict = (anchorCenter - modalHalf) < (shortcutsCenter + 25) &&
+                       (anchorCenter + modalHalf) > (shortcutsCenter - 25);
+      setShortcutsTooltipConflicts(conflict);
+      if (conflict) setIsShortcutsHovered(false);
+    }
+  }, [activeModal, activeAnchorRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    updatePopupConflicts();
+    window.addEventListener('resize', updatePopupConflicts);
+    return () => window.removeEventListener('resize', updatePopupConflicts);
+  }, [updatePopupConflicts]);
 
   // Handle video ended event - auto-advance to next video
   const handleVideoEnded = (e) => {
@@ -2479,15 +2528,15 @@ function App() {
           {!isTabletOrBelow && (
             <div className="hover-trigger">
             <button
-              className="nav-search-button relative border h-[37px] pl-[12px] pr-[8px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[190px] bg-white border-[#ebeef5]/85 shadow-[0_0.5px_1px_rgba(0,0,0,0.02),inset_0_0.5px_0_rgba(255,255,255,0.5)] hover:bg-[#fcfcfd] hover:border-[#e0e3ec] hover:shadow-[0_0.5px_2px_rgba(0,0,0,0.035),inset_0_0.5px_0_rgba(255,255,255,0.6)] transition-all duration-[180ms]"
+              className="nav-info-button relative h-[37px] pl-[12px] pr-[8px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[190px]"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
               }}
-              aria-label="About - Information"
+              aria-label="About - Introduction"
             >
-              <span className="font-graphik text-[14px] text-[#666] group-hover:text-[#555] whitespace-nowrap transition-colors duration-[180ms]">Information...</span>
-              <span className="bg-[#f5f5f7] border border-[#ebeef5]/85 h-[24px] w-[24px] rounded-[5px] flex items-center justify-center transition-all duration-[180ms] flex-shrink-0 group-hover:bg-[#f0f0f3]">
+              <span className="font-graphik text-[14px] text-[#666] group-hover:text-[#555] whitespace-nowrap transition-colors duration-[180ms]">Introduction...</span>
+              <span className="nav-info-badge h-[24px] w-[24px] rounded-[5px] flex items-center justify-center flex-shrink-0">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-colors duration-[180ms] group-hover:stroke-[#777]"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               </span>
             </button>
@@ -2562,7 +2611,7 @@ function App() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Information..."
+                      placeholder="Introduction..."
                       className="flex-1 bg-transparent font-graphik text-[14px] text-[#333] placeholder-[#8f8f8f] outline-none"
                     />
                     <span className="bg-[#eeeeee] border border-[#e0e0e0] h-[25px] w-[29px] rounded-[5px] flex items-center justify-center flex-shrink-0">
@@ -2980,7 +3029,7 @@ function App() {
       >
         <div className="flex h-full bottom-pill-container rounded-[14px] relative" style={{ '--music-pill-width': `${musicPillWidth}px` }}>
           {/* Status Tab - aligned to right edge of music hover box, 10px above pill */}
-          {(isMusicHovered || isModalExiting) && currentTrack && (
+          {!musicTabConflicts && (isMusicHovered || isModalExiting) && currentTrack && (
             <div 
               className={`music-status-tab absolute z-[100] ${isModalExiting ? 'exiting' : ''}`}
               onAnimationEnd={() => {
@@ -3032,6 +3081,7 @@ function App() {
               }}
               onMouseEnter={() => {
                 preloadModalComponents();
+                if (musicTabConflicts) return;
                 if (modalTimeoutRef.current) {
                   clearTimeout(modalTimeoutRef.current);
                   modalTimeoutRef.current = null;
@@ -3130,7 +3180,7 @@ function App() {
           {/* Right side - Buttons */}
           <div className={`pill-buttons-section h-[64px] flex items-center px-[12px] py-[14px] relative flex-shrink-0 ${isTabletOrBelow ? 'w-auto' : 'w-[292px]'}`}>
             {/* ⌘K indicator - desktop only */}
-            {!isTabletOrBelow && activeModal !== 'shortcuts' && (isShortcutsHovered || isShortcutsModalExiting) && (
+            {!isTabletOrBelow && !shortcutsTooltipConflicts && (isShortcutsHovered || isShortcutsModalExiting) && (
               <div
                 className={`shortcuts-modal absolute z-[100] ${isShortcutsModalExiting ? 'exiting' : ''}`}
                 onAnimationEnd={() => {
@@ -3176,6 +3226,7 @@ function App() {
                 className={`bottom-button h-[37px] w-full flex items-center justify-center cursor-pointer ${isShortcutsActive ? 'active' : ''} ${isTabletOrBelow ? 'w-[37px] rounded-[8px]' : 'rounded-r-[8px]'}`}
                 onMouseEnter={() => {
                   preloadModalComponents();
+                  if (shortcutsTooltipConflicts) return;
                   if (shortcutsModalTimeoutRef.current) {
                     clearTimeout(shortcutsModalTimeoutRef.current);
                     shortcutsModalTimeoutRef.current = null;

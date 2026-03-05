@@ -1980,43 +1980,19 @@ background-color: #E8F6FF;
   flex-shrink: 0;
 }
 
-/* EXT — amber */
-.te-btn-ext.on .te-led {
+/* All buttons — amber LED */
+.te-btn.on .te-led {
   background: #e8922a;
   box-shadow:
     0 0 4px rgba(232, 146, 42, 0.7),
     0 0 8px rgba(232, 146, 42, 0.3);
   animation: led-glow-amber 3.5s ease-in-out infinite;
 }
-/* MSG — rose */
-.te-btn-msg.on .te-led {
-  background: #d45c5c;
-  box-shadow:
-    0 0 4px rgba(212, 92, 92, 0.7),
-    0 0 8px rgba(212, 92, 92, 0.3);
-  animation: led-glow-rose 3.5s ease-in-out infinite;
-}
-/* BOT — warm yellow */
-.te-btn-bot.on .te-led {
-  background: #e4c232;
-  box-shadow:
-    0 0 4px rgba(228, 194, 50, 0.7),
-    0 0 8px rgba(228, 194, 50, 0.3);
-  animation: led-glow-yellow 3.5s ease-in-out infinite;
-}
 
 /* Slow glow pulse */
 @keyframes led-glow-amber {
   0%, 100% { box-shadow: 0 0 4px rgba(232, 146, 42, 0.7), 0 0 8px rgba(232, 146, 42, 0.25); }
   50%      { box-shadow: 0 0 5px rgba(232, 146, 42, 0.85), 0 0 10px rgba(232, 146, 42, 0.4); }
-}
-@keyframes led-glow-rose {
-  0%, 100% { box-shadow: 0 0 4px rgba(212, 92, 92, 0.7), 0 0 8px rgba(212, 92, 92, 0.25); }
-  50%      { box-shadow: 0 0 5px rgba(212, 92, 92, 0.85), 0 0 10px rgba(212, 92, 92, 0.4); }
-}
-@keyframes led-glow-yellow {
-  0%, 100% { box-shadow: 0 0 4px rgba(228, 194, 50, 0.7), 0 0 8px rgba(228, 194, 50, 0.25); }
-  50%      { box-shadow: 0 0 5px rgba(228, 194, 50, 0.85), 0 0 10px rgba(228, 194, 50, 0.4); }
 }
 
 /* Button label */

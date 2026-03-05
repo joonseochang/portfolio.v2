@@ -778,6 +778,66 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   const isKeyboardNavRef = useRef(false);
   const suppressMouseRef = useRef(false);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+  const [placeholder, setPlaceholder] = useState('');
+
+  const PHRASES = [
+    'Scotland 2025',
+    'Leave a message',
+    'Notes on disappearing',
+    'Student Machines',
+    'Book a call',
+    'Seoul photos',
+    'Perplexity campaign',
+    'Coffee order',
+    'Sign the guestbook',
+    'What I use',
+    'Current playlist',
+    'View resume',
+    'Chess rating',
+    'Japan trip',
+  ];
+
+  useEffect(() => {
+    // Only animate placeholder when input is empty and unfocused
+    let cancelled = false;
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let timeoutId;
+
+    const tick = () => {
+      if (cancelled) return;
+      const phrase = PHRASES[phraseIndex];
+
+      if (!isDeleting) {
+        charIndex++;
+        setPlaceholder(phrase.slice(0, charIndex));
+        if (charIndex === phrase.length) {
+          // Fully typed — pause before deleting
+          timeoutId = setTimeout(() => { isDeleting = true; tick(); }, 2000);
+          return;
+        }
+        // Vary speed slightly for natural feel
+        const typeSpeed = 55 + Math.random() * 30;
+        timeoutId = setTimeout(tick, typeSpeed);
+      } else {
+        charIndex--;
+        setPlaceholder(phrase.slice(0, charIndex));
+        if (charIndex === 0) {
+          // Fully deleted — pause then move to next phrase
+          isDeleting = false;
+          phraseIndex = (phraseIndex + 1) % PHRASES.length;
+          timeoutId = setTimeout(tick, 450);
+          return;
+        }
+        timeoutId = setTimeout(tick, 28);
+      }
+    };
+
+    // Initial delay before starting
+    timeoutId = setTimeout(tick, 900);
+    return () => { cancelled = true; clearTimeout(timeoutId); };
+  }, []);
 
   const handleAction = (action, payload) => {
     playClick();
@@ -961,7 +1021,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Type a command..."
+              placeholder={placeholder}
               className="font-graphik text-[14px] text-[#444] bg-transparent outline-none w-full placeholder-[#b3b3b3]"
             />
           </div>
