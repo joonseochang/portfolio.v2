@@ -544,7 +544,7 @@ export const MusicModalContent = ({ currentTrack }) => {
 
       {/* Recent Tracks List */}
       <div className="space-y-1">
-        <p className="font-graphik text-[11px] text-[#999] uppercase tracking-wide px-1 mb-2">Recently Played</p>
+        <p className="font-graphik text-[11px] text-[#ababab] uppercase tracking-wide px-1 mb-2">Recently Played</p>
         <div className="max-h-[280px] overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#ddd transparent' }}>
           {recentTracks.slice(1).map((track, i) => (
             <div
@@ -567,7 +567,7 @@ export const MusicModalContent = ({ currentTrack }) => {
               {/* Track info */}
               <div className="flex-1 min-w-0">
                 <p className="font-graphik text-[13px] text-[#1a1a1a] truncate group-hover:text-[#0066cc] transition-colors">{track.name}</p>
-                <p className="font-graphik text-[11px] text-[#999] truncate">{track.artist}</p>
+                <p className="font-graphik text-[11px] text-[#ababab] truncate">{track.artist}</p>
               </div>
 
               {/* Play indicator on hover */}
@@ -586,7 +586,7 @@ export const MusicModalContent = ({ currentTrack }) => {
         href="https://www.last.fm/user/joonzambia"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 mt-4 pt-3 border-t border-black/[0.04] font-graphik text-[12px] text-[#999] hover:text-[#666] transition-colors"
+        className="flex items-center justify-center gap-2 mt-4 pt-3 border-t border-black/[0.04] font-graphik text-[12px] text-[#ababab] hover:text-[#666] transition-colors"
       >
         <span>View on Last.fm</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
@@ -602,7 +602,7 @@ export const ActivityModalContent = () => (
     {/* Code changes widget */}
     <div className="p-4 rounded-[12px] bg-gradient-to-br from-[#fafafa] to-[#f5f5f5] border border-black/[0.04]">
       <div className="flex items-center justify-between mb-3">
-        <span className="font-graphik text-[11px] text-[#999] uppercase tracking-wide">This Week</span>
+        <span className="font-graphik text-[11px] text-[#ababab] uppercase tracking-wide">This Week</span>
         <span className="font-graphik text-[11px] text-[#ccc]">Refreshes daily</span>
       </div>
       <div className="flex items-baseline gap-3">
@@ -632,7 +632,7 @@ export const ActivityModalContent = () => (
             <p className="font-graphik text-[13px] text-[#1a1a1a]">
               <span className="text-[#888]">{activity.action}</span> {activity.item}
             </p>
-            <p className="font-graphik text-[11px] text-[#999] mt-0.5">{activity.time}</p>
+            <p className="font-graphik text-[11px] text-[#ababab] mt-0.5">{activity.time}</p>
           </div>
         </div>
       ))}
@@ -656,7 +656,7 @@ const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSele
       <div className="flex-1 min-w-0">
         <span className="font-graphik text-[14px] text-[#444] block truncate">{label}</span>
         {subtitle && (
-          <span className="block font-graphik text-[12px] text-[#999] mt-[1px] truncate">{subtitle}</span>
+          <span className="block font-graphik text-[12px] text-[#ababab] mt-[1px] truncate">{subtitle}</span>
         )}
       </div>
       {keys && (
@@ -1042,7 +1042,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
               renderFilteredSections()
             ) : (
               <div className="flex items-center justify-center py-[24px]">
-                <span className="font-graphik text-[13px] text-[#999]">No results found</span>
+                <span className="font-graphik text-[13px] text-[#ababab]">No results found</span>
               </div>
             )}
           </div>
