@@ -60,7 +60,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
     { label: 'Sports I watch', value: 'ATP, WTA, LCK, PL' },
     { label: 'K-Drama pick', value: 'Reply 1988' },
     { label: 'K-Music pick', value: '심야행 - SE SO NEON' },
-    { label: 'Motivational anthem', value: "Fuckin' in the Bushes" },
+    { label: 'Motivational anthem', value: "Fuckin' in the Bushes - Oasis" },
     { label: 'Learning', value: 'Japanese' },
     { label: 'Military unit', value: '12th Infantry Division' },
     { label: 'Favorite show', value: 'Mad Men' },
