@@ -59,7 +59,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
     { label: 'Favorite director', value: 'Hirokazu Koreeda' },
     { label: 'Sports I watch', value: 'ATP, WTA, LCK, PL' },
     { label: 'K-Drama pick', value: 'Reply 1988' },
-    { label: 'K-Music pick', value: 'Last Night Story' },
+    { label: 'K-Music pick', value: '심야행 - SE SO NEON' },
     { label: 'Motivational anthem', value: "Fuckin' in the Bushes" },
     { label: 'Learning', value: 'Japanese' },
     { label: 'Military unit', value: '12th Infantry Division' },
