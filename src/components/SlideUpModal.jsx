@@ -1246,7 +1246,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
           onMouseLeave={handleEmailMouseLeave}
           className="contact-row w-full cursor-pointer text-left relative"
         >
-          <div className="contact-row-inner w-full flex items-center gap-[10px] px-[10px] py-[4px] rounded-[10px]">
+          <div className="contact-row-inner w-full flex items-center gap-[10px] px-[10px] py-[4px] rounded-[14px]">
             <div className={`contact-icon-box contact-icon-${item.id} w-[37px] h-[35px] flex items-center justify-center rounded-[8px] shrink-0`}>
               <item.Icon hovered={hoveredRow === item.id} />
             </div>
@@ -1273,7 +1273,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
           onMouseLeave={() => setHoveredRow(null)}
           className="contact-row w-full cursor-pointer relative"
         >
-          <div className="contact-row-inner w-full flex items-center gap-[10px] px-[10px] py-[4px] rounded-[10px]">
+          <div className="contact-row-inner w-full flex items-center gap-[10px] px-[10px] py-[4px] rounded-[14px]">
             {item.Icon ? (
               <div className={`contact-icon-box contact-icon-${item.id} w-[37px] h-[35px] flex items-center justify-center rounded-[8px] shrink-0`}>
                 <item.Icon hovered={hoveredRow === item.id} />
