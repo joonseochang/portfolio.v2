@@ -456,7 +456,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
   const innerContent = (
     <>
       {/* Header */}
-      <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[100px]' : 'pt-[calc(38vh-40px)]'}`}>
+      <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[140px]' : 'pt-[calc(38vh-40px)]'}`}>
         <h1 className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#333] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-i': 0 } : undefined}>
           Greetings tourist, I'm Joonseo.
         </h1>
@@ -569,31 +569,27 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
                 {photos[activePhotoIndex].caption}
               </p>
             </div>
-            {/* Navigation arrows — hide on mobile (use swipe instead) */}
-            {!mobile && (
-              <>
-                <button className="about-photo-arrow" style={{
-                  left: '-8px',
-                  opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
-                  transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
-                }}
-                  onClick={goToPrevPhoto} aria-label="Previous photo">
-                  <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                    <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                <button className="about-photo-arrow" style={{
-                  right: '-8px',
-                  opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
-                  transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
-                }}
-                  onClick={goToNextPhoto} aria-label="Next photo">
-                  <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                    <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </>
-            )}
+            {/* Navigation arrows */}
+            <button className="about-photo-arrow" style={{
+              left: '-8px',
+              opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
+              transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
+            }}
+              onClick={goToPrevPhoto} aria-label="Previous photo">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <button className="about-photo-arrow" style={{
+              right: '-8px',
+              opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
+              transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
+            }}
+              onClick={goToNextPhoto} aria-label="Next photo">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
             {/* Progress pills */}
             <div className="absolute bottom-[10px] left-0 right-0 flex items-center justify-center"
               style={{

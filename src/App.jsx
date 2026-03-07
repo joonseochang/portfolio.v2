@@ -2481,6 +2481,12 @@ function App() {
               <nav className="flex flex-col px-[16px] pt-[8px] pb-[16px] gap-[4px]" aria-label="Mobile navigation">
                 <button
                   className="mobile-nav-link font-graphik text-[15px] text-[#5b5b5e] py-[12px] px-[12px] rounded-[8px] text-left transition-colors"
+                  onClick={() => { playClick(); navigate('/about'); setIsMobileMenuOpen(false); }}
+                >
+                  About
+                </button>
+                <button
+                  className="mobile-nav-link font-graphik text-[15px] text-[#5b5b5e] py-[12px] px-[12px] rounded-[8px] text-left transition-colors"
                   onClick={() => { playClick(); setIsMobileMenuOpen(false); }}
                 >
                   Experience
@@ -2502,12 +2508,6 @@ function App() {
                   onClick={() => { playClick(); setIsMobileMenuOpen(false); }}
                 >
                   Extra
-                </button>
-                <button
-                  className="mobile-nav-link font-graphik text-[15px] text-[#5b5b5e] py-[12px] px-[12px] rounded-[8px] text-left transition-colors"
-                  onClick={() => { playClick(); navigate('/about'); setIsMobileMenuOpen(false); }}
-                >
-                  About
                 </button>
               </nav>
             </div>
