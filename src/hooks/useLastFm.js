@@ -36,7 +36,6 @@ export function useLastFm() {
       }
       return null;
     } catch (err) {
-      // Debug: console.warn('Could not fetch iTunes preview:', err);
       return null;
     }
   };
@@ -141,7 +140,6 @@ export function useLastFm() {
       setIsLoading(false);
       setError(null);
     } catch (err) {
-      // Debug: console.error('Error fetching from Last.fm:', err);
       setError(err.message);
       setIsLoading(false);
       // Keep data complete if we had previous data (don't break existing display)
@@ -189,7 +187,6 @@ export function useLastFm() {
         }
       }, stepTime);
     }).catch(err => {
-      // Debug: console.warn('Could not play preview:', err);
     });
   }, [currentTrack?.previewUrl]);
 

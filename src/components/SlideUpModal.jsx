@@ -5,7 +5,6 @@ import { useMediaQuery } from '../hooks/useMediaQuery';
 
 // Contact modal icons - defined outside component to prevent recreation on each render
 
-// Email: Gentle jiggle with notification badge popup
 const MailIcon = ({ hovered }) => (
   <motion.svg
     width="19"
@@ -17,7 +16,6 @@ const MailIcon = ({ hovered }) => (
     strokeLinejoin="round"
     style={{ overflow: 'visible' }}
   >
-    {/* Envelope group - jiggles */}
     <motion.g
       animate={hovered ? {
         rotate: [0, -3, 2.5, -2, 1.5, -1, 0],
@@ -29,13 +27,11 @@ const MailIcon = ({ hovered }) => (
       }}
       style={{ transformOrigin: '12px 12px' }}
     >
-      {/* Envelope body - ORIGINAL */}
       <rect
         x="3" y="5" width="18" height="14" rx="2"
         stroke={hovered ? "#6b7280" : "#a3a3a3"}
         style={{ transition: 'stroke 300ms ease' }}
       />
-      {/* Envelope flap - ORIGINAL */}
       <path
         d="M3 7l9 6 9-6"
         stroke={hovered ? "#6b7280" : "#a3a3a3"}
@@ -44,7 +40,6 @@ const MailIcon = ({ hovered }) => (
       />
     </motion.g>
 
-    {/* Notification badge - pops up on hover */}
     <motion.g
       animate={hovered ? {
         scale: [0, 1.15, 1],
@@ -57,28 +52,24 @@ const MailIcon = ({ hovered }) => (
       }}
       style={{ transformOrigin: '21px 3px' }}
     >
-      {/* Badge shadow for depth */}
       <circle
         cx="21"
         cy="3.5"
         r="6"
         fill="rgba(0,0,0,0.1)"
       />
-      {/* Red notification circle */}
       <circle
         cx="21"
         cy="3"
         r="6"
         fill="#ef4444"
       />
-      {/* Subtle inner highlight for skeuomorphic style */}
       <circle
         cx="21"
         cy="2"
         r="4"
         fill="rgba(255,255,255,0.15)"
       />
-      {/* White "1" */}
       <text
         x="21"
         y="5.5"
@@ -94,7 +85,6 @@ const MailIcon = ({ hovered }) => (
   </motion.svg>
 );
 
-// Instagram: Camera focus animation
 const InstagramIcon = ({ hovered }) => (
   <motion.svg
     width="19"
@@ -105,13 +95,11 @@ const InstagramIcon = ({ hovered }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    {/* Camera body */}
     <rect
       x="2" y="2" width="20" height="20" rx="5"
       stroke={hovered ? "#6b7280" : "#a3a3a3"}
       style={{ transition: 'stroke 300ms ease' }}
     />
-    {/* Lens - focus animation, returns to default */}
     <motion.circle
       cx="12" cy="12"
       stroke={hovered ? "#6b7280" : "#a3a3a3"}
@@ -126,7 +114,6 @@ const InstagramIcon = ({ hovered }) => (
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
     />
-    {/* Inner lens - appears then fades back out */}
     <motion.circle
       cx="12" cy="12"
       fill={hovered ? "#6b7280" : "transparent"}
@@ -140,7 +127,6 @@ const InstagramIcon = ({ hovered }) => (
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
     />
-    {/* Flash dot - pulses and returns */}
     <motion.circle
       cx="17.5" cy="6.5"
       fill={hovered ? "#6b7280" : "#a3a3a3"}
@@ -160,7 +146,6 @@ const InstagramIcon = ({ hovered }) => (
   </motion.svg>
 );
 
-// LinkedIn: Bouncy wave animation
 const LinkedInIcon = ({ hovered }) => (
   <motion.svg
     width="20"
@@ -181,7 +166,6 @@ const LinkedInIcon = ({ hovered }) => (
   </motion.svg>
 );
 
-// Twitter/X: Spin animation
 const TwitterIcon = ({ hovered }) => (
   <motion.svg
     width="17"
@@ -202,7 +186,6 @@ const TwitterIcon = ({ hovered }) => (
   </motion.svg>
 );
 
-// Letterboxd: Film frame flicker
 const LetterboxdIcon = ({ hovered }) => (
   <motion.svg
     width="18"
@@ -211,7 +194,6 @@ const LetterboxdIcon = ({ hovered }) => (
     fill="none"
     style={{ overflow: 'visible' }}
   >
-    {/* Three overlapping circles - the Letterboxd logo */}
     <motion.circle
       cx="5" cy="12" r="5"
       fill={hovered ? "#FF8000" : "#a3a3a3"}
@@ -236,7 +218,6 @@ const LetterboxdIcon = ({ hovered }) => (
   </motion.svg>
 );
 
-// GitHub: Octocat tentacle wiggle
 const GitHubIcon = ({ hovered }) => (
   <motion.svg
     width="19"
@@ -257,7 +238,6 @@ const GitHubIcon = ({ hovered }) => (
   </motion.svg>
 );
 
-// Chess.com: Official pawn logo with bounce
 const ChessIcon = ({ hovered }) => (
   <motion.svg
     width="17"
@@ -279,7 +259,6 @@ const ChessIcon = ({ hovered }) => (
   </motion.svg>
 );
 
-// Hinge: Stylized H lettermark with tilt
 const HingeIcon = ({ hovered }) => (
   <motion.svg
     width="16"
@@ -296,12 +275,10 @@ const HingeIcon = ({ hovered }) => (
       ease: [0.36, 0.07, 0.19, 0.97]
     }}
   >
-    {/* Stylized H - Hinge lettermark */}
     <path d="M4 2h3.5v8.5H16.5V2H20v20h-3.5v-8.5H7.5V22H4V2z"/>
   </motion.svg>
 );
 
-// Spotify: Sound wave pulse
 const SpotifyIcon = ({ hovered }) => (
   <motion.svg
     width="19"
@@ -372,7 +349,6 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
     }
   }, [isOpen, anchorRef, type, isMobile]);
 
-  // Click outside to close
   useEffect(() => {
     if (!isOpen) return;
 
@@ -406,7 +382,6 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
     }
   };
 
-  // Content wrapper based on modal type
   const renderContent = () => {
     if (isContactModal) {
       return (
@@ -422,7 +397,6 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
         </div>
       );
     }
-    // Default modal with header
     return (
       <div className="bg-white rounded-[16px] shadow-[0_8px_40px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden border border-black/[0.04]">
         <div className="px-5 pt-4 pb-3 border-b border-black/[0.06]">
@@ -484,9 +458,7 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
   );
 };
 
-// Music modal with current track and recent tracks list
 export const MusicModalContent = ({ currentTrack }) => {
-  // Placeholder recent tracks for testing (will be replaced with real API data)
   const recentTracks = [
     { name: 'Born Slippy .NUXX', artist: 'Underworld', albumArt: null, isNowPlaying: true },
     { name: 'Windowlicker', artist: 'Aphex Twin', albumArt: null },
@@ -500,14 +472,11 @@ export const MusicModalContent = ({ currentTrack }) => {
     { name: 'Everything In Its Right Place', artist: 'Radiohead', albumArt: null },
   ];
 
-  // Use current track if available, otherwise use first placeholder
   const nowPlaying = currentTrack || recentTracks[0];
 
   return (
     <div className="w-[340px]">
-      {/* Now Playing Section */}
       <div className="flex items-center gap-4 p-4 rounded-[12px] bg-gradient-to-br from-[#fafafa] to-[#f5f5f5] border border-black/[0.04] mb-4">
-        {/* Album Art */}
         <div className="w-16 h-16 rounded-[8px] bg-gradient-to-br from-[#e0e0e0] to-[#d0d0d0] flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
           {nowPlaying.albumArt || nowPlaying.albumArtSmall ? (
             <img
@@ -527,7 +496,6 @@ export const MusicModalContent = ({ currentTrack }) => {
           )}
         </div>
 
-        {/* Track Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             {nowPlaying.isNowPlaying && (
@@ -542,7 +510,6 @@ export const MusicModalContent = ({ currentTrack }) => {
         </div>
       </div>
 
-      {/* Recent Tracks List */}
       <div className="space-y-1">
         <p className="font-graphik text-[11px] text-[#ababab] uppercase tracking-wide px-1 mb-2">Recently Played</p>
         <div className="max-h-[280px] overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#ddd transparent' }}>
@@ -551,7 +518,6 @@ export const MusicModalContent = ({ currentTrack }) => {
               key={i}
               className="flex items-center gap-3 p-2.5 rounded-[8px] hover:bg-[#f5f5f5] transition-colors cursor-pointer group"
             >
-              {/* Small album art */}
               <div className="w-10 h-10 rounded-[6px] bg-gradient-to-br from-[#e8e8e8] to-[#ddd] flex items-center justify-center overflow-hidden flex-shrink-0">
                 {track.albumArt ? (
                   <img src={track.albumArt} alt={track.name} className="w-full h-full object-cover" width="40" height="40" loading="lazy"/>
@@ -564,13 +530,11 @@ export const MusicModalContent = ({ currentTrack }) => {
                 )}
               </div>
 
-              {/* Track info */}
               <div className="flex-1 min-w-0">
                 <p className="font-graphik text-[13px] text-[#1a1a1a] truncate group-hover:text-[#0066cc] transition-colors">{track.name}</p>
                 <p className="font-graphik text-[11px] text-[#ababab] truncate">{track.artist}</p>
               </div>
 
-              {/* Play indicator on hover */}
               <div className="w-6 h-6 rounded-full bg-[#1a1a1a] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                   <path d="M8 5V19L19 12L8 5Z" fill="white"/>
@@ -581,7 +545,6 @@ export const MusicModalContent = ({ currentTrack }) => {
         </div>
       </div>
 
-      {/* Last.fm link */}
       <a
         href="https://www.last.fm/user/joonzambia"
         target="_blank"
@@ -599,7 +562,6 @@ export const MusicModalContent = ({ currentTrack }) => {
 
 export const ActivityModalContent = () => (
   <div className="w-[340px] space-y-4">
-    {/* Code changes widget */}
     <div className="p-4 rounded-[12px] bg-gradient-to-br from-[#fafafa] to-[#f5f5f5] border border-black/[0.04]">
       <div className="flex items-center justify-between mb-3">
         <span className="font-graphik text-[11px] text-[#ababab] uppercase tracking-wide">This Week</span>
@@ -616,7 +578,6 @@ export const ActivityModalContent = () => (
       <p className="font-graphik text-[12px] text-[#888] mt-2">lines changed across 23 commits</p>
     </div>
 
-    {/* Activity items */}
     <div className="space-y-2">
       {[
         { action: 'Updated', item: 'Homepage hero section', time: '2 hours ago', icon: '✏️' },
@@ -638,14 +599,12 @@ export const ActivityModalContent = () => (
       ))}
     </div>
 
-    {/* View all link */}
     <button className="w-full py-2.5 rounded-[8px] bg-[#f5f5f5] hover:bg-[#eee] transition-colors font-graphik text-[13px] text-[#666]">
       View all activity
     </button>
   </div>
 );
 
-// Shortcut row sub-component
 const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSelected, onMouseEnter }) => {
   const rowClass = `shortcut-row${isSelected ? ' shortcut-row-selected' : ''}`;
   const content = (
@@ -688,23 +647,19 @@ const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSele
   );
 };
 
-// Palette section icons — 16x16, viewBox 0 0 24 24, stroke #a3a3a3, strokeWidth 1.5, strokeLinecap round
 const PaletteIcons = {
-  // Open book — Read latest writing
   book: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
       <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
     </svg>
   ),
-  // Play circle — Watch recent video
   video: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="palette-video-icon">
       <circle cx="12" cy="12" r="10"/>
       <polygon points="10 8 16 12 10 16 10 8" fill="#a3a3a3" stroke="none"/>
     </svg>
   ),
-  // Document with folded corner — View resume
   resume: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -713,7 +668,6 @@ const PaletteIcons = {
       <line x1="9" y1="17" x2="13" y2="17"/>
     </svg>
   ),
-  // Expand arrows — Theater mode
   expand: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="15 3 21 3 21 9"/>
@@ -722,7 +676,6 @@ const PaletteIcons = {
       <line x1="3" y1="21" x2="10" y2="14"/>
     </svg>
   ),
-  // Calendar — Book a call
   calendar: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -731,14 +684,12 @@ const PaletteIcons = {
       <line x1="3" y1="10" x2="21" y2="10"/>
     </svg>
   ),
-  // Compass — What is Joon up to
   compass: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10"/>
       <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="none"/>
     </svg>
   ),
-  // Download arrow — Time capsule
   download: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -746,7 +697,6 @@ const PaletteIcons = {
       <line x1="12" y1="15" x2="12" y2="3"/>
     </svg>
   ),
-  // Speaker — Pronounce name
   speaker: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none"/>
@@ -754,14 +704,12 @@ const PaletteIcons = {
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
     </svg>
   ),
-  // Paper airplane — Send a Wuphf
   paperPlane: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="22" y1="2" x2="11" y2="13"/>
       <polygon points="22 2 15 22 11 13 2 9 22 2" fill="none"/>
     </svg>
   ),
-  // Pen writing — Sign guestbook
   pen: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>
@@ -844,7 +792,6 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
     if (onAction) onAction(action, payload);
   };
 
-  // Auto-focus search input on mount
   useEffect(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 50);
     return () => clearTimeout(timer);
@@ -877,7 +824,6 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
     },
   ];
 
-  // Filter sections by query
   const q = query.toLowerCase().trim();
   const filteredSections = sections
     .map(section => ({
@@ -891,10 +837,8 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
     }))
     .filter(section => section.items.length > 0);
 
-  // Flat list of visible items for keyboard nav
   const flatItems = filteredSections.flatMap(s => s.items);
 
-  // Reset selectedIndex when query changes
   useEffect(() => {
     setSelectedIndex(0);
   }, [query]);
@@ -967,7 +911,6 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose, playClick]);
 
-  // Render filtered sections with flat index tracking
   let flatIndex = 0;
   const renderFilteredSections = () => {
     flatIndex = 0;
@@ -1007,9 +950,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Inner white card */}
       <div className="shortcuts-palette-inner w-[355px] max-w-[calc(100vw-48px)]">
-        {/* Search input */}
         <div className="px-[12px] pt-[12px] pb-[10px]" style={{ borderBottom: '1px solid rgba(235, 238, 245, 0.85)' }}>
           <div className="flex items-center gap-[8px] rounded-[8px] px-[10px] py-[8px]" style={{ background: '#f5f5f5', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)', border: '1px solid #e0e0e0' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -1027,7 +968,6 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
           </div>
         </div>
 
-        {/* Items list — height clips last visible item mid-row to hint scrollability */}
         <div className="shortcuts-palette-list-wrapper">
           <div
             ref={listRef}
@@ -1050,7 +990,6 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
         </div>
       </div>
 
-      {/* Footer keyboard hints */}
       <div className="shortcuts-palette-footer">
         <div className="footer-hint">
           <kbd className="footer-kbd">↑↓</kbd>
@@ -1096,13 +1035,11 @@ export const ContactModalContent = ({ darkMode = false }) => {
   const scrollRef = useRef(null);
   const { playClick } = useSounds();
 
-  // Track scroll position to hide fade when at bottom
   const handleContactScroll = (e) => {
     const el = e.target;
     setScrolledToBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 5);
   };
 
-  // Check if device is mobile/tablet
   const isMobileOrTablet = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   const handleCopyEmail = async () => {
@@ -1130,14 +1067,12 @@ export const ContactModalContent = ({ darkMode = false }) => {
     setHoveredRow(null);
   };
 
-  // Get the email description text based on state
   const getEmailDescription = () => {
     if (copiedEmail) return isMobileOrTablet ? 'Copied! Talk soon :)' : 'Send me a digital raven';
     if (emailHover && !isMobileOrTablet) return 'Copy address';
     return 'changjoonseo126@gmail.com';
   };
 
-  // Get the email description color based on state
   const getEmailDescriptionColor = () => {
     if (copiedEmail) return '#5AABEE';
     return '#ababab';
@@ -1236,7 +1171,6 @@ export const ContactModalContent = ({ darkMode = false }) => {
     }
   };
 
-  // Render a contact row (shared between main + extra items)
   const renderContactRow = (item, showDividerAfter) => (
     <div key={item.title} className="contents">
       {item.onClick ? (
@@ -1302,10 +1236,8 @@ export const ContactModalContent = ({ darkMode = false }) => {
 
   return (
     <div className="flex flex-col items-center">
-      {/* Inner card - skeuomorphic white card */}
       <div className="contact-modal-inner w-[280px]">
 
-        {/* Contact links view */}
         {!composing && (
           <div className="contact-scroll-wrapper" style={{ position: 'relative' }}>
             <div
@@ -1324,7 +1256,6 @@ export const ContactModalContent = ({ darkMode = false }) => {
           </div>
         )}
 
-        {/* Compose view */}
         {composing && (
           <div className="contact-view-anim py-[15px] px-[15px] flex flex-col gap-[10px]">
             <div className="flex flex-col gap-[2px]">
@@ -1351,9 +1282,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
 
       </div>
 
-      {/* TE-inspired control strip */}
       <div className="te-strip flex items-center justify-end pt-[8px] pb-[9px] px-[14px] w-full" style={{ position: 'relative' }}>
-        {/* QR popover */}
         {showQR && (
           <div className="te-qr-popover">
             <img src={qrUrl} width={120} height={120} alt="QR code" />

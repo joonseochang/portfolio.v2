@@ -21,7 +21,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const imageRef = useRef(null)
   const [showFlowers, setShowFlowers] = useState(false)
   const [firstReveal, setFirstReveal] = useState(true)
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0)
+  const [prevPhotoIndex, setPrevPhotoIndex] = useState(null)
   const [imageColorized, setImageColorized] = useState(false)
+  const photoTimerRef = useRef(null)
+  const pillFillRefs = useRef([])
   const carouselRef = useRef(null)
   const carouselWrapRef = useRef(null)
   const carouselState = useRef({
@@ -71,6 +75,46 @@ const AboutPanel = ({ isOpen, onClose }) => {
     { label: 'Favorite book', value: 'The Fellowship of the Ring' },
     { label: 'Currently watching', value: 'AKOTSK, Frieren, The Pitt' },
   ]
+
+  const photos = [
+    { src: '/images/about-panel.jpg', caption: 'Popped into existence in Bundang,\nSouth Korea in the spring of 2000.' },
+    { src: '/images/about-panel.jpg', caption: 'Moved to Northbrook, Chicago as an infant.\nJohn Hughes suburbia, barely attained object permanence.' },
+    { src: '/images/about-panel.jpg', caption: 'Grew up in Bogota, Colombia.\nSpanish became my first language, empanadas my religion.' },
+    { src: '/images/about-panel.jpg', caption: 'British-Korean school in Weihai, China.\nBlazers, ties, and latiao every single day.' },
+    { src: '/images/about-panel.jpg', caption: 'University years at Yonsei in Seoul.\nStudying and picking up a camera along the way.' },
+    { src: '/images/about-panel.jpg', caption: 'Mandatory military service in the mountains\nwith the 12th Infantry Division.' },
+    { src: '/images/about-panel.jpg', caption: 'Currently in Kagoshima, Japan.\nSlowly learning the language, shooting on a Leica Q2.' },
+    { src: '/images/about-panel.jpg', caption: 'Next stop is Saigon. Building things\nfor the web and documenting along the way.' },
+  ]
+
+  const advancePhoto = (nextIndex) => {
+    setActivePhotoIndex(prev => {
+      setPrevPhotoIndex(prev)
+      return typeof nextIndex === 'function' ? nextIndex(prev) : nextIndex
+    })
+  }
+
+  const resetPhotoTimer = () => {
+    clearInterval(photoTimerRef.current)
+    photoTimerRef.current = setInterval(() => {
+      advancePhoto(prev => (prev + 1) % photos.length)
+    }, 5000)
+  }
+
+  const handlePhotoPillClick = (index) => {
+    advancePhoto(index)
+    resetPhotoTimer()
+  }
+
+  const goToNextPhoto = () => {
+    advancePhoto(prev => (prev + 1) % photos.length)
+    resetPhotoTimer()
+  }
+
+  const goToPrevPhoto = () => {
+    advancePhoto(prev => (prev - 1 + photos.length) % photos.length)
+    resetPhotoTimer()
+  }
 
   // Track if we've animated before (skip on re-open within same session)
   useEffect(() => {
@@ -267,30 +311,75 @@ const AboutPanel = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
-  // Reset image color state when panel closes
+  // Reset photo carousel when panel closes
   useEffect(() => {
-    if (!isOpen) setImageColorized(false)
+    if (isOpen) {
+      setActivePhotoIndex(0)
+      setPrevPhotoIndex(null)
+    } else {
+      clearInterval(photoTimerRef.current)
+      setImageColorized(false)
+    }
+    return () => clearInterval(photoTimerRef.current)
   }, [isOpen])
 
-  // Colorize image when fully scrolled into view within the panel, revert when out
+  // Progress pill fill animation — direct DOM manipulation
+  useEffect(() => {
+    pillFillRefs.current.forEach((el, idx) => {
+      if (!el) return
+      if (idx === activePhotoIndex && isOpen) {
+        el.style.transition = 'none'
+        el.style.width = '0%'
+        el.style.opacity = '1'
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (!el) return
+            el.style.transition = 'width 5000ms linear'
+            el.style.width = '100%'
+          })
+        })
+      } else {
+        el.style.transition = 'none'
+        el.style.width = '0%'
+        el.style.opacity = '0'
+      }
+    })
+  }, [activePhotoIndex, isOpen])
+
+  // Intersection observer — colorize image + start/pause auto-advance
   useEffect(() => {
     if (!imageRef.current || !panelRef.current) return
-    let timer
+    let colorTimer
     const observer = new IntersectionObserver(
       ([entry]) => {
-        clearTimeout(timer)
+        clearTimeout(colorTimer)
         if (entry.isIntersecting) {
-          timer = setTimeout(() => setImageColorized(true), 250)
+          colorTimer = setTimeout(() => setImageColorized(true), 250)
+          // Start auto-advance when visible
+          clearInterval(photoTimerRef.current)
+          photoTimerRef.current = setInterval(() => {
+            advancePhoto(prev => (prev + 1) % photos.length)
+          }, 5000)
         } else {
           setImageColorized(false)
+          // Pause auto-advance when out of view
+          clearInterval(photoTimerRef.current)
+          // Pause fill animation on all pills
+          pillFillRefs.current.forEach((el) => {
+            if (!el) return
+            el.style.transition = 'none'
+            el.style.width = '0%'
+            el.style.opacity = '0'
+          })
         }
       },
-      { root: panelRef.current, threshold: 0.85 }
+      { root: panelRef.current, threshold: 0.5 }
     )
     observer.observe(imageRef.current)
     return () => {
       observer.disconnect()
-      clearTimeout(timer)
+      clearTimeout(colorTimer)
+      clearInterval(photoTimerRef.current)
     }
   }, [isOpen])
 
@@ -410,23 +499,93 @@ const AboutPanel = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Bottom image */}
-        <div
-          ref={imageRef}
-          className={`${firstReveal ? 'about-reveal' : ''} h-[240px] overflow-hidden mt-[25px]`}
-          style={{ position: 'relative', left: '-26px', width: 'calc(100% + 28px)', ...(firstReveal ? { '--reveal-i': 7 } : {}) }}
-        >
-          <img
-            src="/images/about-panel.jpg"
-            alt="Personal photo"
-            className="w-full h-full object-cover"
-            style={{
-              filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
-              transform: imageColorized ? 'scale(1)' : 'scale(1.03)',
-              transition: 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            }}
-            onError={(e) => { e.target.parentElement.style.display = 'none' }}
-          />
+        {/* Photo carousel */}
+        <div className={`${firstReveal ? 'about-reveal' : ''} w-full mt-[25px]`} ref={imageRef}
+          style={firstReveal ? { '--reveal-i': 7 } : undefined}>
+          <div className="relative w-full h-[240px] overflow-hidden" style={{ backgroundColor: '#111' }}>
+            {/* Photo slides — outgoing stays opaque, incoming fades in on top */}
+            {photos.map((photo, i) => {
+              const isActive = i === activePhotoIndex
+              const isPrev = i === prevPhotoIndex
+              const isVisible = isActive || isPrev
+              return (
+                <div key={i} className="absolute inset-0"
+                  style={{
+                    opacity: isActive ? 1 : isPrev ? 1 : 0,
+                    zIndex: isActive ? 2 : isPrev ? 1 : 0,
+                    transition: isActive ? 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
+                    pointerEvents: isActive ? 'auto' : 'none',
+                  }}>
+                  {isVisible && (
+                    <>
+                      <img src={photo.src} alt={photo.caption.replace('\n', ' — ')}
+                        className="w-full h-full object-cover"
+                        style={{
+                          filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
+                          transform: imageColorized ? 'scale(1)' : 'scale(1.03)',
+                          transition: 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        }} />
+                      {/* Gradient overlay — taller for text breathing room */}
+                      <div className="absolute bottom-0 left-0 right-0 h-[130px] pointer-events-none"
+                        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)' }} />
+                      {/* Two-line caption */}
+                      <p className="absolute bottom-[22px] left-[16px] right-[16px] font-graphik text-[12px] text-white text-center leading-[17px]"
+                        style={{ whiteSpace: 'pre-line', opacity: 0.85 }}>
+                        {photo.caption}
+                      </p>
+                    </>
+                  )}
+                </div>
+              )
+            })}
+            {/* Navigation arrows */}
+            <button className="about-photo-arrow" style={{ left: '8px' }}
+              onClick={goToPrevPhoto} aria-label="Previous photo">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            <button className="about-photo-arrow" style={{ right: '8px' }}
+              onClick={goToNextPhoto} aria-label="Next photo">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            {/* Progress pills — inside photo frame */}
+            <div className="absolute bottom-[8px] left-0 right-0 flex items-center justify-center z-10"
+              style={{ gap: '3px' }}>
+              {photos.map((_, i) => {
+                const isActive = i === activePhotoIndex
+                return (
+                  <button key={i}
+                    className="about-photo-pill"
+                    onClick={() => handlePhotoPillClick(i)}
+                    aria-label={`Photo ${i + 1}`}
+                    style={{
+                      width: isActive ? '24px' : '14px',
+                      height: isActive ? '3px' : '2.5px',
+                      backgroundColor: isActive ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.25)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}>
+                    <div
+                      ref={el => { pillFillRefs.current[i] = el }}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        height: '100%',
+                        borderRadius: '2px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        width: '0%',
+                        opacity: 0,
+                      }}
+                    />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Placeholder — below image */}

@@ -49,7 +49,6 @@ const MarqueeText = ({ children, className, style, maxWidth, delay = 0, waitForS
   const GAP = 50; // Gap between text instances
   const SCROLL_SPEED = 35; // Uniform scroll speed in pixels per second
 
-  // Check if text overflows container
   useEffect(() => {
     const checkOverflow = () => {
       if (textRef.current && containerRef.current) {
@@ -65,7 +64,6 @@ const MarqueeText = ({ children, className, style, maxWidth, delay = 0, waitForS
     return () => clearTimeout(timeout);
   }, [children, maxWidth]);
 
-  // Circular scroll animation
   useEffect(() => {
     // If waiting for signal and signal not ready, don't start
     if (waitForSignal && !signalReady) {
@@ -192,13 +190,11 @@ function App() {
   const navigate = useNavigate()
   const [clockTimeString, setClockTimeString] = useState('');
   const [clockTime, setClockTime] = useState({ hours: 0, minutes: 0, seconds: 0, milliseconds: 0 });
-  // Clock hover state for weather expansion
   const [isClockHovered, setIsClockHovered] = useState(false);
   const [isClockPressed, setIsClockPressed] = useState(false);
   const clockCardRef = useRef(null);
   const clockPillRef = useRef(null);
 
-  // Loader state - shows coordinates while videos preload
   const [isLoading, setIsLoading] = useState(true);
   const [currentCoordIndex, setCurrentCoordIndex] = useState(0);
   const [coordFading, setCoordFading] = useState(false);
@@ -209,20 +205,16 @@ function App() {
   const [fontsReady, setFontsReady] = useState(false); // State to trigger re-render when fonts load
   const loaderMinTimeRef = useRef(false); // Minimum loader display time
 
-  // Responsive breakpoints
   const isTabletOrBelow = useMediaQuery('(max-width: 813px)');
   const isMobileBreakpoint = useMediaQuery('(max-width: 480px)');
 
-  // Mobile menu state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef(null);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Close mobile menu on Escape key
   useEffect(() => {
     if (!isMobileMenuOpen) return;
     const handleKeyDown = (e) => {
@@ -232,7 +224,6 @@ function App() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isMobileMenuOpen]);
 
-  // Close mobile menu on outside click
   useEffect(() => {
     if (!isMobileMenuOpen) return;
     const handleClickOutside = (e) => {
@@ -250,15 +241,12 @@ function App() {
     };
   }, [isMobileMenuOpen]);
 
-  // Search input state
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef(null);
 
-  // About panel state (desktop slide-in)
   const [isAboutPanelOpen, setIsAboutPanelOpen] = useState(false);
 
-  // Face emoticon animation state
   const [faceExpression, setFaceExpression] = useState('(=_=)');
   const [faceTransform, setFaceTransform] = useState({ scaleY: 1, scaleX: 1, translateX: 0, translateY: 0 });
   const [isMouseNearFace, setIsMouseNearFace] = useState(false);
@@ -268,7 +256,6 @@ function App() {
   const [isSleepingTime, setIsSleepingTime] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false); // Nav background on scroll
 
-  // Check if scrolled for nav background
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -277,7 +264,6 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Check if it's sleeping time (10PM - 6AM local time)
   useEffect(() => {
     const checkSleepingTime = () => {
       const hour = new Date().getHours();
@@ -288,7 +274,6 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Global mouseup to handle releasing click outside button
   useEffect(() => {
     const handleGlobalMouseUp = () => setIsFaceClicked(false);
     window.addEventListener('mouseup', handleGlobalMouseUp);
@@ -300,7 +285,6 @@ function App() {
   const faceZoneRef = useRef(null);
   const faceIconRef = useRef(null);
 
-  // Mouse tracking handler for frightened face
   const handleFaceZoneMouseMove = useCallback((e) => {
     if (!isMouseNearFace || !faceIconRef.current) return;
 
@@ -325,7 +309,6 @@ function App() {
     }));
   }, [isMouseNearFace]);
 
-  // Face animation - blinks, yawns, and looking around
   useEffect(() => {
     // Wait until site is fully loaded before starting animations
     if (isLoading) return;
@@ -459,42 +442,34 @@ function App() {
       }
       isYawning = true;
       isAnimating = true;
-      // Start stretching - head rises up, slight stretch
       setFaceTransform(prev => ({ ...prev, scaleY: 1.02, scaleX: 0.99, translateY: -1 }));
       setTimeout(() => {
         setFaceExpression('(=.=)'); // Mouth slightly open
         setFaceTransform(prev => ({ ...prev, scaleY: 1.03, scaleX: 0.98, translateY: -1.5 }));
       }, 250);
-      // Mouth opening more - head rises higher
       setTimeout(() => {
-        setFaceExpression('(=0=)'); // Mouth more open
+        setFaceExpression('(=0=)');
         setFaceTransform(prev => ({ ...prev, scaleY: 1.05, scaleX: 0.97, translateY: -2 }));
       }, 500);
-      // Full yawn - peak rise
       setTimeout(() => {
-        setFaceExpression('(=O=)'); // Full yawn
+        setFaceExpression('(=O=)');
         setFaceTransform(prev => ({ ...prev, scaleY: 1.06, scaleX: 0.96, translateY: -2.5 }));
       }, 750);
-      // Hold the yawn at peak
       setTimeout(() => {
         setFaceTransform(prev => ({ ...prev, scaleY: 1.05, scaleX: 0.97, translateY: -2 }));
       }, 1100);
-      // Start closing mouth - head lowers
       setTimeout(() => {
         setFaceExpression('(=0=)');
         setFaceTransform(prev => ({ ...prev, scaleY: 1.03, scaleX: 0.98, translateY: -1.5 }));
       }, 1400);
-      // Mouth almost closed
       setTimeout(() => {
         setFaceExpression('(=.=)');
         setFaceTransform(prev => ({ ...prev, scaleY: 1.01, scaleX: 0.99, translateY: -0.5 }));
       }, 1650);
-      // Back to sleepy - slight settle
       setTimeout(() => {
         setFaceExpression(expressions.default);
         setFaceTransform(prev => ({ ...prev, scaleY: 0.99, scaleX: 1.01, translateY: 0.5 }));
       }, 1900);
-      // Settle to normal
       setTimeout(() => {
         setFaceTransform(prev => ({ ...prev, scaleY: 1, scaleX: 1, translateY: 0 }));
         isYawning = false;
@@ -563,13 +538,10 @@ function App() {
     };
   }, [isLoading, isMouseNearFace, isFaceClicked, isHomeButtonHovered, isSleepingTime]);
 
-  // Last.fm integration
   const { currentTrack, isLoading: musicLoading, error: musicError, isPlaying: isPreviewPlaying, isDataComplete, playPreview, stopPreview } = useLastFm();
 
-  // GitHub stats integration
   const { stats: githubStats } = useGitHubStats();
 
-  // Sound effects
   const { playClick, playArrow } = useSounds();
   const videoRef1 = useRef(null);
   const videoRef2 = useRef(null);
@@ -600,7 +572,6 @@ function App() {
   });
   const [showJiggle, setShowJiggle] = useState(false);
 
-  // Arrow key navigation indicator
   const [arrowKeyIndicator, setArrowKeyIndicator] = useState(null); // { direction: 'left' | 'right', key: number } | null
   const arrowKeyTimeoutRef = useRef(null);
   const arrowKeyCounterRef = useRef(0);
@@ -627,7 +598,6 @@ function App() {
   const [musicTabConflicts, setMusicTabConflicts] = useState(false);
   const [shortcutsTooltipConflicts, setShortcutsTooltipConflicts] = useState(false);
 
-  // Bunny CDN base URL for video hosting
   const BUNNY_CDN_BASE = 'https://joonseo-videos.b-cdn.net';
   const musicButtonRef = useRef(null);
   const activityButtonRef = useRef(null);
@@ -660,7 +630,6 @@ function App() {
     setBarWidths([10, 10, 10]);
   };
 
-  // CMS data - fetched at runtime for live updates
   const [videoData, setVideoData] = useState([]);
   const [websiteCopy, setWebsiteCopy] = useState({});
   const lastMediaHashRef = useRef('');
@@ -909,7 +878,6 @@ function App() {
     };
   }, []);
   
-  // Update refs when state changes
   useEffect(() => {
     isHoveredRef.current = isHovered;
   }, [isHovered]);
@@ -918,7 +886,6 @@ function App() {
     isTransitioningRef.current = isTransitioning;
   }, [isTransitioning]);
 
-  // Cleanup blob URLs on unmount
   useEffect(() => {
     return () => {
       videoCacheRef.current.forEach((blobUrl) => {
@@ -950,17 +917,8 @@ function App() {
     const artistWidth = measureTextWidth(currentTrack.artist);
     const maxTextWidth = Math.max(titleWidth, artistWidth);
 
-    // Fixed offsets:
-    // - Album art: 40px
-    // - Gap between art and text: 10px
-    // - Button padding (left 6px + right 16px): 22px
-    // - Wrapper padding (left 6px + right 12px): 18px
-    // - Comfortable breathing room: 45px (matches original live version feel)
-    const fixedOffset = 40 + 10 + 22 + 18 + 45; // = 135px
+    const fixedOffset = 40 + 10 + 22 + 18 + 45;
 
-    // Calculate dynamic width with min/max constraints
-    // Min: 185px (more than original 172px, but less whitespace for short text)
-    // Max: 265px (prevent excessive width while allowing longer titles)
     const calculatedWidth = Math.round(maxTextWidth + fixedOffset);
     const newWidth = Math.max(185, Math.min(265, calculatedWidth));
 
@@ -969,12 +927,10 @@ function App() {
     return newWidth;
   }, [currentTrack?.name, currentTrack?.artist, isDataComplete]);
 
-  // Reset artist marquee signal when track changes
   useEffect(() => {
     setArtistMarqueeReady(false);
   }, [currentTrack?.name]);
 
-  // Cleanup modal timeout on unmount
   useEffect(() => {
     return () => {
       if (modalTimeoutRef.current) {
@@ -986,7 +942,6 @@ function App() {
     };
   }, []);
 
-  // Detect Mac vs Windows/Linux
   useEffect(() => {
     const checkIsMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0 ||
                        navigator.userAgent.toUpperCase().indexOf('MAC') >= 0;
@@ -1356,7 +1311,6 @@ function App() {
   };
 
 
-  // Detect Safari and add class for underline fallback
   useEffect(() => {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     if (isSafari) {
@@ -1364,12 +1318,10 @@ function App() {
     }
   }, []);
 
-  // Keep changeVideo ref updated to avoid stale closures in keyboard handler
   useEffect(() => {
     changeVideoRef.current = changeVideo;
   });
 
-  // Keyboard navigation for videos (arrow keys)
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Only on homepage and when not in an input/textarea
@@ -1380,7 +1332,6 @@ function App() {
         e.preventDefault();
         e.stopPropagation();
 
-        // Blur any focused element to prevent focus outlines
         if (document.activeElement && document.activeElement !== document.body) {
           document.activeElement.blur();
         }
@@ -1389,7 +1340,6 @@ function App() {
         changeVideoRef.current?.(direction);
         playArrow();
 
-        // Show indicator with unique key to force re-render
         arrowKeyCounterRef.current += 1;
         setArrowKeyIndicator({ direction: e.key === 'ArrowRight' ? 'right' : 'left', key: arrowKeyCounterRef.current });
         if (arrowKeyTimeoutRef.current) clearTimeout(arrowKeyTimeoutRef.current);
@@ -2449,7 +2399,7 @@ function App() {
           {/* Nav Links - inline after face section, separated by divider */}
           {!isTabletOrBelow && (
             <>
-              <div className="h-[24px] w-[1px] bg-[#eaeaea] ml-[6px] mr-[10px] relative z-20 rounded-full" />
+              <div className="h-[24px] w-[1px] ml-[6px] mr-[10px] relative z-20 rounded-full" style={{ background: 'rgba(0, 0, 0, 0.08)' }} />
               <nav className="flex items-center gap-[15px] relative z-20" aria-label="Main navigation">
                 <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
                   Experience
