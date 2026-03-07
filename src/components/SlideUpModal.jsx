@@ -605,7 +605,7 @@ export const ActivityModalContent = () => (
   </div>
 );
 
-const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSelected, onMouseEnter }) => {
+const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSelected, onMouseEnter, onMouseLeave, rowRef }) => {
   const rowClass = `shortcut-row${isSelected ? ' shortcut-row-selected' : ''}`;
   const content = (
     <div className={`shortcut-row-inner w-full flex items-center gap-[10px] px-[10px] ${subtitle ? 'py-[7px]' : 'py-[5px]'}`}>
@@ -635,13 +635,13 @@ const ShortcutRow = ({ icon, label, subtitle, keys, isMac, onClick, href, isSele
 
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={rowClass} data-shortcut-row onMouseEnter={onMouseEnter}>
+      <a ref={rowRef} href={href} target="_blank" rel="noopener noreferrer" className={rowClass} data-shortcut-row onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         {content}
       </a>
     );
   }
   return (
-    <button onClick={onClick} className={`${rowClass} w-full text-left`} data-shortcut-row onMouseEnter={onMouseEnter}>
+    <button ref={rowRef} onClick={onClick} className={`${rowClass} w-full text-left`} data-shortcut-row onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       {content}
     </button>
   );
@@ -715,7 +715,22 @@ const PaletteIcons = {
       <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>
     </svg>
   ),
+  globe: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  ),
 };
+
+const LANGUAGES = [
+  { code: 'en', label: 'English', sublabel: 'Default' },
+  { code: 'ko', label: '한국어', sublabel: 'Korean' },
+  { code: 'es', label: 'Español', sublabel: 'Spanish' },
+  { code: 'zh', label: '中文', sublabel: 'Chinese' },
+  { code: 'ja', label: '日本語', sublabel: 'Japanese' },
+];
 
 export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   const { playClick } = useSounds();
@@ -727,6 +742,12 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
   const suppressMouseRef = useRef(false);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
   const [placeholder, setPlaceholder] = useState('');
+  const [languagePanelOpen, setLanguagePanelOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(() => localStorage.getItem('site-language') || 'en');
+  const languageRowRef = useRef(null);
+  const languagePanelRef = useRef(null);
+  const languageHoverTimeoutRef = useRef(null);
+  const isMobile = useMediaQuery('(max-width: 813px)');
 
   const PHRASES = [
     'Scotland 2025',
@@ -811,6 +832,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
         { icon: PaletteIcons.resume, label: 'View resume', action: () => handleAction('viewResume') },
         { icon: PaletteIcons.calendar, label: 'Book a call (30 mins)', href: '#' },
         { icon: PaletteIcons.expand, label: 'Enter theater mode', action: () => handleAction('enterTheaterMode') },
+        { icon: PaletteIcons.globe, label: 'Change site language', isLanguageRow: true, action: () => {} },
       ],
     },
     {
@@ -880,11 +902,13 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
         e.preventDefault();
         isKeyboardNavRef.current = true;
         suppressMouseRef.current = true;
+        setLanguagePanelOpen(false);
         setSelectedIndex(prev => items.length ? (prev + 1) % items.length : 0);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         isKeyboardNavRef.current = true;
         suppressMouseRef.current = true;
+        setLanguagePanelOpen(false);
         setSelectedIndex(prev => items.length ? (prev - 1 + items.length) % items.length : 0);
       } else if (e.key === 'Enter') {
         e.preventDefault();
@@ -911,6 +935,27 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose, playClick]);
 
+  // Cleanup hover timeout on unmount
+  useEffect(() => {
+    return () => clearTimeout(languageHoverTimeoutRef.current);
+  }, []);
+
+  const handleLanguageSelect = (code) => {
+    playClick();
+    setSelectedLanguage(code);
+    localStorage.setItem('site-language', code);
+  };
+
+  // Calculate panel top position relative to shortcuts-palette-outer
+  const getLanguagePanelTop = () => {
+    if (!languageRowRef.current) return 0;
+    const rowRect = languageRowRef.current.getBoundingClientRect();
+    const outerEl = languageRowRef.current.closest('.shortcuts-palette-outer');
+    if (!outerEl) return 0;
+    const outerRect = outerEl.getBoundingClientRect();
+    return rowRect.top - outerRect.top;
+  };
+
   let flatIndex = 0;
   const renderFilteredSections = () => {
     flatIndex = 0;
@@ -918,6 +963,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
       const sectionRows = section.items.map((item) => {
         const currentFlatIndex = flatIndex;
         flatIndex++;
+        const isLangRow = item.isLanguageRow;
         return (
           <ShortcutRow
             key={`${section.label}-${item.label}`}
@@ -929,7 +975,17 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
             onClick={item.action}
             href={item.href}
             isSelected={currentFlatIndex === selectedIndex}
-            onMouseEnter={() => { if (!suppressMouseRef.current) setSelectedIndex(currentFlatIndex); }}
+            onMouseEnter={() => {
+              if (!suppressMouseRef.current) setSelectedIndex(currentFlatIndex);
+              if (isLangRow && !isMobile) {
+                clearTimeout(languageHoverTimeoutRef.current);
+                setLanguagePanelOpen(true);
+              }
+            }}
+            onMouseLeave={isLangRow ? () => {
+              languageHoverTimeoutRef.current = setTimeout(() => setLanguagePanelOpen(false), 150);
+            } : undefined}
+            rowRef={isLangRow ? languageRowRef : undefined}
           />
         );
       });
@@ -989,6 +1045,45 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
           {!isScrolledToBottom && <div className="shortcuts-palette-list-fade" />}
         </div>
       </div>
+
+      {languagePanelOpen && !isMobile && (
+        <div
+          ref={languagePanelRef}
+          className="language-side-panel"
+          style={{ top: getLanguagePanelTop() }}
+          onMouseEnter={() => clearTimeout(languageHoverTimeoutRef.current)}
+          onMouseLeave={() => {
+            languageHoverTimeoutRef.current = setTimeout(() => setLanguagePanelOpen(false), 150);
+          }}
+        >
+          <div className="language-panel-inner">
+            <div className="px-[12px] pt-[10px] pb-[6px]">
+              <span className="font-graphik text-[11px] text-[#b3b3b3] uppercase tracking-[0.05em]">Language</span>
+            </div>
+            <div className="px-[4px] pb-[6px] flex flex-col">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  className={`language-option${selectedLanguage === lang.code ? ' language-option-selected' : ''}`}
+                  onClick={() => handleLanguageSelect(lang.code)}
+                >
+                  <div className="language-option-inner">
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="font-graphik text-[14px] text-[#444]">{lang.label}</span>
+                      <span className="font-graphik text-[12px] text-[#ababab]">{lang.sublabel}</span>
+                    </div>
+                    {selectedLanguage === lang.code && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2480ED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="shortcuts-palette-footer">
         <div className="footer-hint">

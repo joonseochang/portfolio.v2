@@ -185,9 +185,11 @@ const imgFrame223 = "https://www.figma.com/api/mcp/asset/30286a38-278c-48f0-9f18
 const imgLine5 = "https://www.figma.com/api/mcp/asset/e24604e5-5571-4d0f-ab1d-aed70112aa6f";
 const imgGroup = "https://www.figma.com/api/mcp/asset/61c7aa82-f3ce-422a-beda-513c99c4bdb8";
 
-// Rewrite /about to / before React Router sees it — keeps homepage visible
+// Rewrite /about to / before React Router sees it — desktop only (overlay, not a route)
+// On mobile, /about is a real route so we don't rewrite
+const _isDesktop = window.matchMedia('(min-width: 814px)').matches;
 const _initialAbout = window.location.pathname === '/about';
-if (_initialAbout) window.history.replaceState(null, '', '/');
+if (_initialAbout && _isDesktop) window.history.replaceState(null, '', '/');
 
 function App() {
   const location = useLocation()
@@ -1336,9 +1338,10 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Only on homepage and when not in an input/textarea
+      // Only on homepage and when not in an input/textarea or about panel
       if (location.pathname !== '/') return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (isAboutPanelOpen) return;
 
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
         e.preventDefault();
@@ -1365,7 +1368,7 @@ function App() {
       if (arrowKeyTimeoutRef.current) clearTimeout(arrowKeyTimeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+  }, [location.pathname, isAboutPanelOpen]);
 
   // Track when current video is actually playing (for loading indicator)
   useEffect(() => {
@@ -2500,25 +2503,12 @@ function App() {
                 >
                   Extra
                 </button>
-
-                {/* Search in drawer */}
-                <div className="mobile-nav-search mt-[8px] pt-[12px] border-t border-[#eaeaea]">
-                  <div
-                    className="relative border h-[37px] pl-[10px] pr-[7px] py-[6px] rounded-[8px] flex items-center justify-between bg-[#f7f7f7] border-[#eaeaea] w-full"
-                    role="search"
-                  >
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="README.md"
-                      className="flex-1 bg-transparent font-graphik text-[14px] text-[#333] placeholder-[#8f8f8f] outline-none"
-                    />
-                    <span className="bg-[#eeeeee] border border-[#e0e0e0] h-[25px] w-[29px] rounded-[5px] flex items-center justify-center flex-shrink-0">
-                      <span className="font-graphik text-[12px] text-[#888]">{isMac ? '⌘J' : '⌃J'}</span>
-                    </span>
-                  </div>
-                </div>
+                <button
+                  className="mobile-nav-link font-graphik text-[15px] text-[#5b5b5e] py-[12px] px-[12px] rounded-[8px] text-left transition-colors"
+                  onClick={() => { playClick(); navigate('/about'); setIsMobileMenuOpen(false); }}
+                >
+                  About
+                </button>
               </nav>
             </div>
           </div>
@@ -2546,6 +2536,11 @@ function App() {
       <div style={{ display: location.pathname === '/soundtracking' ? 'block' : 'none' }}>
         <SoundtrackingPage isVisible={location.pathname === '/soundtracking'} />
       </div>
+
+      {/* Mobile About Page */}
+      {isTabletOrBelow && location.pathname === '/about' && (
+        <AboutPanel isOpen={true} onClose={() => navigate('/')} mobile={true} />
+      )}
 
       <main id="main-content" className="page-enter w-full min-h-screen items-center justify-center py-[120px] mt-[-10px]" style={{ display: location.pathname === '/' ? 'flex' : 'none' }}>
         <div className="flex gap-[50px] items-start text-left main-content-wrapper">

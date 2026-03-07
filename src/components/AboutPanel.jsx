@@ -14,10 +14,11 @@ const AgeTicker = () => {
   return <span style={{ fontVariantNumeric: 'tabular-nums' }}>{age}</span>
 }
 
-const AboutPanel = ({ isOpen, onClose }) => {
+const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
   const panelRef = useRef(null)
   const hasAnimatedRef = useRef(false)
   const hasRevealedRef = useRef(false)
+  const hasControlsRevealedRef = useRef(false)
   const imageRef = useRef(null)
   const [showFlowers, setShowFlowers] = useState(false)
   const [firstReveal, setFirstReveal] = useState(true)
@@ -51,6 +52,33 @@ const AboutPanel = ({ isOpen, onClose }) => {
     momentumStartTime: 0,
     momentumK: 1.8,       // exponential decay constant (lower = longer coast)
   })
+  // Touch swipe for photo carousel (mobile)
+  const touchStartRef = useRef({ x: 0, y: 0 })
+  const touchSwipingRef = useRef(false)
+
+  const onPhotoTouchStart = (e) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    touchSwipingRef.current = false
+  }
+
+  const onPhotoTouchMove = (e) => {
+    const dx = e.touches[0].clientX - touchStartRef.current.x
+    const dy = e.touches[0].clientY - touchStartRef.current.y
+    // If horizontal movement exceeds vertical, we're swiping
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+      touchSwipingRef.current = true
+    }
+  }
+
+  const onPhotoTouchEnd = (e) => {
+    if (!touchSwipingRef.current) return
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goToNextPhoto()
+      else goToPrevPhoto()
+    }
+  }
+
   const facts = [
     { label: 'Current age', value: <AgeTicker /> },
     { label: 'School', value: 'Yonsei University' },
@@ -135,11 +163,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
         hasRevealedRef.current = true
         setFirstReveal(false)
       }, 1700)
-      // Controls overlay fade-in: starts shortly after photo frame reveal finishes
-      const controlsTimer = setTimeout(() => {
-        setControlsRevealed(true)
-      }, 1900)
-      return () => { clearTimeout(timer); clearTimeout(controlsTimer) }
+      return () => { clearTimeout(timer) }
     }
   }, [isOpen])
 
@@ -324,6 +348,8 @@ const AboutPanel = ({ isOpen, onClose }) => {
     } else {
       clearInterval(photoTimerRef.current)
       setImageColorized(false)
+      setControlsRevealed(false)
+      hasControlsRevealedRef.current = false
     }
     return () => clearInterval(photoTimerRef.current)
   }, [isOpen])
@@ -361,6 +387,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
         clearTimeout(colorTimer)
         if (entry.isIntersecting) {
           colorTimer = setTimeout(() => setImageColorized(true), 250)
+          // Reveal controls overlay on first scroll into view
+          if (!hasControlsRevealedRef.current) {
+            hasControlsRevealedRef.current = true
+            setTimeout(() => setControlsRevealed(true), 400)
+          }
           // Start auto-advance when visible
           clearInterval(photoTimerRef.current)
           photoTimerRef.current = setInterval(() => {
@@ -379,7 +410,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
           })
         }
       },
-      { root: panelRef.current, threshold: 0.5 }
+      { root: mobile ? null : panelRef.current, threshold: 0.5 }
     )
     observer.observe(imageRef.current)
     return () => {
@@ -410,16 +441,220 @@ const AboutPanel = ({ isOpen, onClose }) => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  // Lock body scroll when open
+  // Lock body scroll when open (desktop only — mobile about page scrolls)
   useEffect(() => {
+    if (mobile) return
     if (isOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
+    return () => { if (!mobile) document.body.style.overflow = '' }
+  }, [isOpen, mobile])
 
+  // Shared inner content used by both mobile and desktop
+  const innerContent = (
+    <>
+      {/* Header */}
+      <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[100px]' : 'pt-[calc(38vh-40px)]'}`}>
+        <h1 className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#333] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-i': 0 } : undefined}>
+          Greetings tourist, I'm Joonseo.
+        </h1>
+        <p className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#a1a1a1] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-i': 1 } : undefined}>
+          But feel free to call me Joon.
+        </p>
+      </header>
+
+      {/* Facts carousel — full-width, right-edge fade */}
+      <div
+        ref={carouselWrapRef}
+        className={`${firstReveal && !mobile ? 'about-reveal' : ''} w-full overflow-hidden mt-[18px] cursor-grab`}
+        style={{
+          maskImage: 'linear-gradient(to right, black 0%, black 72%, rgba(0,0,0,0.4) 88%, rgba(0,0,0,0) 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, black 0%, black 72%, rgba(0,0,0,0.4) 88%, rgba(0,0,0,0) 100%)',
+          ...(firstReveal && !mobile ? { '--reveal-i': 2 } : {}),
+        }}
+      >
+        <div ref={carouselRef} className="fact-carousel-track gap-[25px] pl-[24px]">
+          {[...facts, ...facts].map((fact, i) => (
+            <div key={i} className="flex flex-col gap-[6px] shrink-0">
+              <span className="font-graphik text-[14px] leading-[15px] text-[#5b5b5e] whitespace-nowrap">{fact.label}</span>
+              <span className="font-graphik text-[14px] leading-[15px] text-[#c3c3c3] whitespace-nowrap">{fact.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider + body content */}
+      <div className="flex flex-col gap-[15px] items-center mt-[16px] w-full">
+        {/* Divider - full width, subtle skeuomorphic inset */}
+        <div
+          className={`${firstReveal && !mobile ? 'about-reveal' : ''} w-full h-[2px]`}
+          style={{
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.04), rgba(255,255,255,0.8))',
+            ...(firstReveal && !mobile ? { '--reveal-i': 3 } : {}),
+          }}
+        />
+
+        {/* Text content */}
+        <div className={`flex flex-col gap-[5px] ${mobile ? 'w-full px-[24px]' : 'w-[337px]'} leading-[25px] text-[14px]`}>
+          <p className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-graphik font-medium text-[#333333]`} style={firstReveal && !mobile ? { '--reveal-i': 4 } : undefined}>
+            I've had a nomadic upbringing.
+          </p>
+          <div className="flex flex-col gap-[10px] font-graphik text-[#5b5b5e]">
+            <p className={firstReveal && !mobile ? 'about-reveal' : ''} style={firstReveal && !mobile ? { '--reveal-i': 5 } : undefined}>I popped into existence in Bundang, South Korea, but then moved to John Hughes' suburbia of Northbrook, Chicago as an infant. Having barely attained object permanence, I suddenly found myself on another plane to Bogota, Colombia, the birthplace of magical realism and Shakira.</p>
+            <p className={firstReveal && !mobile ? 'about-reveal' : ''} style={firstReveal && !mobile ? { '--reveal-i': 6 } : undefined}>Spanish became my first language, empanadas my religion, and I earned my first unpaid internship as a 6-year-old altar boy at the local church. Up until I boarded yet another plane, this time bound for the culturally oxymoronic setting of a British-Korean school in Weihai, China, where I wore a blazer and tie every day while munching on latiao.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Photo carousel */}
+      <div className={`${firstReveal && !mobile ? 'about-reveal' : ''} w-full mt-[25px]`} ref={imageRef}
+        style={firstReveal && !mobile ? { '--reveal-i': 7 } : undefined}>
+        <div
+          className="relative w-full h-[280px] overflow-hidden"
+          style={{ backgroundColor: '#111' }}
+          onTouchStart={onPhotoTouchStart}
+          onTouchMove={onPhotoTouchMove}
+          onTouchEnd={onPhotoTouchEnd}
+        >
+          {/* Photo slides — image only, no caption inside */}
+          {photos.map((photo, i) => {
+            const isActive = i === activePhotoIndex
+            const isPrev = i === prevPhotoIndex
+            const isVisible = isActive || isPrev
+            return (
+              <div key={i} className="absolute inset-0"
+                style={{
+                  opacity: isActive ? 1 : isPrev ? 1 : 0,
+                  zIndex: isActive ? 2 : isPrev ? 1 : 0,
+                  transition: isActive ? 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
+                  pointerEvents: isActive ? 'auto' : 'none',
+                }}>
+                {isVisible && (
+                  photo.src ? (
+                    <img src={photo.src} alt={photo.caption}
+                      className="w-full h-full object-cover"
+                      style={{
+                        filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
+                        transform: imageColorized ? 'scale(1)' : 'scale(1.03)',
+                        transition: 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                      }} />
+                  ) : (
+                    <div className="w-full h-full" style={{ backgroundColor: photo.color }} />
+                  )
+                )}
+              </div>
+            )
+          })}
+          {/* Overlay: gradient, caption, arrows, pills — staggered fade after photo reveal */}
+          <div className="absolute inset-0" style={{ zIndex: 5 }}>
+            {/* Gradient */}
+            <div className="absolute bottom-0 left-0 right-0 h-[140px] pointer-events-none"
+              style={{
+                background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)',
+                opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
+                transition: 'opacity 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              }} />
+            {/* Caption */}
+            <div className="absolute bottom-[26px] left-[16px] right-[16px] pointer-events-none"
+              style={{
+                opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
+                transform: (firstReveal && !controlsRevealed) ? 'translateY(6px)' : 'translateY(0)',
+                transition: 'opacity 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 150ms, transform 700ms cubic-bezier(0.25, 1, 0.5, 1) 150ms',
+              }}>
+              <p key={activePhotoIndex}
+                className="about-photo-caption font-graphik text-[12px] text-white text-center leading-[17px]"
+                style={{ opacity: 0.85, textWrap: 'balance' }}>
+                {photos[activePhotoIndex].caption}
+              </p>
+            </div>
+            {/* Navigation arrows — hide on mobile (use swipe instead) */}
+            {!mobile && (
+              <>
+                <button className="about-photo-arrow" style={{
+                  left: '-8px',
+                  opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
+                  transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
+                }}
+                  onClick={goToPrevPhoto} aria-label="Previous photo">
+                  <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                    <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <button className="about-photo-arrow" style={{
+                  right: '-8px',
+                  opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
+                  transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
+                }}
+                  onClick={goToNextPhoto} aria-label="Next photo">
+                  <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                    <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </>
+            )}
+            {/* Progress pills */}
+            <div className="absolute bottom-[10px] left-0 right-0 flex items-center justify-center"
+              style={{
+                gap: '3px',
+                opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
+                transform: (firstReveal && !controlsRevealed) ? 'translateY(4px)' : 'translateY(0)',
+                transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 300ms, transform 600ms cubic-bezier(0.25, 1, 0.5, 1) 300ms',
+              }}>
+            {photos.map((_, i) => {
+              const isActive = i === activePhotoIndex
+              return (
+                <button key={i}
+                  className="about-photo-pill"
+                  onClick={() => handlePhotoPillClick(i)}
+                  aria-label={`Photo ${i + 1}`}
+                  style={{
+                    width: isActive ? '24px' : '14px',
+                    height: isActive ? '3px' : '2.5px',
+                    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.25)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}>
+                  <div
+                    ref={el => { pillFillRefs.current[i] = el }}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      height: '100%',
+                      borderRadius: '2px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                      width: '0%',
+                      opacity: 0,
+                    }}
+                  />
+                </button>
+              )
+            })}
+          </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Closing text — below image */}
+      <div className={`flex flex-col gap-[10px] font-graphik text-[14px] text-[#5b5b5e] leading-[25px] px-[24px] mt-[16px] ${mobile ? 'pb-[60px]' : ''}`}>
+        <p>After Weihai, I moved back to South Korea for university at Yonsei, where I studied and served my mandatory military assignment with the 12th Infantry Division. Between drills and lectures, I picked up a camera and started documenting the places and people around me.</p>
+        <p>These days I'm based in Kagoshima, Japan, slowly learning the language, shooting on a Leica Q2, and building things for the web. Next stop is Saigon.</p>
+      </div>
+    </>
+  )
+
+  // Mobile: full-page scrollable view
+  if (mobile) {
+    return (
+      <div ref={panelRef} className="about-panel-mobile">
+        {innerContent}
+      </div>
+    )
+  }
+
+  // Desktop: slide-in overlay
   return (
     <>
       {/* Backdrop */}
@@ -448,196 +683,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
         aria-modal="true"
         aria-label="About"
       >
-        {/* Watercolor Flowers — archived, not rendered (restore by uncommenting)
-        <div
-          className={`about-flowers-wrap ${showFlowers ? 'visible' : ''}`}
-          style={{ height: 'calc(38vh - 40px)' }}
-        >
-          <WatercolorFlowers
-            isVisible={showFlowers}
-            hasBeenSeen={hasAnimatedRef.current}
-          />
-        </div>
-        */}
-
-        {/* Header */}
-        <header className="flex flex-col gap-[7px] px-[24px] pt-[calc(38vh-40px)]">
-          <h1 className={`${firstReveal ? 'about-reveal' : ''} font-calluna text-[21px] text-[#333] leading-[1] whitespace-nowrap`} style={firstReveal ? { '--reveal-i': 0 } : undefined}>
-            Greetings tourist, I'm Joonseo.
-          </h1>
-          <p className={`${firstReveal ? 'about-reveal' : ''} font-calluna text-[21px] text-[#a1a1a1] leading-[1] whitespace-nowrap`} style={firstReveal ? { '--reveal-i': 1 } : undefined}>
-            But feel free to call me Joon.
-          </p>
-        </header>
-
-        {/* Facts carousel — full-width, right-edge fade */}
-        <div
-          ref={carouselWrapRef}
-          className={`${firstReveal ? 'about-reveal' : ''} w-full overflow-hidden mt-[18px] cursor-grab`}
-          style={{
-            maskImage: 'linear-gradient(to right, black 0%, black 72%, rgba(0,0,0,0.4) 88%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, black 0%, black 72%, rgba(0,0,0,0.4) 88%, rgba(0,0,0,0) 100%)',
-            ...(firstReveal ? { '--reveal-i': 2 } : {}),
-          }}
-        >
-          <div ref={carouselRef} className="fact-carousel-track gap-[25px] pl-[24px]">
-            {[...facts, ...facts].map((fact, i) => (
-              <div key={i} className="flex flex-col gap-[6px] shrink-0">
-                <span className="font-graphik text-[14px] leading-[15px] text-[#5b5b5e] whitespace-nowrap">{fact.label}</span>
-                <span className="font-graphik text-[14px] leading-[15px] text-[#c3c3c3] whitespace-nowrap">{fact.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Divider + body content */}
-        <div className="flex flex-col gap-[15px] items-center mt-[16px] w-full">
-          {/* Divider - full width, subtle skeuomorphic inset */}
-          <div
-            className={`${firstReveal ? 'about-reveal' : ''} w-full h-[2px]`}
-            style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.04), rgba(255,255,255,0.8))',
-              ...(firstReveal ? { '--reveal-i': 3 } : {}),
-            }}
-          />
-
-          {/* Text content - 337px wide centered in 385px */}
-          <div className="flex flex-col gap-[5px] w-[337px] leading-[25px] text-[14px]">
-            <p className={`${firstReveal ? 'about-reveal' : ''} font-graphik font-medium text-[#333333]`} style={firstReveal ? { '--reveal-i': 4 } : undefined}>
-              I've had a nomadic upbringing.
-            </p>
-            <div className="flex flex-col gap-[10px] font-graphik text-[#5b5b5e]">
-              <p className={firstReveal ? 'about-reveal' : ''} style={firstReveal ? { '--reveal-i': 5 } : undefined}>I popped into existence in Bundang, South Korea, but then moved to John Hughes' suburbia of Northbrook, Chicago as an infant. Having barely attained object permanence, I suddenly found myself on another plane to Bogota, Colombia, the birthplace of magical realism and Shakira.</p>
-              <p className={firstReveal ? 'about-reveal' : ''} style={firstReveal ? { '--reveal-i': 6 } : undefined}>Spanish became my first language, empanadas my religion, and I earned my first unpaid internship as a 6-year-old altar boy at the local church. Up until I boarded yet another plane, this time bound for the culturally oxymoronic setting of a British-Korean school in Weihai, China, where I wore a blazer and tie every day while munching on latiao.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Photo carousel */}
-        <div className={`${firstReveal ? 'about-reveal' : ''} w-full mt-[25px]`} ref={imageRef}
-          style={firstReveal ? { '--reveal-i': 7 } : undefined}>
-          <div className="relative w-full h-[280px] overflow-hidden" style={{ backgroundColor: '#111' }}>
-            {/* Photo slides — image only, no caption inside */}
-            {photos.map((photo, i) => {
-              const isActive = i === activePhotoIndex
-              const isPrev = i === prevPhotoIndex
-              const isVisible = isActive || isPrev
-              return (
-                <div key={i} className="absolute inset-0"
-                  style={{
-                    opacity: isActive ? 1 : isPrev ? 1 : 0,
-                    zIndex: isActive ? 2 : isPrev ? 1 : 0,
-                    transition: isActive ? 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
-                    pointerEvents: isActive ? 'auto' : 'none',
-                  }}>
-                  {isVisible && (
-                    photo.src ? (
-                      <img src={photo.src} alt={photo.caption}
-                        className="w-full h-full object-cover"
-                        style={{
-                          filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
-                          transform: imageColorized ? 'scale(1)' : 'scale(1.03)',
-                          transition: 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                        }} />
-                    ) : (
-                      <div className="w-full h-full" style={{ backgroundColor: photo.color }} />
-                    )
-                  )}
-                </div>
-              )
-            })}
-            {/* Overlay: gradient, caption, arrows, pills — staggered fade after photo reveal */}
-            <div className="absolute inset-0" style={{ zIndex: 5 }}>
-              {/* Gradient */}
-              <div className="absolute bottom-0 left-0 right-0 h-[140px] pointer-events-none"
-                style={{
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)',
-                  opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
-                  transition: 'opacity 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                }} />
-              {/* Caption */}
-              <div className="absolute bottom-[26px] left-[16px] right-[16px] pointer-events-none"
-                style={{
-                  opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
-                  transform: (firstReveal && !controlsRevealed) ? 'translateY(6px)' : 'translateY(0)',
-                  transition: 'opacity 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 150ms, transform 700ms cubic-bezier(0.25, 1, 0.5, 1) 150ms',
-                }}>
-                <p key={activePhotoIndex}
-                  className="about-photo-caption font-graphik text-[12px] text-white text-center leading-[17px]"
-                  style={{ opacity: 0.85, textWrap: 'balance' }}>
-                  {photos[activePhotoIndex].caption}
-                </p>
-              </div>
-              {/* Navigation arrows */}
-              <button className="about-photo-arrow" style={{
-                left: '-8px',
-                opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
-                transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
-              }}
-                onClick={goToPrevPhoto} aria-label="Previous photo">
-                <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                  <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              <button className="about-photo-arrow" style={{
-                right: '-8px',
-                opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
-                transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
-              }}
-                onClick={goToNextPhoto} aria-label="Next photo">
-                <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                  <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              {/* Progress pills */}
-              <div className="absolute bottom-[10px] left-0 right-0 flex items-center justify-center"
-                style={{
-                  gap: '3px',
-                  opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
-                  transform: (firstReveal && !controlsRevealed) ? 'translateY(4px)' : 'translateY(0)',
-                  transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 300ms, transform 600ms cubic-bezier(0.25, 1, 0.5, 1) 300ms',
-                }}>
-              {photos.map((_, i) => {
-                const isActive = i === activePhotoIndex
-                return (
-                  <button key={i}
-                    className="about-photo-pill"
-                    onClick={() => handlePhotoPillClick(i)}
-                    aria-label={`Photo ${i + 1}`}
-                    style={{
-                      width: isActive ? '24px' : '14px',
-                      height: isActive ? '3px' : '2.5px',
-                      backgroundColor: isActive ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.25)',
-                      position: 'relative',
-                      overflow: 'hidden',
-                    }}>
-                    <div
-                      ref={el => { pillFillRefs.current[i] = el }}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        height: '100%',
-                        borderRadius: '2px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
-                        width: '0%',
-                        opacity: 0,
-                      }}
-                    />
-                  </button>
-                )
-              })}
-            </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Placeholder — below image */}
-        <div className="flex flex-col gap-[10px] font-graphik text-[14px] text-[#5b5b5e] leading-[25px] px-[24px] mt-[16px]">
-          <p>After Weihai, I moved back to South Korea for university at Yonsei, where I studied and served my mandatory military assignment with the 12th Infantry Division. Between drills and lectures, I picked up a camera and started documenting the places and people around me.</p>
-          <p>These days I'm based in Kagoshima, Japan, slowly learning the language, shooting on a Leica Q2, and building things for the web. Next stop is Saigon.</p>
-        </div>
-
+        {innerContent}
       </div>
     </>
   )
