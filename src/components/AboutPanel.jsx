@@ -569,7 +569,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
                       style={{
                         filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
                         transform: imageColorized ? 'scale(1)' : 'scale(1.03)',
-                        transition: 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        transition: isActive ? 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
                       }} />
                   ) : (
                     <div className="w-full h-full" style={{ backgroundColor: photo.color }} />
@@ -601,22 +601,22 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
               </p>
             </div>
             {/* Navigation arrows */}
-            <button className="about-photo-arrow" style={{
-              left: '-8px',
-              opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
-              transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
-            }}
-              onClick={goToPrevPhoto} aria-label="Previous photo">
+            <button
+              className={`about-photo-arrow${(firstReveal && !controlsRevealed) ? ' about-photo-arrow-hidden' : ''}`}
+              style={{ left: '-8px' }}
+              onClick={goToPrevPhoto}
+              aria-label="Previous photo"
+            >
               <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
                 <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
-            <button className="about-photo-arrow" style={{
-              right: '-8px',
-              opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
-              transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
-            }}
-              onClick={goToNextPhoto} aria-label="Next photo">
+            <button
+              className={`about-photo-arrow${(firstReveal && !controlsRevealed) ? ' about-photo-arrow-hidden' : ''}`}
+              style={{ right: '-8px' }}
+              onClick={goToNextPhoto}
+              aria-label="Next photo"
+            >
               <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
                 <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
