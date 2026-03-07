@@ -2359,12 +2359,12 @@ function App() {
       <div
         className={`fixed top-0 left-0 right-0 z-50 top-nav-container ${loadedComponents.navBar ? 'component-loaded from-top' : 'component-hidden from-top'}`}
         style={{
-          background: isScrolled ? 'rgba(252, 252, 252, 0.85)' : 'linear-gradient(180deg, #ffffff 0%, #fefefe 100%)',
+          background: isScrolled ? 'rgba(252, 252, 252, 0.85)' : 'transparent',
           backdropFilter: isScrolled ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',
         }}
       >
-        <div className="light-nav-bar h-[62px] pt-[3px] pb-[6px] w-full px-[15px] flex items-center justify-between">
+        <div className="light-nav-bar pt-[8px] pb-[8px] w-full px-[15px] flex items-center">
           {/* Gary Section - Face Icon + Name + Hover Info Box */}
           <div className="gary-section relative">
             {/* Mouse proximity detection zone */}
@@ -2449,7 +2449,7 @@ function App() {
           {/* Nav Links - inline after face section, separated by divider */}
           {!isTabletOrBelow && (
             <>
-              <div className="h-[24px] w-[1px] bg-[#eaeaea] ml-[6px] mr-[10px] relative z-20" />
+              <div className="h-[24px] w-[1px] bg-[#eaeaea] ml-[6px] mr-[10px] relative z-20 rounded-full" />
               <nav className="flex items-center gap-[15px] relative z-20" aria-label="Main navigation">
                 <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
                   Experience
@@ -2483,8 +2483,8 @@ function App() {
               }}
               aria-label="Introduction"
             >
-              <span className="font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[180ms]">Introduction...</span>
-              <span className="nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[180ms]">{isMac ? '⌘J' : '⌃J'}</span>
+              <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">Introduction...</span>
+              <span className="relative z-[1] nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[350ms]">{isMac ? '⌘J' : '⌃J'}</span>
             </button>
           )}
 
