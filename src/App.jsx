@@ -2603,8 +2603,9 @@ function App() {
                   <div
                     className="clock-weather-section overflow-hidden flex justify-end"
                     style={{
-                      // Fixed pixel width - collapse to 3px (not 0) to allow bounce undershoot
-                      width: isClockHovered ? '48px' : '3px',
+                      // Dynamic width based on actual temperature text (e.g. "9°C" vs "29°C" vs "-3°C")
+                      // 1px divider + 8px gap + text + 8px gap from parent = measured + ~17px
+                      width: isClockHovered ? `${Math.ceil(measureTextWidth(`${ambientWeather.temperature}℃`) + 17)}px` : '3px',
                       // Constant -8px margin fully compensates for parent's gap, extra -3px hides the 3px collapsed width
                       marginLeft: isClockHovered ? '-8px' : '-11px',
                       // Expand: 480ms with bounce, Collapse: 560ms with bounce
