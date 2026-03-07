@@ -456,7 +456,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
   const innerContent = (
     <>
       {/* Header */}
-      <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[140px]' : 'pt-[calc(38vh-40px)]'}`}>
+      <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[220px]' : 'pt-[calc(38vh-40px)]'}`}>
         <h1 className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#333] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-i': 0 } : undefined}>
           Greetings tourist, I'm Joonseo.
         </h1>
