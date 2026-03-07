@@ -479,6 +479,7 @@ background-color: #E8F6FF;
     bottom: 24px !important;
     max-width: calc(100vw - 32px) !important;
     width: auto !important;
+    z-index: 100;
   }
 
   .music-pill-wrapper {
