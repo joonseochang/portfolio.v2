@@ -41,6 +41,8 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     // Drag
     dragging: false,
     dragStartX: 0,
+    dragStartY: 0,
+    dragAxis: null,       // null = undecided, 'horizontal' or 'vertical'
     dragFrozenPos: 0,     // visual position frozen at drag start
     dragDelta: 0,
     // Velocity — ring buffer for reliable flick detection
@@ -50,7 +52,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     inMomentum: false,
     momentumV0: 0,        // px/s at release
     momentumStartTime: 0,
-    momentumK: 1.8,       // exponential decay constant (lower = longer coast)
+    momentumK: mobile ? 1.1 : 1.8, // lower = longer coast; more fluid on mobile
   })
   // Touch swipe for photo carousel (mobile)
   const touchStartRef = useRef({ x: 0, y: 0 })
@@ -184,6 +186,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     const cs = carouselState.current
 
     const getX = (e) => e.touches ? e.touches[0].clientX : e.clientX
+    const getY = (e) => e.touches ? e.touches[0].clientY : e.clientY
 
     // Compute the current visual position from time-based state
     const getCurrentPos = (now) => {
@@ -204,6 +207,8 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
       cs.inMomentum = false
       cs.dragDelta = 0
       cs.dragStartX = getX(e)
+      cs.dragStartY = getY(e)
+      cs.dragAxis = null  // undecided — will lock on first significant move
       cs.velSamples = []
       if (e.type === 'mousedown') wrap.style.cursor = 'grabbing'
     }
@@ -212,15 +217,39 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
       if (!cs.dragging) return
       const now = performance.now()
       const x = getX(e)
-      cs.dragDelta = x - cs.dragStartX
+      const y = getY(e)
+      const dx = x - cs.dragStartX
+      const dy = y - cs.dragStartY
+
+      // On touch: decide axis once movement exceeds threshold
+      if (e.touches && cs.dragAxis === null) {
+        const absDx = Math.abs(dx)
+        const absDy = Math.abs(dy)
+        if (absDx < 5 && absDy < 5) return  // too small to decide
+        cs.dragAxis = absDx >= absDy ? 'horizontal' : 'vertical'
+      }
+
+      // If vertical scroll won, abandon the carousel drag entirely
+      if (cs.dragAxis === 'vertical') return
+
+      // Horizontal drag confirmed — prevent page scroll
+      if (e.cancelable) e.preventDefault()
+
+      cs.dragDelta = dx
       cs.velSamples.push({ x, time: now })
       if (cs.velSamples.length > cs.velMaxSamples) cs.velSamples.shift()
     }
 
     const onDragEnd = () => {
       if (!cs.dragging) return
+      const wasVertical = cs.dragAxis === 'vertical'
       cs.dragging = false
+      cs.dragAxis = null
       wrap.style.cursor = ''
+
+      // If we never engaged horizontal drag, don't apply momentum
+      if (wasVertical) return
+
       const now = performance.now()
       // Rebase: absorb drag into openPosition, reset epoch
       cs.openPosition = cs.dragFrozenPos + cs.dragDelta
@@ -248,9 +277,11 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     }
 
     wrap.addEventListener('mousedown', onDragStart)
+    // touchstart must be non-passive so we can preventDefault in touchmove
     wrap.addEventListener('touchstart', onDragStart, { passive: true })
     window.addEventListener('mousemove', onDragMove)
-    window.addEventListener('touchmove', onDragMove, { passive: true })
+    // touchmove must be non-passive so we can preventDefault to block vertical scroll
+    window.addEventListener('touchmove', onDragMove, { passive: false })
     window.addEventListener('mouseup', onDragEnd)
     window.addEventListener('touchend', onDragEnd)
 
