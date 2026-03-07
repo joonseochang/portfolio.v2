@@ -487,7 +487,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
   const innerContent = (
     <>
       {/* Header */}
-      <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[calc(40vh)]' : 'pt-[calc(38vh-40px)]'}`}>
+      <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[calc(55vh)]' : 'pt-[calc(38vh-40px)]'}`}>
         <h1 className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#333] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-anim': 'aboutRevealHero', '--reveal-dur': '900ms', '--reveal-ease': 'cubic-bezier(0.34, 1.15, 0.64, 1)', '--reveal-delay': '320ms' } : undefined}>
           Greetings tourist, I'm Joonseo.
         </h1>
