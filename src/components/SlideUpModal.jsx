@@ -946,16 +946,6 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
     localStorage.setItem('site-language', code);
   };
 
-  // Calculate panel top position relative to shortcuts-palette-outer
-  const getLanguagePanelTop = () => {
-    if (!languageRowRef.current) return 0;
-    const rowRect = languageRowRef.current.getBoundingClientRect();
-    const outerEl = languageRowRef.current.closest('.shortcuts-palette-outer');
-    if (!outerEl) return 0;
-    const outerRect = outerEl.getBoundingClientRect();
-    return rowRect.top - outerRect.top;
-  };
-
   let flatIndex = 0;
   const renderFilteredSections = () => {
     flatIndex = 0;
@@ -1050,7 +1040,6 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
         <div
           ref={languagePanelRef}
           className="language-side-panel"
-          style={{ top: getLanguagePanelTop() }}
           onMouseEnter={() => clearTimeout(languageHoverTimeoutRef.current)}
           onMouseLeave={() => {
             languageHoverTimeoutRef.current = setTimeout(() => setLanguagePanelOpen(false), 150);

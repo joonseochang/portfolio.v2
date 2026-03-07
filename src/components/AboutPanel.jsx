@@ -160,11 +160,11 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
   // Mark text reveal as done after first open completes
   useEffect(() => {
     if (isOpen && !hasRevealedRef.current) {
-      // Last element (index 7) finishes at: 400ms delay + 7*80ms stagger + 700ms animation = 1660ms
+      // Last element (photo) finishes at: 860ms delay + 950ms animation = 1810ms
       const timer = setTimeout(() => {
         hasRevealedRef.current = true
         setFirstReveal(false)
-      }, 1700)
+      }, 1850)
       return () => { clearTimeout(timer) }
     }
   }, [isOpen])
@@ -488,10 +488,10 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     <>
       {/* Header */}
       <header className={`flex flex-col gap-[7px] px-[24px] ${mobile ? 'pt-[calc(40vh)]' : 'pt-[calc(38vh-40px)]'}`}>
-        <h1 className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#333] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-i': 0 } : undefined}>
+        <h1 className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#333] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-anim': 'aboutRevealHero', '--reveal-dur': '900ms', '--reveal-ease': 'cubic-bezier(0.34, 1.15, 0.64, 1)', '--reveal-delay': '320ms' } : undefined}>
           Greetings tourist, I'm Joonseo.
         </h1>
-        <p className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#a1a1a1] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-i': 1 } : undefined}>
+        <p className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-calluna text-[21px] text-[#a1a1a1] leading-[1] whitespace-nowrap`} style={firstReveal && !mobile ? { '--reveal-anim': 'aboutRevealHero', '--reveal-dur': '780ms', '--reveal-delay': '360ms' } : undefined}>
           But feel free to call me Joon.
         </p>
       </header>
@@ -503,7 +503,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
         style={{
           maskImage: 'linear-gradient(to right, black 0%, black 72%, rgba(0,0,0,0.4) 88%, rgba(0,0,0,0) 100%)',
           WebkitMaskImage: 'linear-gradient(to right, black 0%, black 72%, rgba(0,0,0,0.4) 88%, rgba(0,0,0,0) 100%)',
-          ...(firstReveal && !mobile ? { '--reveal-i': 2 } : {}),
+          ...(firstReveal && !mobile ? { '--reveal-delay': '520ms' } : {}),
         }}
       >
         <div ref={carouselRef} className="fact-carousel-track gap-[25px] pl-[24px]">
@@ -523,25 +523,25 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
           className={`${firstReveal && !mobile ? 'about-reveal' : ''} w-full h-[2px]`}
           style={{
             background: 'linear-gradient(to bottom, rgba(0,0,0,0.04), rgba(255,255,255,0.8))',
-            ...(firstReveal && !mobile ? { '--reveal-i': 3 } : {}),
+            ...(firstReveal && !mobile ? { '--reveal-dur': '500ms', '--reveal-delay': '510ms' } : {}),
           }}
         />
 
         {/* Text content */}
         <div className={`flex flex-col gap-[5px] ${mobile ? 'w-full px-[24px]' : 'w-[337px]'} leading-[25px] text-[14px]`}>
-          <p className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-graphik font-medium text-[#333333]`} style={firstReveal && !mobile ? { '--reveal-i': 4 } : undefined}>
+          <p className={`${firstReveal && !mobile ? 'about-reveal' : ''} font-graphik font-medium text-[#333333]`} style={firstReveal && !mobile ? { '--reveal-delay': '660ms' } : undefined}>
             I've had a nomadic upbringing.
           </p>
           <div className="flex flex-col gap-[10px] font-graphik text-[#5b5b5e]">
-            <p className={firstReveal && !mobile ? 'about-reveal' : ''} style={firstReveal && !mobile ? { '--reveal-i': 5 } : undefined}>I popped into existence in Bundang, South Korea, but then moved to John Hughes' suburbia of Northbrook, Chicago as an infant. Having barely attained object permanence, I suddenly found myself on another plane to Bogota, Colombia, the birthplace of magical realism and Shakira.</p>
-            <p className={firstReveal && !mobile ? 'about-reveal' : ''} style={firstReveal && !mobile ? { '--reveal-i': 6 } : undefined}>Spanish became my first language, empanadas my religion, and I earned my first unpaid internship as a 6-year-old altar boy at the local church. Up until I boarded yet another plane, this time bound for the culturally oxymoronic setting of a British-Korean school in Weihai, China, where I wore a blazer and tie every day while munching on latiao.</p>
+            <p className={firstReveal && !mobile ? 'about-reveal' : ''} style={firstReveal && !mobile ? { '--reveal-delay': '690ms' } : undefined}>I popped into existence in Bundang, South Korea, but then moved to John Hughes' suburbia of Northbrook, Chicago as an infant. Having barely attained object permanence, I suddenly found myself on another plane to Bogota, Colombia, the birthplace of magical realism and Shakira.</p>
+            <p className={firstReveal && !mobile ? 'about-reveal' : ''} style={firstReveal && !mobile ? { '--reveal-delay': '725ms' } : undefined}>Spanish became my first language, empanadas my religion, and I earned my first unpaid internship as a 6-year-old altar boy at the local church. Up until I boarded yet another plane, this time bound for the culturally oxymoronic setting of a British-Korean school in Weihai, China, where I wore a blazer and tie every day while munching on latiao.</p>
           </div>
         </div>
       </div>
 
       {/* Photo carousel */}
       <div className={`${firstReveal && !mobile ? 'about-reveal' : ''} w-full mt-[25px]`} ref={imageRef}
-        style={firstReveal && !mobile ? { '--reveal-i': 7 } : undefined}>
+        style={firstReveal && !mobile ? { '--reveal-anim': 'aboutRevealPhoto', '--reveal-dur': '950ms', '--reveal-delay': '860ms' } : undefined}>
         <div
           className="relative w-full h-[280px] overflow-hidden"
           style={{ backgroundColor: '#111' }}
