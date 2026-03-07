@@ -2359,12 +2359,12 @@ function App() {
       <div
         className={`fixed top-0 left-0 right-0 z-50 top-nav-container ${loadedComponents.navBar ? 'component-loaded from-top' : 'component-hidden from-top'}`}
         style={{
-          backgroundColor: isScrolled ? 'rgba(252, 252, 252, 0.85)' : 'transparent',
+          backgroundColor: isScrolled ? 'rgba(252, 252, 252, 0.85)' : '#ffffff',
           backdropFilter: isScrolled ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',
         }}
       >
-        <div className="light-nav-bar h-[62px] pt-[3px] w-full px-[15px] flex items-center justify-between">
+        <div className="light-nav-bar h-[62px] pt-[3px] pb-[6px] w-full px-[15px] flex items-center justify-between">
           {/* Gary Section - Face Icon + Name + Hover Info Box */}
           <div className="gary-section relative">
             {/* Mouse proximity detection zone */}
@@ -2492,25 +2492,25 @@ function App() {
           {/* Center - Navigation Links */}
           <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-[20px]" aria-label="Main navigation">
             <button
-              className="nav-text-link font-graphik text-[14px] text-[#9f9fa3] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
+              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
               onClick={playClick}
             >
               Experience
             </button>
             <button
-              className="nav-text-link font-graphik text-[14px] text-[#9f9fa3] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
+              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
               onClick={playClick}
             >
               Gallery
             </button>
             <button
-              className="nav-text-link font-graphik text-[14px] text-[#9f9fa3] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
+              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
               onClick={playClick}
             >
               Notes
             </button>
             <button
-              className="nav-text-link font-graphik text-[14px] text-[#9f9fa3] hover:text-[#5b5b5e] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
+              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
               onClick={playClick}
             >
               Extra

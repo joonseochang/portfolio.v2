@@ -56,7 +56,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
     { label: 'Favorite album', value: 'An Awesome Wave' },
     { label: 'Favorite camera', value: 'Leica Q2' },
     { label: 'Favorite anime', value: 'Cowboy Bebop' },
-    { label: 'Favorite director', value: 'Hirokazu Koreeda' },
+    { label: 'Favorite director', value: 'Park Chan-wook' },
     { label: 'Sports I watch', value: 'ATP, WTA, LCK, PL' },
     { label: 'K-Drama pick', value: 'Reply 1988' },
     { label: 'K-Music pick', value: '심야행 - SE SO NEON' },
