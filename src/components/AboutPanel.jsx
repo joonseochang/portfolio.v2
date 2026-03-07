@@ -21,6 +21,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
   const imageRef = useRef(null)
   const [showFlowers, setShowFlowers] = useState(false)
   const [firstReveal, setFirstReveal] = useState(true)
+  const [controlsRevealed, setControlsRevealed] = useState(false)
   const [activePhotoIndex, setActivePhotoIndex] = useState(0)
   const [prevPhotoIndex, setPrevPhotoIndex] = useState(null)
   const [imageColorized, setImageColorized] = useState(false)
@@ -77,14 +78,14 @@ const AboutPanel = ({ isOpen, onClose }) => {
   ]
 
   const photos = [
-    { src: '/images/about-panel.jpg', caption: 'Popped into existence in Bundang,\nSouth Korea in the spring of 2000.' },
-    { src: '/images/about-panel.jpg', caption: 'Moved to Northbrook, Chicago as an infant.\nJohn Hughes suburbia, barely attained object permanence.' },
-    { src: '/images/about-panel.jpg', caption: 'Grew up in Bogota, Colombia.\nSpanish became my first language, empanadas my religion.' },
-    { src: '/images/about-panel.jpg', caption: 'British-Korean school in Weihai, China.\nBlazers, ties, and latiao every single day.' },
-    { src: '/images/about-panel.jpg', caption: 'University years at Yonsei in Seoul.\nStudying and picking up a camera along the way.' },
-    { src: '/images/about-panel.jpg', caption: 'Mandatory military service in the mountains\nwith the 12th Infantry Division.' },
-    { src: '/images/about-panel.jpg', caption: 'Currently in Kagoshima, Japan.\nSlowly learning the language, shooting on a Leica Q2.' },
-    { src: '/images/about-panel.jpg', caption: 'Next stop is Saigon. Building things\nfor the web and documenting along the way.' },
+    { src: '/images/about-panel.jpg', caption: 'Popped into existence in Bundang, South Korea in the spring of 2000.' },
+    { color: '#8B7355', caption: 'Moved to Northbrook, Chicago as an infant. John Hughes suburbia.' },
+    { color: '#4A6741', caption: 'Grew up in Bogota, Colombia. Spanish became my first language, empanadas my religion.' },
+    { color: '#5B6E8A', caption: 'British-Korean school in Weihai, China. Blazers, ties, and latiao every single day.' },
+    { color: '#7A5C5C', caption: 'University years at Yonsei in Seoul, studying and picking up a camera along the way.' },
+    { color: '#5A6B52', caption: 'Mandatory military service in the mountains with the 12th Infantry Division.' },
+    { color: '#6B5B7B', caption: 'Currently in Kagoshima, Japan. Slowly learning the language, shooting on a Leica Q2.' },
+    { color: '#8A7262', caption: 'Next stop is Saigon. Building things for the web and documenting along the way.' },
   ]
 
   const advancePhoto = (nextIndex) => {
@@ -121,7 +122,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
     if (isOpen && hasAnimatedRef.current === false) {
       const timer = setTimeout(() => {
         hasAnimatedRef.current = true
-      }, 3500)
+      }, 2200)
       return () => clearTimeout(timer)
     }
   }, [isOpen])
@@ -129,12 +130,16 @@ const AboutPanel = ({ isOpen, onClose }) => {
   // Mark text reveal as done after first open completes
   useEffect(() => {
     if (isOpen && !hasRevealedRef.current) {
-      // Last element (index 7) finishes at: 700ms delay + 7*100ms stagger + 1400ms animation = 2800ms
+      // Last element (index 7) finishes at: 400ms delay + 7*80ms stagger + 700ms animation = 1660ms
       const timer = setTimeout(() => {
         hasRevealedRef.current = true
         setFirstReveal(false)
-      }, 2900)
-      return () => clearTimeout(timer)
+      }, 1700)
+      // Controls overlay fade-in: starts shortly after photo frame reveal finishes
+      const controlsTimer = setTimeout(() => {
+        setControlsRevealed(true)
+      }, 1900)
+      return () => { clearTimeout(timer); clearTimeout(controlsTimer) }
     }
   }, [isOpen])
 
@@ -324,10 +329,11 @@ const AboutPanel = ({ isOpen, onClose }) => {
   }, [isOpen])
 
   // Progress pill fill animation — direct DOM manipulation
+  // Depends on imageColorized so it starts when the carousel becomes visible
   useEffect(() => {
     pillFillRefs.current.forEach((el, idx) => {
       if (!el) return
-      if (idx === activePhotoIndex && isOpen) {
+      if (idx === activePhotoIndex && isOpen && imageColorized) {
         el.style.transition = 'none'
         el.style.width = '0%'
         el.style.opacity = '1'
@@ -344,7 +350,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
         el.style.opacity = '0'
       }
     })
-  }, [activePhotoIndex, isOpen])
+  }, [activePhotoIndex, isOpen, imageColorized])
 
   // Intersection observer — colorize image + start/pause auto-advance
   useEffect(() => {
@@ -383,13 +389,21 @@ const AboutPanel = ({ isOpen, onClose }) => {
     }
   }, [isOpen])
 
-  // Close on Escape key
+  // Keyboard: Escape to close, arrow keys to navigate photos
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         onClose()
         document.activeElement?.blur()
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        goToNextPhoto()
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        goToPrevPhoto()
       }
     }
     document.addEventListener('keydown', handleKeyDown)
@@ -502,8 +516,8 @@ const AboutPanel = ({ isOpen, onClose }) => {
         {/* Photo carousel */}
         <div className={`${firstReveal ? 'about-reveal' : ''} w-full mt-[25px]`} ref={imageRef}
           style={firstReveal ? { '--reveal-i': 7 } : undefined}>
-          <div className="relative w-full h-[240px] overflow-hidden" style={{ backgroundColor: '#111' }}>
-            {/* Photo slides — outgoing stays opaque, incoming fades in on top */}
+          <div className="relative w-full h-[280px] overflow-hidden" style={{ backgroundColor: '#111' }}>
+            {/* Photo slides — image only, no caption inside */}
             {photos.map((photo, i) => {
               const isActive = i === activePhotoIndex
               const isPrev = i === prevPhotoIndex
@@ -517,43 +531,72 @@ const AboutPanel = ({ isOpen, onClose }) => {
                     pointerEvents: isActive ? 'auto' : 'none',
                   }}>
                   {isVisible && (
-                    <>
-                      <img src={photo.src} alt={photo.caption.replace('\n', ' — ')}
+                    photo.src ? (
+                      <img src={photo.src} alt={photo.caption}
                         className="w-full h-full object-cover"
                         style={{
                           filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
                           transform: imageColorized ? 'scale(1)' : 'scale(1.03)',
                           transition: 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                         }} />
-                      {/* Gradient overlay — taller for text breathing room */}
-                      <div className="absolute bottom-0 left-0 right-0 h-[130px] pointer-events-none"
-                        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)' }} />
-                      {/* Two-line caption */}
-                      <p className="absolute bottom-[22px] left-[16px] right-[16px] font-graphik text-[12px] text-white text-center leading-[17px]"
-                        style={{ whiteSpace: 'pre-line', opacity: 0.85 }}>
-                        {photo.caption}
-                      </p>
-                    </>
+                    ) : (
+                      <div className="w-full h-full" style={{ backgroundColor: photo.color }} />
+                    )
                   )}
                 </div>
               )
             })}
-            {/* Navigation arrows */}
-            <button className="about-photo-arrow" style={{ left: '8px' }}
-              onClick={goToPrevPhoto} aria-label="Previous photo">
-              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            <button className="about-photo-arrow" style={{ right: '8px' }}
-              onClick={goToNextPhoto} aria-label="Next photo">
-              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            {/* Progress pills — inside photo frame */}
-            <div className="absolute bottom-[8px] left-0 right-0 flex items-center justify-center z-10"
-              style={{ gap: '3px' }}>
+            {/* Overlay: gradient, caption, arrows, pills — staggered fade after photo reveal */}
+            <div className="absolute inset-0" style={{ zIndex: 5 }}>
+              {/* Gradient */}
+              <div className="absolute bottom-0 left-0 right-0 h-[140px] pointer-events-none"
+                style={{
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)',
+                  opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
+                  transition: 'opacity 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                }} />
+              {/* Caption */}
+              <div className="absolute bottom-[26px] left-[16px] right-[16px] pointer-events-none"
+                style={{
+                  opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
+                  transform: (firstReveal && !controlsRevealed) ? 'translateY(6px)' : 'translateY(0)',
+                  transition: 'opacity 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 150ms, transform 700ms cubic-bezier(0.25, 1, 0.5, 1) 150ms',
+                }}>
+                <p key={activePhotoIndex}
+                  className="about-photo-caption font-graphik text-[12px] text-white text-center leading-[17px]"
+                  style={{ opacity: 0.85, textWrap: 'balance' }}>
+                  {photos[activePhotoIndex].caption}
+                </p>
+              </div>
+              {/* Navigation arrows */}
+              <button className="about-photo-arrow" style={{
+                left: '-8px',
+                opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
+                transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
+              }}
+                onClick={goToPrevPhoto} aria-label="Previous photo">
+                <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                  <path d="M6 1L1 6L6 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <button className="about-photo-arrow" style={{
+                right: '-8px',
+                opacity: (firstReveal && !controlsRevealed) ? 0 : undefined,
+                transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 250ms',
+              }}
+                onClick={goToNextPhoto} aria-label="Next photo">
+                <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                  <path d="M1 1L6 6L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              {/* Progress pills */}
+              <div className="absolute bottom-[10px] left-0 right-0 flex items-center justify-center"
+                style={{
+                  gap: '3px',
+                  opacity: (firstReveal && !controlsRevealed) ? 0 : 1,
+                  transform: (firstReveal && !controlsRevealed) ? 'translateY(4px)' : 'translateY(0)',
+                  transition: 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 300ms, transform 600ms cubic-bezier(0.25, 1, 0.5, 1) 300ms',
+                }}>
               {photos.map((_, i) => {
                 const isActive = i === activePhotoIndex
                 return (
@@ -584,6 +627,7 @@ const AboutPanel = ({ isOpen, onClose }) => {
                   </button>
                 )
               })}
+            </div>
             </div>
           </div>
         </div>

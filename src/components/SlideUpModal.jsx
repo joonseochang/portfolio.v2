@@ -328,9 +328,9 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
     positionRef.current = rect.left + rect.width / 2;
   }
 
-  // Keep position updated on resize
+  // Keep position updated on resize (desktop only — mobile always centers)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || isMobile) return;
     const onResize = () => {
       if (anchorRef?.current && positionDivRef.current) {
         const rect = anchorRef.current.getBoundingClientRect();
@@ -339,7 +339,7 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [isOpen, anchorRef]);
+  }, [isOpen, anchorRef, isMobile]);
 
   // Update position div immediately when anchor changes (for switching modals)
   useEffect(() => {

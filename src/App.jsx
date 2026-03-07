@@ -185,6 +185,10 @@ const imgFrame223 = "https://www.figma.com/api/mcp/asset/30286a38-278c-48f0-9f18
 const imgLine5 = "https://www.figma.com/api/mcp/asset/e24604e5-5571-4d0f-ab1d-aed70112aa6f";
 const imgGroup = "https://www.figma.com/api/mcp/asset/61c7aa82-f3ce-422a-beda-513c99c4bdb8";
 
+// Rewrite /about to / before React Router sees it — keeps homepage visible
+const _initialAbout = window.location.pathname === '/about';
+if (_initialAbout) window.history.replaceState(null, '', '/');
+
 function App() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -245,6 +249,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef(null);
 
+  const shouldOpenAboutRef = useRef(_initialAbout);
   const [isAboutPanelOpen, setIsAboutPanelOpen] = useState(false);
 
   const [faceExpression, setFaceExpression] = useState('(=_=)');
@@ -959,18 +964,25 @@ function App() {
     console.warn(`Video ${videoId} failed to load:`, videoElement?.src);
   };
 
-  // Route /about → open About side panel (desktop) or redirect home (mobile)
+  // On mount: if URL was /about, open the panel once loader finishes
   useEffect(() => {
-    if (location.pathname === '/about') {
-      if (isTabletOrBelow) {
-        navigate('/', { replace: true });
-      } else {
+    if (isLoading) return;
+    if (shouldOpenAboutRef.current) {
+      shouldOpenAboutRef.current = false;
+      if (!isTabletOrBelow) {
         setIsAboutPanelOpen(true);
       }
-    } else {
-      setIsAboutPanelOpen(false);
     }
-  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync URL with about panel state (overlay, not a route change)
+  useEffect(() => {
+    if (isAboutPanelOpen) {
+      window.history.replaceState(null, '', '/about');
+    } else if (window.location.pathname === '/about') {
+      window.history.replaceState(null, '', '/');
+    }
+  }, [isAboutPanelOpen])
 
   // Pause/resume video when about panel opens/closes
   useEffect(() => {
@@ -1000,7 +1012,7 @@ function App() {
         return;
       }
 
-      // Cmd+J / Ctrl+J to open about panel
+      // Cmd+J / Ctrl+J to toggle about panel
       if ((e.metaKey || e.ctrlKey) && e.code === 'KeyJ') {
         e.preventDefault();
         setIsAboutPanelOpen(prev => !prev);
@@ -3133,7 +3145,7 @@ function App() {
                 }}
               >
                 {isTabletOrBelow ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" shapeRendering="geometricPrecision"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#aaa" strokeWidth="1.5"/><path d="M7 9.5H9M10.5 9.5H12.5M14.5 9.5H16.5M8 13.5H16" stroke="#aaa" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" shapeRendering="geometricPrecision"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H18.5C19.9 5 21 6.1 21 7.5V16.5C21 17.9 19.9 19 18.5 19H5.5C4.1 19 3 17.9 3 16.5V7.5Z" stroke="#aaa" strokeWidth="1.5"/><path d="M7 11H17M7 14.5H13" stroke="#aaa" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 ) : (
                   <p className="font-graphik text-[14px] text-[#5b5b5e]">Shortcuts</p>
                 )}
@@ -3169,51 +3181,52 @@ function App() {
         </div>
       </div>
 
-      {/* Slide Up Modal - Lazy loaded with Framer Motion */}
-      <Suspense fallback={null}>
-        <SlideUpModal
-          isOpen={activeModal !== null}
-          onClose={() => setActiveModal(null)}
-          type={activeModal || 'contact'}
-          anchorRef={activeAnchorRef}
-        >
-          <Suspense fallback={<div className="p-4 text-center text-gray-400" role="status" aria-live="polite">Loading...</div>}>
-            {activeModal === 'music' && <MusicModalContent currentTrack={currentTrack} />}
-            {activeModal === 'activity' && <ActivityModalContent />}
-            {activeModal === 'shortcuts' && (
-              <ShortcutsModalContent
-                isMac={isMac}
-                onClose={() => setActiveModal(null)}
-                onAction={(action, payload) => {
-                  switch (action) {
-                    case 'navigate':
-                      setActiveModal(null);
-                      // Scroll to top for home navigation
-                      if (payload === '/') window.scrollTo({ top: 0, behavior: 'smooth' });
-                      break;
-                    case 'openAboutPanel':
-                      setActiveModal(null);
-                      setIsAboutPanelOpen(true);
-                      break;
-                    case 'copyEmail':
-                      navigator.clipboard.writeText('changjoonseo126@gmail.com').catch(() => {});
-                      setActiveModal(null);
-                      break;
-                    case 'toggleDarkMode':
-                      setActiveModal(null);
-                      break;
-                    case 'close':
-                      setActiveModal(null);
-                      break;
-                  }
-                }}
-              />
-            )}
-            {activeModal === 'contact' && <ContactModalContent />}
-          </Suspense>
-        </SlideUpModal>
-      </Suspense>
     </div>
+
+    {/* Slide Up Modal - outside bottom-pill-outer so its transform doesn't break position:fixed */}
+    <Suspense fallback={null}>
+      <SlideUpModal
+        isOpen={activeModal !== null}
+        onClose={() => setActiveModal(null)}
+        type={activeModal || 'contact'}
+        anchorRef={activeAnchorRef}
+      >
+        <Suspense fallback={<div className="p-4 text-center text-gray-400" role="status" aria-live="polite">Loading...</div>}>
+          {activeModal === 'music' && <MusicModalContent currentTrack={currentTrack} />}
+          {activeModal === 'activity' && <ActivityModalContent />}
+          {activeModal === 'shortcuts' && (
+            <ShortcutsModalContent
+              isMac={isMac}
+              onClose={() => setActiveModal(null)}
+              onAction={(action, payload) => {
+                switch (action) {
+                  case 'navigate':
+                    setActiveModal(null);
+                    // Scroll to top for home navigation
+                    if (payload === '/') window.scrollTo({ top: 0, behavior: 'smooth' });
+                    break;
+                  case 'openAboutPanel':
+                    setActiveModal(null);
+                    setIsAboutPanelOpen(true);
+                    break;
+                  case 'copyEmail':
+                    navigator.clipboard.writeText('changjoonseo126@gmail.com').catch(() => {});
+                    setActiveModal(null);
+                    break;
+                  case 'toggleDarkMode':
+                    setActiveModal(null);
+                    break;
+                  case 'close':
+                    setActiveModal(null);
+                    break;
+                }
+              }}
+            />
+          )}
+          {activeModal === 'contact' && <ContactModalContent />}
+        </Suspense>
+      </SlideUpModal>
+    </Suspense>
 
     {/* Arrow Key Navigation Indicator */}
     {arrowKeyIndicator && (
@@ -3266,7 +3279,7 @@ function App() {
 
     {/* About Panel (desktop slide-in) */}
     {!isTabletOrBelow && (
-      <AboutPanel isOpen={isAboutPanelOpen} onClose={() => { setIsAboutPanelOpen(false); navigate('/'); }} />
+      <AboutPanel isOpen={isAboutPanelOpen} onClose={() => setIsAboutPanelOpen(false)} />
     )}
 
     <Toaster
