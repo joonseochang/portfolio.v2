@@ -413,8 +413,8 @@ const AboutPanel = ({ isOpen, onClose }) => {
         {/* Bottom image */}
         <div
           ref={imageRef}
-          className={`${firstReveal ? 'about-reveal' : ''} w-full h-[240px] overflow-hidden mt-[25px]`}
-          style={firstReveal ? { '--reveal-i': 7 } : undefined}
+          className={`${firstReveal ? 'about-reveal' : ''} h-[240px] overflow-hidden mt-[25px]`}
+          style={{ position: 'relative', left: '-26px', width: 'calc(100% + 28px)', ...(firstReveal ? { '--reveal-i': 7 } : {}) }}
         >
           <img
             src="/images/about-panel.jpg"
