@@ -98,7 +98,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     { label: 'Motivational anthem', value: "Fuckin' in the Bushes - Oasis" },
     { label: 'Learning', value: 'Japanese' },
     { label: 'Military unit', value: '12th Infantry Division' },
-    { label: 'Favorite show', value: 'Mad Men' },
+    { label: 'Favorite show', value: 'House M.D.' },
     { label: 'LoL rank', value: 'Platinum (KR)' },
     { label: 'Favorite artist', value: 'The Strokes' },
     { label: 'Favorite dish to make', value: 'Doenjang-jjigae (된장찌개)' },
