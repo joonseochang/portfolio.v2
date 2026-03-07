@@ -557,9 +557,13 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
             return (
               <div key={i} className="absolute inset-0"
                 style={{
-                  opacity: isActive ? 1 : isPrev ? 1 : 0,
+                  opacity: isActive ? 1 : 0,
                   zIndex: isActive ? 2 : isPrev ? 1 : 0,
-                  transition: isActive ? 'opacity 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
+                  transition: isActive
+                    ? 'opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    : isPrev
+                      ? 'opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 100ms'
+                      : 'none',
                   pointerEvents: isActive ? 'auto' : 'none',
                 }}>
                 {isVisible && (
