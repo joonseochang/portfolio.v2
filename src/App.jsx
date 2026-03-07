@@ -2359,7 +2359,7 @@ function App() {
       <div
         className={`fixed top-0 left-0 right-0 z-50 top-nav-container ${loadedComponents.navBar ? 'component-loaded from-top' : 'component-hidden from-top'}`}
         style={{
-          backgroundColor: isScrolled ? 'rgba(252, 252, 252, 0.85)' : '#ffffff',
+          background: isScrolled ? 'rgba(252, 252, 252, 0.85)' : 'linear-gradient(180deg, #ffffff 0%, #fefefe 100%)',
           backdropFilter: isScrolled ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',
         }}
@@ -2440,104 +2440,52 @@ function App() {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col items-start gap-[4px] pr-[8px]">
-                  <span className="nav-name font-graphik text-[14px] text-[#5b5b5e] leading-none transition-colors duration-[250ms]">Joonseo Chang</span>
-                  <span className="font-graphik text-[14px] leading-none">
-                    <span className="activity-added text-[#c3c3c3] transition-colors duration-[250ms]">+{(githubStats?.added || 0).toLocaleString()}</span>
-                    <span className="text-[#c3c3c3]"> </span>
-                    <span className="activity-removed text-[#c3c3c3] transition-colors duration-[250ms]">-{(githubStats?.deleted || 0).toLocaleString()}</span>
-                  </span>
-                </div>
+                <span className="nav-name font-graphik text-[14px] text-[#5b5b5e] leading-none transition-colors duration-[250ms]">Joonseo Chang</span>
               </button>
 
-              {/* Gary section hover info box - appears when hovering on home button */}
-              {(isHomeButtonHovered || isFaceHoverExiting) && (
-                <div
-                  className={`face-hover-box absolute z-[100] ${isFaceHoverExiting ? 'exiting' : ''}`}
-                >
-                  <div className="face-hover-box-inner rounded-[12px] p-[4px]">
-                    <button
-                      className="commit-toggle-btn flex items-center gap-[4px] cursor-pointer rounded-[8px] px-[6px] py-[6px] transition-all duration-150"
-                      onClick={() => setIsCommitExpanded(!isCommitExpanded)}
-                    >
-                      <p className="font-graphik text-[14px] leading-normal whitespace-nowrap">
-                        <span className="text-[#969494]">Last commit: </span>
-                        <span className="text-[#e6eaee]">{githubStats?.lastCommitAt ? getTimeAgo(githubStats.lastCommitAt) : 'recently'}</span>
-                      </p>
-                      <svg
-                        width="12"
-                        height="7"
-                        viewBox="0 0 12 7"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="commit-arrow shrink-0 transition-transform duration-200"
-                        style={{ transform: isCommitExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                      >
-                        <path
-                          d="M1 1L6 5.5L11 1"
-                          className="transition-[stroke] duration-200"
-                          stroke={isCommitExpanded ? '#e6eaee' : '#969494'}
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Center - Navigation Links */}
-          <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-[20px]" aria-label="Main navigation">
-            <button
-              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
-              onClick={playClick}
-            >
-              Experience
-            </button>
-            <button
-              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
-              onClick={playClick}
-            >
-              Gallery
-            </button>
-            <button
-              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
-              onClick={playClick}
-            >
-              Notes
-            </button>
-            <button
-              className="nav-text-link font-graphik text-[14px] text-[#5b5b5e] hover:text-[#1a1a1a] transition-colors cursor-pointer px-[8px] py-[12px] -mx-[8px]"
-              onClick={playClick}
-            >
-              Extra
-            </button>
-          </nav>
-
-          {/* Right - Ask me anything button (hidden on mobile) */}
+          {/* Nav Links - inline after face section, separated by divider */}
           {!isTabletOrBelow && (
-            <div className="hover-trigger" onMouseEnter={onBarsEnter} onMouseLeave={onBarsLeave}>
+            <>
+              <div className="h-[24px] w-[1px] bg-[#eaeaea] ml-[6px] mr-[10px] relative z-20" />
+              <nav className="flex items-center gap-[15px] relative z-20" aria-label="Main navigation">
+                <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
+                  Experience
+                </button>
+                <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
+                  Research
+                </button>
+                <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
+                  Gallery
+                </button>
+                <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
+                  Notes
+                </button>
+                <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
+                  Extra
+                </button>
+              </nav>
+            </>
+          )}
+
+          {/* Spacer to push Introduction button to the right */}
+          <div className="flex-1" />
+
+          {/* Right - Introduction button (hidden on mobile) */}
+          {!isTabletOrBelow && (
             <button
-              className="nav-info-button relative h-[37px] pl-[12px] pr-[8px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group w-[190px]"
+              className="nav-intro-button relative h-[37px] w-[156px] pl-[10px] pr-[7px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
               }}
-              aria-label="About - README"
+              aria-label="Introduction"
             >
-              <span className="font-graphik text-[14px] text-[#9F9FA3] group-hover:text-[#555] whitespace-nowrap transition-colors duration-[180ms]">README.md</span>
-              <span className="nav-info-badge h-[24px] w-[24px] rounded-[5px] flex items-center justify-center flex-shrink-0">
-                <div className="nav-bars-icon">
-                  <span className="nav-bar-1" ref={el => barRefs.current[0] = el} />
-                  <span className="nav-bar-2" ref={el => barRefs.current[1] = el} />
-                  <span className="nav-bar-3" ref={el => barRefs.current[2] = el} />
-                </div>
-              </span>
+              <span className="font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[180ms]">Introduction...</span>
+              <span className="nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[180ms]">{isMac ? '⌘J' : '⌃J'}</span>
             </button>
-            </div>
           )}
 
           {/* Hamburger Menu Button (mobile only) */}
