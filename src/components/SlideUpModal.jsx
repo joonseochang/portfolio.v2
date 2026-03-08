@@ -847,7 +847,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
       label: 'Miscellaneous',
       items: [
         { icon: PaletteIcons.download, label: 'Download time capsule', action: () => handleAction('downloadTimeCapsule') },
-        { icon: PaletteIcons.chess, label: <><span>Challenge me</span><span style={{ color: '#ababab', marginLeft: '8px' }}>Rapid 15 mins</span></>, href: 'https://www.chess.com/member/joonseo123' },
+        { icon: PaletteIcons.chess, label: <><span>Challenge me</span><span style={{ color: '#c8c8c8', margin: '0 6px' }}>·</span><span style={{ color: '#ababab' }}>Rapid 15 mins</span></>, href: 'https://www.chess.com/member/joonseo123' },
         { icon: PaletteIcons.speaker, label: 'How to pronounce my name', action: () => handleAction('pronounceName') },
         { icon: PaletteIcons.paperPlane, label: 'Send a Wuphf', action: () => handleAction('sendWuphf') },
         { icon: PaletteIcons.pen, label: 'Sign guestbook', action: () => handleAction('signGuestbook') },
