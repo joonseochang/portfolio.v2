@@ -2484,7 +2484,7 @@ function App() {
               }}
               aria-label="Introduction"
             >
-              <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">Introduction...</span>
+              <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">Introduction</span>
               <span className="relative z-[1] nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[350ms]">{isMac ? '⌘J' : '⌃J'}</span>
             </button>
           )}
