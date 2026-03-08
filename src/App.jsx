@@ -2470,7 +2470,7 @@ function App() {
               onClick={playClick}
             >
               <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">
-                <span className="text-[#22c55e]">+{githubStats.added}</span>{' '}<span className="text-[#ef4444]">-{githubStats.deleted}</span>
+                <span className="text-[#6bbf7b]">+{githubStats.added}</span><span className="inline-block w-[6px]" /><span className="text-[#e0736a]">-{githubStats.deleted}</span>
               </span>
               <span className="relative z-[1] nav-commit-badge font-graphik text-[12px] text-[#8f8f8f] h-[25px] px-[6px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[350ms]">{formatRelativeTime(githubStats.lastCommitAt)}</span>
             </a>
