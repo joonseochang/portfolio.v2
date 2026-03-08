@@ -409,7 +409,7 @@ background-color: #E8F6FF;
   /* Light navigation bar - mobile responsive */
   .light-nav-bar {
     height: 56px !important;
-    padding-left: 16px !important;
+    padding-left: 12px !important;
     padding-right: 16px !important;
   }
 
