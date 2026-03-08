@@ -1293,6 +1293,8 @@ function App() {
     const doSwitch = () => {
       // Now update index - this will swap z-index making next video visible
       setVideoIndex(nextIndex);
+      // Reset mobile metadata on every video switch
+      if (isMobileOrTablet) setMobileMetadataExpanded(false);
 
       // Hide and pause current video after switch
       if (currentVideo) {
