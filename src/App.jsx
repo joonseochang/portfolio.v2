@@ -191,6 +191,26 @@ const _isDesktop = window.matchMedia('(min-width: 814px)').matches;
 const _initialAbout = window.location.pathname === '/about';
 if (_initialAbout && _isDesktop) window.history.replaceState(null, '', '/');
 
+function formatRelativeTime(dateString) {
+  if (!dateString) return '';
+  const now = Date.now();
+  const then = new Date(dateString).getTime();
+  const seconds = Math.floor((now - then) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes === 1) return '1 min';
+  if (minutes < 60) return `${minutes} mins`;
+  const hours = Math.floor(minutes / 60);
+  if (hours === 1) return '1 hour';
+  if (hours < 24) return `${hours} hours`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return '1 day';
+  if (days < 30) return `${days} days`;
+  const months = Math.floor(days / 30);
+  if (months === 1) return '1 month';
+  return `${months} months`;
+}
+
 function App() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -2440,7 +2460,21 @@ function App() {
           {/* Spacer to push Introduction button to the right */}
           <div className="flex-1" />
 
-          {/* Right - Introduction button (hidden on mobile) */}
+          {/* Right - Commit tracker + Introduction button (hidden on mobile) */}
+          {!isTabletOrBelow && githubStats && (
+            <a
+              href="https://github.com/joonseochang"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-commit-button relative h-[37px] pl-[10px] pr-[7px] py-[6px] rounded-[8px] flex items-center cursor-pointer group no-underline"
+              onClick={playClick}
+            >
+              <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">
+                <span className="text-[#22c55e]">+{githubStats.added}</span>{' '}<span className="text-[#ef4444]">-{githubStats.deleted}</span>
+              </span>
+              <span className="relative z-[1] nav-commit-badge font-graphik text-[12px] text-[#8f8f8f] h-[25px] px-[6px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[350ms]">{formatRelativeTime(githubStats.lastCommitAt)}</span>
+            </a>
+          )}
           {!isTabletOrBelow && (
             <button
               className="nav-intro-button relative h-[37px] w-[156px] pl-[10px] pr-[7px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group"

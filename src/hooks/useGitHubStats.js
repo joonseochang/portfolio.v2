@@ -93,8 +93,18 @@ export function useGitHubStats() {
     return () => clearInterval(interval);
   }, []);
 
+  // In dev (no Netlify functions), provide fallback so UI is visible
+  const effectiveStats = stats || (error && !isLoading ? {
+    added: 0,
+    deleted: 0,
+    pushCount: 0,
+    weekStart: new Date().toISOString(),
+    lastCommitAt: new Date().toISOString(),
+    partial: true,
+  } : null);
+
   return {
-    stats,
+    stats: effectiveStats,
     isLoading,
     error,
     refresh: fetchStats,
