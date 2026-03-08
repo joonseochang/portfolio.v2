@@ -2470,7 +2470,7 @@ function App() {
               onClick={playClick}
             >
               <div className="nav-commit-inner">
-                <span className="nav-commit-text font-graphik text-[14px] text-[#8f8f8f] whitespace-nowrap transition-colors duration-[350ms]">
+                <span className="nav-commit-text font-graphik text-[14px] text-[#8f8f8f] whitespace-nowrap transition-colors duration-[200ms]">
                   <span className="text-[#6bbf7b]">+{githubStats.added.toLocaleString()}</span><span className="inline-block w-[6px]" /><span className="text-[#e0736a]">-{githubStats.deleted.toLocaleString()}</span>
                 </span>
                 <span
@@ -2493,8 +2493,8 @@ function App() {
               aria-label="Introduction"
             >
               <div className="nav-intro-inner">
-                <span className="nav-intro-text font-graphik text-[14px] text-[#8f8f8f] whitespace-nowrap transition-colors duration-[350ms]">Introduction</span>
-                <span className="nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[12px] transition-colors duration-[350ms]">{isMac ? '⌘J' : '⌃J'}</span>
+                <span className="nav-intro-text font-graphik text-[14px] text-[#8f8f8f] whitespace-nowrap transition-colors duration-[200ms]">Introduction</span>
+                <span className="nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[12px] transition-colors duration-[200ms]">{isMac ? '⌘J' : '⌃J'}</span>
               </div>
             </button>
           )}
