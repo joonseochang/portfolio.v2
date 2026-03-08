@@ -2472,12 +2472,12 @@ function App() {
               <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">
                 <span className="text-[#6bbf7b]">+{githubStats.added.toLocaleString()}</span><span className="inline-block w-[6px]" /><span className="text-[#e0736a]">-{githubStats.deleted.toLocaleString()}</span>
               </span>
-              <span className="relative z-[1] nav-commit-badge font-graphik text-[12px] text-[#8f8f8f] h-[25px] px-[6px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[350ms]">{formatRelativeTime(githubStats.lastCommitAt)}</span>
+              <span className="relative z-[1] nav-commit-badge font-graphik text-[12px] text-[#8f8f8f] h-[25px] px-[6px] rounded-[6px] flex items-center justify-center ml-[12px] transition-colors duration-[350ms]">{formatRelativeTime(githubStats.lastCommitAt)}</span>
             </a>
           )}
           {!isTabletOrBelow && (
             <button
-              className="nav-intro-button relative h-[37px] w-[156px] pl-[10px] pr-[7px] py-[6px] rounded-[8px] flex items-center justify-between cursor-pointer group"
+              className="nav-intro-button relative h-[37px] pl-[10px] pr-[7px] py-[6px] rounded-[8px] flex items-center cursor-pointer group"
               onClick={() => {
                 playClick();
                 setIsAboutPanelOpen(true);
@@ -2485,7 +2485,7 @@ function App() {
               aria-label="Introduction"
             >
               <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">Introduction</span>
-              <span className="relative z-[1] nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[8px] transition-colors duration-[350ms]">{isMac ? '⌘J' : '⌃J'}</span>
+              <span className="relative z-[1] nav-intro-kbd font-graphik text-[12px] text-[#8f8f8f] h-[25px] w-[29px] rounded-[6px] flex items-center justify-center ml-[12px] transition-colors duration-[350ms]">{isMac ? '⌘J' : '⌃J'}</span>
             </button>
           )}
 
