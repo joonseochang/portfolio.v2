@@ -385,7 +385,7 @@ const SlideUpModal = ({ isOpen, onClose, type, anchorRef, darkMode = false, chil
   const renderContent = () => {
     if (isContactModal) {
       return (
-        <div className="contact-modal-outer rounded-[20px] flex justify-center">
+        <div className="contact-modal-outer rounded-[22px] flex justify-center">
           {children}
         </div>
       );
@@ -928,6 +928,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
           inputRef.current?.focus();
         } else if (onClose) {
           onClose();
+          document.activeElement?.blur();
         }
       }
     };
@@ -1327,7 +1328,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
             <div
               ref={showMore ? scrollRef : undefined}
               onScroll={showMore ? handleContactScroll : undefined}
-              className={`contact-view-anim pt-[12px] pb-[10px] flex flex-col items-center gap-[10px]${showMore ? ' contact-scrollable' : ''}`}
+              className={`contact-view-anim pt-[10px] pb-[10px] flex flex-col items-center gap-[10px]${showMore ? ' contact-scrollable' : ''}`}
             >
               {contactItems.map((item, index) =>
                 renderContactRow(item, index < contactItems.length - 1 || showMore)

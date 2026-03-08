@@ -224,7 +224,7 @@ function App() {
   useEffect(() => {
     if (!isMobileMenuOpen) return;
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setIsMobileMenuOpen(false);
+      if (e.key === 'Escape') { setIsMobileMenuOpen(false); document.activeElement?.blur(); }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
@@ -1004,6 +1004,7 @@ function App() {
       if (e.code === 'Escape' && isAboutPanelOpen) {
         e.preventDefault();
         setIsAboutPanelOpen(false);
+        document.activeElement?.blur();
         return;
       }
 
@@ -1011,6 +1012,7 @@ function App() {
       if (e.code === 'Escape' && activeModal) {
         e.preventDefault();
         setActiveModal(null);
+        document.activeElement?.blur();
         return;
       }
 
