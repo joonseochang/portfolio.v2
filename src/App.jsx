@@ -2086,9 +2086,8 @@ function App() {
       // Standard attributes for all browsers
       videoEl.setAttribute('playsinline', 'true');
       videoEl.setAttribute('webkit-playsinline', 'true');
-      const hasAudio = !!(videoData[index]?.hasAudio);
-      videoEl.muted = !hasAudio;
-      videoEl.defaultMuted = !hasAudio;
+      videoEl.muted = true;
+      videoEl.defaultMuted = true;
 
       // Disable picture-in-picture and remote playback for cleaner experience
       videoEl.disablePictureInPicture = true;
@@ -2794,7 +2793,7 @@ function App() {
                       ...(isMobileOrTablet && mobileMetadataExpanded && { filter: video.noExposureBoost ? 'brightness(1.03)' : 'brightness(1.20)' })
                     }}
                     poster={getPosterSrc(getVideoSrc(video))}
-                    muted={!video.hasAudio}
+                    muted
                     playsInline
                     preload="auto"
                     controls={false}
