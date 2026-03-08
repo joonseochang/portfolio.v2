@@ -108,12 +108,12 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
   ]
 
   const photos = [
-    { src: '/images/about-panel.jpg', caption: 'Shameless exhibitionism employed by baby Joon in Bundang, circa 2002.' },
+    { src: '/images/about-panel.webp', caption: 'Shameless exhibitionism employed by baby Joon in Bundang, circa 2002.' },
     { color: '#8B7355', caption: 'Moved to Northbrook, Chicago as an infant. John Hughes suburbia.' },
     { color: '#4A6741', caption: 'Grew up in Bogota, Colombia. Spanish became my first language, empanadas my religion.' },
     { color: '#5B6E8A', caption: 'British-Korean school in Weihai, China. Blazers, ties, and latiao every single day.' },
     { color: '#7A5C5C', caption: 'University years at Yonsei in Seoul, studying and picking up a camera along the way.' },
-    { src: '/images/IMG_8650.jpg', objectPosition: 'center 65%', caption: 'Mandatory military service in the mountains with the 12th Infantry Division.' },
+    { src: '/images/IMG_8650.webp', objectPosition: 'center 65%', caption: 'Mandatory military service in the mountains with the 12th Infantry Division.' },
     { color: '#6B5B7B', caption: 'Currently in Kagoshima, Japan. Slowly learning the language, shooting on a Leica Q2.' },
     { color: '#8A7262', caption: 'Next stop is Saigon. Building things for the web and documenting along the way.' },
   ]
@@ -553,7 +553,8 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
           {photos.map((photo, i) => {
             const isActive = i === activePhotoIndex
             const isPrev = i === prevPhotoIndex
-            const isVisible = isActive || isPrev
+            const isNext = i === (activePhotoIndex + 1) % photos.length
+            const shouldRender = isActive || isPrev || isNext
             return (
               <div key={i} className="absolute inset-0"
                 style={{
@@ -566,10 +567,12 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
                       : 'none',
                   pointerEvents: isActive ? 'auto' : 'none',
                 }}>
-                {isVisible && (
+                {shouldRender && (
                   photo.src ? (
                     <img src={photo.src} alt={photo.caption}
                       className="w-full h-full object-cover"
+                      fetchpriority={isActive ? 'high' : 'low'}
+                      decoding={isActive ? 'sync' : 'async'}
                       style={{
                         objectPosition: photo.objectPosition || 'center center',
                         filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
