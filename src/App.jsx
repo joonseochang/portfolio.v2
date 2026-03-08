@@ -2436,7 +2436,7 @@ function App() {
           {/* Nav Links - inline after face section, separated by divider */}
           {!isTabletOrBelow && (
             <>
-              <div className="h-[24px] w-[1px] ml-[6px] mr-[10px] relative z-20 rounded-full" style={{ background: 'rgba(0, 0, 0, 0.08)' }} />
+              <div className="h-[24px] w-[1.5px] ml-[6px] mr-[10px] relative z-20 rounded-full" style={{ background: 'rgba(0, 0, 0, 0.08)' }} />
               <nav className="flex items-center gap-[15px] relative z-20" aria-label="Main navigation">
                 <button className="nav-text-link font-graphik text-[14px] cursor-pointer" onClick={playClick}>
                   Experience

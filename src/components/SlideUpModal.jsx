@@ -1098,15 +1098,17 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
 // Module-level variable: persists panel state across component unmounts/remounts
 // (switching modals, closing and reopening). Resets only on page refresh.
 let _persistedContactPanel = null;
+const CHAT_WELCOME = { role: 'assistant', content: 'hey — ask me anything about my work, this site, or whatever. i\'m around.' };
+const CHAT_MAX_MESSAGES = 20;
+let _persistedChat = [CHAT_WELCOME];
 
 export const ContactModalContent = ({ darkMode = false }) => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
   const [activePanel, setActivePanel] = useState(_persistedContactPanel);
-  const composing = activePanel === 'msg';
   const showMore = activePanel === 'ext';
-  const showQR = activePanel === 'bot';
+  const showBot = activePanel === 'bot';
   const togglePanel = (panel) => {
     playClick();
     setScrolledToBottom(false);
@@ -1114,11 +1116,77 @@ export const ContactModalContent = ({ darkMode = false }) => {
     _persistedContactPanel = next;
     setActivePanel(next);
   };
-  const [message, setMessage] = useState('');
-  const [sendState, setSendState] = useState('idle'); // idle | sending | sent | error
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const scrollRef = useRef(null);
   const { playClick } = useSounds();
+
+  // Chat state
+  const [chatMessages, setChatMessages] = useState(_persistedChat);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatEndRef = useRef(null);
+  const chatInputRef = useRef(null);
+
+  // Sync persisted chat
+  useEffect(() => {
+    _persistedChat = chatMessages;
+  }, [chatMessages]);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, chatLoading]);
+
+  // Focus input when bot panel opens
+  useEffect(() => {
+    if (showBot) {
+      setTimeout(() => chatInputRef.current?.focus(), 100);
+    }
+  }, [showBot]);
+
+  // Count only real conversation messages (exclude welcome)
+  const chatAtLimit = chatMessages.length >= CHAT_MAX_MESSAGES;
+
+  const sendChat = async () => {
+    const text = chatInput.trim();
+    if (!text || chatLoading || chatAtLimit) return;
+
+    const userMsg = { role: 'user', content: text };
+    const updated = [...chatMessages, userMsg];
+    setChatMessages(updated);
+    setChatInput('');
+    setChatLoading(true);
+
+    // Send only user/assistant messages (skip the hardcoded welcome for cleaner context)
+    const toSend = updated.filter((_, i) => i > 0);
+
+    try {
+      const res = await fetch('/.netlify/functions/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: toSend }),
+      });
+      const data = await res.json();
+      if (data.reply) {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      } else if (data.error) {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: data.error }]);
+      } else {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: 'hmm, something went wrong. try again?' }]);
+      }
+    } catch {
+      setChatMessages(prev => [...prev, { role: 'assistant', content: 'couldn\'t connect right now. try again in a bit?' }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleChatKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChat();
+    }
+  };
 
   const handleContactScroll = (e) => {
     const el = e.target;
@@ -1232,29 +1300,6 @@ export const ContactModalContent = ({ darkMode = false }) => {
   ];
 
   const linkCount = contactItems.length + (showMore ? extraItems.length : 0);
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent('https://joonseochang.com')}&bgcolor=fafafa&color=333333&margin=8`;
-
-  const handleSend = async () => {
-    if (!message.trim() || sendState === 'sending') return;
-    setSendState('sending');
-    try {
-      const res = await fetch('/.netlify/functions/send-message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message.trim() }),
-      });
-      if (!res.ok) throw new Error();
-      setSendState('sent');
-      setTimeout(() => {
-        setActivePanel(null);
-        setMessage('');
-        setSendState('idle');
-      }, 1500);
-    } catch {
-      setSendState('error');
-      setTimeout(() => setSendState('idle'), 2000);
-    }
-  };
 
   const renderContactRow = (item, showDividerAfter) => (
     <div key={item.title} className="contents">
@@ -1323,7 +1368,55 @@ export const ContactModalContent = ({ darkMode = false }) => {
     <div className="flex flex-col items-center">
       <div className="contact-modal-inner w-[280px]">
 
-        {!composing && (
+        {showBot ? (
+          <div className="chat-view contact-view-anim">
+            <div className="chat-messages">
+              {chatMessages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'}
+                >
+                  <span className="font-graphik text-[13px] leading-[19px]">{msg.content}</span>
+                </div>
+              ))}
+              {chatLoading && (
+                <div className="chat-bubble-bot">
+                  <div className="chat-typing">
+                    <span /><span /><span />
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+            {chatAtLimit ? (
+              <div className="chat-limit-notice">
+                <span className="font-graphik text-[12px] text-[#b3b3b3]">conversation limit reached — refresh to start over</span>
+              </div>
+            ) : (
+              <div className="chat-input-row">
+                <textarea
+                  ref={chatInputRef}
+                  value={chatInput}
+                  onChange={e => setChatInput(e.target.value.slice(0, 500))}
+                  onKeyDown={handleChatKeyDown}
+                  placeholder="Type a message..."
+                  className="chat-input font-graphik text-[13px]"
+                  rows={1}
+                />
+                <button
+                  className="chat-send-btn"
+                  onClick={sendChat}
+                  disabled={!chatInput.trim() || chatLoading}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M22 2L11 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
           <div className="contact-scroll-wrapper" style={{ position: 'relative' }}>
             <div
               ref={showMore ? scrollRef : undefined}
@@ -1341,38 +1434,9 @@ export const ContactModalContent = ({ darkMode = false }) => {
           </div>
         )}
 
-        {composing && (
-          <div className="contact-view-anim py-[15px] px-[15px] flex flex-col gap-[10px]">
-            <div className="flex flex-col gap-[2px]">
-              <span className="font-graphik text-[14px] font-medium text-[#1a1a1a]">Leave a message</span>
-              <span className="font-graphik text-[12px] text-[#b3b3b3]">I'll get back to you by email.</span>
-            </div>
-            <textarea
-              className="contact-compose-textarea font-graphik text-[14px] text-[#5b5b5e] h-[110px] rounded-[10px] p-[10px] resize-none outline-none w-full"
-              placeholder="Write something..."
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              maxLength={1000}
-              autoFocus
-            />
-            <button
-              className={`contact-send-btn w-full h-[34px] rounded-[10px] font-graphik text-[14px]${sendState === 'sent' ? ' sent' : sendState === 'error' ? ' error' : ''}`}
-              onClick={handleSend}
-              disabled={!message.trim() || sendState === 'sending' || sendState === 'sent'}
-            >
-              {sendState === 'sending' ? 'Sending...' : sendState === 'sent' ? 'Sent!' : sendState === 'error' ? 'Failed — try again' : 'Send'}
-            </button>
-          </div>
-        )}
-
       </div>
 
       <div className="te-strip flex items-center justify-end pt-[8px] pb-[9px] px-[14px] w-full" style={{ position: 'relative' }}>
-        {showQR && (
-          <div className="te-qr-popover">
-            <img src={qrUrl} width={120} height={120} alt="QR code" />
-          </div>
-        )}
         <div className="flex items-center gap-[5px]">
           <button
             className={`te-btn te-btn-ext${showMore ? ' on' : ''}`}
@@ -1382,14 +1446,7 @@ export const ContactModalContent = ({ darkMode = false }) => {
             <span className="te-btn-label">ext</span>
           </button>
           <button
-            className={`te-btn te-btn-msg${composing ? ' on' : ''}`}
-            onClick={() => togglePanel('msg')}
-          >
-            <span className="te-led" />
-            <span className="te-btn-label">msg</span>
-          </button>
-          <button
-            className={`te-btn te-btn-bot${showQR ? ' on' : ''}`}
+            className={`te-btn te-btn-bot${showBot ? ' on' : ''}`}
             onClick={() => togglePanel('bot')}
           >
             <span className="te-led" />
