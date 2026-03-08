@@ -43,9 +43,10 @@ select:focus {
   font-display: swap;
 }
 
-/* Normalize Calluna letter-spacing across browsers (Safari renders tighter than Chrome) */
+/* Normalize Calluna rendering across browsers */
 .font-calluna {
-  letter-spacing: 0.01em;
+  letter-spacing: 0.005em;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -1942,9 +1943,8 @@ button.nav-text-link:active {
    ────────────────────────────────────────────────────────────────────────── */
 .nav-intro-button {
   display: flex;
-  align-items: center;
   height: 37px;
-  padding: 6px 7px 6px 10px;
+  padding: 0;
   border-radius: 8px;
   cursor: pointer;
   position: relative;
@@ -1993,6 +1993,8 @@ button.nav-text-link:active {
 .nav-intro-inner {
   display: flex;
   align-items: center;
+  height: 100%;
+  padding: 6px 7px 6px 10px;
   position: relative;
   z-index: 1;
   transition: transform 200ms cubic-bezier(0.34, 1.2, 0.64, 1);
@@ -2029,7 +2031,7 @@ button.nav-text-link:active {
    ────────────────────────────────────────────────────────────────────────── */
 .nav-commit-button {
   height: 37px;
-  padding: 6px 7px 6px 10px;
+  padding: 0;
   border-radius: 8px;
   cursor: pointer;
   position: relative;
@@ -2037,7 +2039,6 @@ button.nav-text-link:active {
   margin-right: 6px;
   text-decoration: none;
   display: inline-flex;
-  align-items: center;
   background: linear-gradient(180deg, #fcfcfc 0%, #f8f8f9 100%);
   border: 1px solid #e8e8e8;
   box-shadow:
@@ -2082,6 +2083,8 @@ button.nav-text-link:active {
 .nav-commit-inner {
   display: flex;
   align-items: center;
+  height: 100%;
+  padding: 6px 7px 6px 10px;
   position: relative;
   z-index: 1;
   transition: transform 200ms cubic-bezier(0.34, 1.2, 0.64, 1);
