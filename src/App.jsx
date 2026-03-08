@@ -2797,7 +2797,11 @@ function App() {
                       ...(video.objectPosition ? { objectPosition: video.objectPosition } : {}),
                       willChange: isActive ? 'auto' : 'opacity',
                       ...(video.defaultBrightness != null && {
-                        filter: `brightness(${!isMobileOrTablet && isHovered && video.hoverBrightness != null ? video.hoverBrightness : video.defaultBrightness})`
+                        filter: `brightness(${
+                          (!isMobileOrTablet && isHovered) || (isMobileOrTablet && mobileMetadataExpanded)
+                            ? (video.hoverBrightness ?? video.defaultBrightness)
+                            : video.defaultBrightness
+                        })`
                       }),
                       ...(isMobileOrTablet && mobileMetadataExpanded && video.defaultBrightness == null && {
                         filter: video.noExposureBoost ? 'brightness(1.03)' : 'brightness(1.20)'
