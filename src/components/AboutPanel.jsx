@@ -108,7 +108,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
   ]
 
   const photos = [
-    { src: '/images/about-panel.jpg', caption: 'Popped into existence in Bundang, South Korea in the spring of 2000.' },
+    { src: '/images/about-panel.jpg', caption: 'Shameless exhibitionism employed by baby Joon in Bundang, circa 2002.' },
     { color: '#8B7355', caption: 'Moved to Northbrook, Chicago as an infant. John Hughes suburbia.' },
     { color: '#4A6741', caption: 'Grew up in Bogota, Colombia. Spanish became my first language, empanadas my religion.' },
     { color: '#5B6E8A', caption: 'British-Korean school in Weihai, China. Blazers, ties, and latiao every single day.' },
