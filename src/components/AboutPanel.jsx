@@ -113,7 +113,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     { color: '#4A6741', caption: 'Grew up in Bogota, Colombia. Spanish became my first language, empanadas my religion.' },
     { color: '#5B6E8A', caption: 'British-Korean school in Weihai, China. Blazers, ties, and latiao every single day.' },
     { color: '#7A5C5C', caption: 'University years at Yonsei in Seoul, studying and picking up a camera along the way.' },
-    { color: '#5A6B52', caption: 'Mandatory military service in the mountains with the 12th Infantry Division.' },
+    { src: '/images/IMG_8650.jpg', objectPosition: 'center 62%', caption: 'Mandatory military service in the mountains with the 12th Infantry Division.' },
     { color: '#6B5B7B', caption: 'Currently in Kagoshima, Japan. Slowly learning the language, shooting on a Leica Q2.' },
     { color: '#8A7262', caption: 'Next stop is Saigon. Building things for the web and documenting along the way.' },
   ]
@@ -571,6 +571,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
                     <img src={photo.src} alt={photo.caption}
                       className="w-full h-full object-cover"
                       style={{
+                        objectPosition: photo.objectPosition || 'center center',
                         filter: imageColorized ? 'grayscale(0%) brightness(1) contrast(1)' : 'grayscale(100%) brightness(0.75) contrast(1.05)',
                         transform: imageColorized ? 'scale(1)' : 'scale(1.03)',
                         transition: isActive ? 'filter 950ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1100ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',

@@ -70,7 +70,7 @@ export const timelineData = [
   {
     id: '2023',
     year: '2023',
-    image: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="403" height="259"%3E%3Cdefs%3E%3ClinearGradient id="g" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" stop-color="%23E8E8E8"/%3E%3Cstop offset="100%25" stop-color="%23D0D0D0"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill="url(%23g)" width="403" height="259"/%3E%3C/svg%3E',
+    image: '/images/IMG_8650.jpg',
     caption: 'Military service. Currently counting days.',
     alt: 'Military'
   }
