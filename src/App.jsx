@@ -2760,7 +2760,9 @@ function App() {
                   className="absolute inset-0 z-5 bg-cover bg-center"
                   style={{
                     backgroundImage: `url(${getPosterSrc(safeVideoData[videoIndex].src)})`,
-                    filter: safeVideoData[videoIndex].defaultBrightness != null ? `brightness(${safeVideoData[videoIndex].defaultBrightness})` : safeVideoData[videoIndex].noExposureBoost ? 'none' : 'brightness(1.10)'
+                    filter: safeVideoData[videoIndex].defaultBrightness != null
+                      ? `brightness(${isHovered && safeVideoData[videoIndex].hoverBrightness != null ? safeVideoData[videoIndex].hoverBrightness : safeVideoData[videoIndex].defaultBrightness})`
+                      : safeVideoData[videoIndex].noExposureBoost ? 'none' : 'brightness(1.10)'
                   }}
                 />
               )}
@@ -2785,7 +2787,7 @@ function App() {
                       if (idx === 0) videoRef1.current = el;
                       if (idx === 1) videoRef2.current = el;
                     }}
-                    className={`absolute inset-0 w-full h-full object-cover ${video.defaultBrightness != null ? '' : video.noExposureBoost ? '' : 'brightness-[1.10]'} ${!isMobileOrTablet ? 'group-hover:brightness-[1.20]' : ''}`}
+                    className={`absolute inset-0 w-full h-full object-cover ${video.defaultBrightness != null ? '' : video.noExposureBoost ? '' : 'brightness-[1.10]'} ${!isMobileOrTablet && video.defaultBrightness == null ? 'group-hover:brightness-[1.20]' : ''}`}
                     style={{
                       zIndex: isActive ? 20 : 10,
                       opacity: isActive ? 1 : 0,
@@ -2794,7 +2796,9 @@ function App() {
                       objectFit: 'cover',
                       ...(video.objectPosition ? { objectPosition: video.objectPosition } : {}),
                       willChange: isActive ? 'auto' : 'opacity',
-                      ...(video.defaultBrightness != null && { filter: `brightness(${video.defaultBrightness})` }),
+                      ...(video.defaultBrightness != null && !isMobileOrTablet && {
+                        filter: `brightness(${isHovered && video.hoverBrightness != null ? video.hoverBrightness : video.defaultBrightness})`
+                      }),
                       ...(isMobileOrTablet && mobileMetadataExpanded && { filter: video.noExposureBoost ? 'brightness(1.03)' : 'brightness(1.20)' })
                     }}
                     poster={getPosterSrc(getVideoSrc(video))}

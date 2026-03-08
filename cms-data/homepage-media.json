@@ -85,7 +85,8 @@
       "alt": "Kagoshima, Japan",
       "fileSize": "",
       "noExposureBoost": true,
-      "defaultBrightness": 0.90
+      "defaultBrightness": 0.90,
+      "hoverBrightness": 1.02
     },
     {
       "id": 19,
