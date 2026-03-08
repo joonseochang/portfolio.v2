@@ -84,7 +84,8 @@
       "iso": "400",
       "alt": "Kagoshima, Japan",
       "fileSize": "",
-      "noExposureBoost": true
+      "noExposureBoost": true,
+      "defaultBrightness": 0.90
     },
     {
       "id": 19,
