@@ -2796,10 +2796,14 @@ function App() {
                       objectFit: 'cover',
                       ...(video.objectPosition ? { objectPosition: video.objectPosition } : {}),
                       willChange: isActive ? 'auto' : 'opacity',
-                      ...(video.defaultBrightness != null && !isMobileOrTablet && {
+                      ...(video.defaultBrightness != null && {
                         filter: `brightness(${isHovered && video.hoverBrightness != null ? video.hoverBrightness : video.defaultBrightness})`
                       }),
-                      ...(isMobileOrTablet && mobileMetadataExpanded && { filter: video.noExposureBoost ? 'brightness(1.03)' : 'brightness(1.20)' })
+                      ...(isMobileOrTablet && mobileMetadataExpanded && {
+                        filter: video.defaultBrightness != null
+                          ? `brightness(${video.hoverBrightness ?? video.defaultBrightness})`
+                          : video.noExposureBoost ? 'brightness(1.03)' : 'brightness(1.20)'
+                      })
                     }}
                     poster={getPosterSrc(getVideoSrc(video))}
                     muted
