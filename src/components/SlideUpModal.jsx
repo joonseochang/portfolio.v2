@@ -1098,7 +1098,7 @@ export const ShortcutsModalContent = ({ isMac, onAction, onClose }) => {
 // Module-level variable: persists panel state across component unmounts/remounts
 // (switching modals, closing and reopening). Resets only on page refresh.
 let _persistedContactPanel = null;
-const CHAT_WELCOME = { role: 'assistant', content: 'hey — ask me anything about my work, this site, or whatever. i\'m around.' };
+const CHAT_WELCOME = { role: 'assistant', content: 'Hi there! I\'m JoonBot. Trained on Joon\'s darkest secrets and his world-class taste in humor. Don\'t run away.' };
 const CHAT_MAX_MESSAGES = 20;
 let _persistedChat = [CHAT_WELCOME];
 
@@ -1172,10 +1172,10 @@ export const ContactModalContent = ({ darkMode = false }) => {
       } else if (data.error) {
         setChatMessages(prev => [...prev, { role: 'assistant', content: data.error }]);
       } else {
-        setChatMessages(prev => [...prev, { role: 'assistant', content: 'hmm, something went wrong. try again?' }]);
+        setChatMessages(prev => [...prev, { role: 'assistant', content: 'Hmm, something went wrong. Try again?' }]);
       }
     } catch {
-      setChatMessages(prev => [...prev, { role: 'assistant', content: 'couldn\'t connect right now. try again in a bit?' }]);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: 'Couldn\'t connect right now. Try again in a bit?' }]);
     } finally {
       setChatLoading(false);
     }
