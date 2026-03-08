@@ -2623,9 +2623,9 @@ function App() {
                         <line key={`minute-${i}`} x1={10 + Math.cos(angle) * innerRadius} y1={10 + Math.sin(angle) * innerRadius} x2={10 + Math.cos(angle) * outerRadius} y2={10 + Math.sin(angle) * outerRadius} stroke="#C3C3C3" strokeWidth={isHourMarker ? "0.8" : "0.4"} strokeLinecap="round" />
                       );
                     })}
-                    <line x1="10" y1="10" x2="10" y2="6" stroke="#111112" strokeWidth="0.8" strokeLinecap="round" transform={`rotate(${clockTime.hours * 30 + clockTime.minutes * 0.5} 10 10)`} />
-                    <line x1="10" y1="10" x2="10" y2="3.5" stroke="#111112" strokeWidth="0.8" strokeLinecap="round" transform={`rotate(${clockTime.minutes * 6 + clockTime.seconds * 0.1} 10 10)`} />
-                    <line x1="10" y1="10" x2="10" y2="2.5" stroke="#FF0000" strokeWidth="0.6" strokeLinecap="round" transform={`rotate(${(clockTime.seconds + clockTime.milliseconds / 1000) * 6} 10 10)`} />
+                    <line x1="10" y1="10" x2="10" y2="6" stroke="#111112" strokeWidth="0.8" strokeLinecap="round" style={{ transform: `rotate(${clockTime.hours * 30 + clockTime.minutes * 0.5}deg)`, transformOrigin: '10px 10px', willChange: 'transform' }} />
+                    <line x1="10" y1="10" x2="10" y2="3.5" stroke="#111112" strokeWidth="0.8" strokeLinecap="round" style={{ transform: `rotate(${clockTime.minutes * 6 + clockTime.seconds * 0.1}deg)`, transformOrigin: '10px 10px', willChange: 'transform' }} />
+                    <line x1="10" y1="10" x2="10" y2="2.5" stroke="#FF0000" strokeWidth="0.6" strokeLinecap="round" style={{ transform: `rotate(${(clockTime.seconds + clockTime.milliseconds / 1000) * 6}deg)`, transformOrigin: '10px 10px', willChange: 'transform' }} />
                     <circle cx="10" cy="10" r="0.8" fill="#111112"/>
                   </svg>
                 </div>
@@ -3103,16 +3103,16 @@ function App() {
                 <div className="absolute w-[2px] h-[2px] rounded-full bg-[#0a0a0a] z-20"></div>
               </div>
             </div>
-            <div className="music-text-container flex flex-col font-graphik text-[14px] justify-center gap-[2px] items-start min-w-0 flex-shrink">
+            <div className="music-text-container flex flex-col font-graphik text-[14px] justify-center gap-[1px] items-start min-w-0 flex-shrink">
               <MarqueeText
-                className="text-[#333] leading-[1.2]"
+                className="text-[#333] leading-[17px]"
                 maxWidth="calc(var(--music-pill-width, 205px) - 100px)"
                 onScrollComplete={() => setArtistMarqueeReady(true)}
               >
                 {currentTrack?.name || (musicLoading ? 'Loading...' : 'No recent track')}
               </MarqueeText>
               <MarqueeText
-                className="text-[#c3c3c3] leading-[1.2]"
+                className="text-[#c3c3c3] leading-[17px]"
                 maxWidth="calc(var(--music-pill-width, 205px) - 100px)"
                 waitForSignal={true}
                 signalReady={artistMarqueeReady}
