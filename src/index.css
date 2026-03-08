@@ -430,7 +430,6 @@ background-color: #E8F6FF;
     padding-right: 16px;
   }
 
-  /* Hide center nav links on mobile */
   .dark-nav-bar > nav.absolute {
     display: none;
   }
@@ -444,7 +443,7 @@ background-color: #E8F6FF;
     width: 34px;
   }
 
-  /* === HOME PAGE MOBILE LAYOUT === */
+  /* Home page mobile layout */
 
   /* Stack vertically, center, preserve desktop text column width */
   .main-content-wrapper {
@@ -473,7 +472,7 @@ background-color: #E8F6FF;
     padding-bottom: 100px;
   }
 
-  /* === BOTTOM NAV PILL === */
+  /* Bottom nav pill */
 
   .bottom-pill-outer {
     bottom: 24px;
@@ -527,7 +526,7 @@ background-color: #E8F6FF;
     border-right: 1px solid rgba(235, 238, 245, 0.85);
   }
 
-  /* === AMBIENT CONTEXT CARD (mobile) === */
+  /* Ambient context card (mobile) */
   .ambient-card-backdrop {
     background: rgba(0, 0, 0, 0.15);
   }
@@ -1359,7 +1358,7 @@ button.nav-text-link:active {
   left: -6px;
 }
 
-/* Animate notes on hover - simple unified animation (optimized for performance) */
+/* Animate notes on hover */
 .group\/vinyl:hover .note-1 {
   animation: float-note 2.5s ease-out infinite;
   animation-delay: 0.4s;
@@ -2158,7 +2157,6 @@ button.nav-text-link:active {
   border: 1px solid rgba(225, 228, 238, 0.8);
 }
 
-/* Transform applied from static parent to prevent hover flicker */
 .hover-trigger:hover > .bottom-button {
   transform: translateY(-0.5px);
 }
@@ -3364,7 +3362,6 @@ button.nav-text-link:active {
   border: 1px solid rgba(230, 233, 240, 0.9);
 }
 
-/* Transform applied from static parent to prevent hover flicker */
 .hover-trigger:hover > [class*="bg-white"][class*="border-[#ebeef5]"][class*="rounded-[20px]"] {
   transform: translateY(-0.5px);
 }
@@ -3633,7 +3630,6 @@ button.nav-text-link:active {
   filter: brightness(1.1);
 }
 
-/* Transform applied from static parent to prevent hover flicker */
 .hover-trigger:hover > .arrow-button {
   transform: translateY(-1px);
 }
@@ -3782,7 +3778,7 @@ a.dotted-underline-grey:hover {
   }
 }
 
-/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+/* Performance optimizations */
 
 /* Reduce animations for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -3973,7 +3969,7 @@ a {
   }
 }
 
-/* ===== About2 Page ===== */
+/* About2 page */
 .about2-text-scroll::-webkit-scrollbar {
   display: none;
 }
