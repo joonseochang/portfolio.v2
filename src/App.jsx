@@ -2086,8 +2086,9 @@ function App() {
       // Standard attributes for all browsers
       videoEl.setAttribute('playsinline', 'true');
       videoEl.setAttribute('webkit-playsinline', 'true');
-      videoEl.muted = true;
-      videoEl.defaultMuted = true;
+      const hasAudio = !!(videoData[index]?.hasAudio);
+      videoEl.muted = !hasAudio;
+      videoEl.defaultMuted = !hasAudio;
 
       // Disable picture-in-picture and remote playback for cleaner experience
       videoEl.disablePictureInPicture = true;
@@ -2472,7 +2473,13 @@ function App() {
               <span className="relative z-[1] font-graphik text-[14px] text-[#8f8f8f] group-hover:text-[#5b5b5e] whitespace-nowrap transition-colors duration-[350ms]">
                 <span className="text-[#6bbf7b]">+{githubStats.added.toLocaleString()}</span><span className="inline-block w-[6px]" /><span className="text-[#e0736a]">-{githubStats.deleted.toLocaleString()}</span>
               </span>
-              <span className="relative z-[1] nav-commit-badge font-graphik text-[12px] text-[#8f8f8f] h-[25px] px-[6px] rounded-[6px] flex items-center justify-center ml-[12px] transition-colors duration-[350ms]">{formatRelativeTime(githubStats.lastCommitAt)}</span>
+              <span
+                className="relative z-[1] nav-commit-badge font-graphik text-[12px] text-[#8f8f8f] h-[25px] rounded-[6px] flex items-center justify-center ml-[12px] overflow-hidden"
+                style={{
+                  width: `${Math.ceil(measureTextWidth(formatRelativeTime(githubStats.lastCommitAt), '12px Graphik, sans-serif') + 12)}px`,
+                  transition: 'width 500ms cubic-bezier(0.34, 1.2, 0.64, 1)',
+                }}
+              >{formatRelativeTime(githubStats.lastCommitAt)}</span>
             </a>
           )}
           {!isTabletOrBelow && (
@@ -2787,7 +2794,7 @@ function App() {
                       ...(isMobileOrTablet && mobileMetadataExpanded && { filter: video.noExposureBoost ? 'brightness(1.03)' : 'brightness(1.20)' })
                     }}
                     poster={getPosterSrc(getVideoSrc(video))}
-                    muted
+                    muted={!video.hasAudio}
                     playsInline
                     preload="auto"
                     controls={false}
