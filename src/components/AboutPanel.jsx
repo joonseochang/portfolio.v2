@@ -113,7 +113,7 @@ const AboutPanel = ({ isOpen, onClose, mobile = false }) => {
     { color: '#4A6741', caption: 'Grew up in Bogota, Colombia. Spanish became my first language, empanadas my religion.' },
     { color: '#5B6E8A', caption: 'British-Korean school in Weihai, China. Blazers, ties, and latiao every single day.' },
     { color: '#7A5C5C', caption: 'University years at Yonsei in Seoul, studying and picking up a camera along the way.' },
-    { src: '/images/IMG_8650.jpg', objectPosition: 'center 77%', caption: 'Mandatory military service in the mountains with the 12th Infantry Division.' },
+    { src: '/images/IMG_8650.jpg', objectPosition: 'center 65%', caption: 'Mandatory military service in the mountains with the 12th Infantry Division.' },
     { color: '#6B5B7B', caption: 'Currently in Kagoshima, Japan. Slowly learning the language, shooting on a Leica Q2.' },
     { color: '#8A7262', caption: 'Next stop is Saigon. Building things for the web and documenting along the way.' },
   ]
